@@ -1,9 +1,13 @@
-const dotenv = require('dotenv');
+import dotenv from 'dotenv';
 dotenv.config();
 import { Config } from '../types/config';
 
 const config: Config = {
-  jwt: {},
+  jwt: {
+    secret: process.env.JWT_SECRET || '',
+  
+
+  },
   port: process.env.PORT,
   database: {
     DB_HOST: process.env.DB_HOST,

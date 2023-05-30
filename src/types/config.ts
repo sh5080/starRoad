@@ -1,6 +1,6 @@
 export interface Config {
   jwt: {
-    // 추후 유효성검사 미들웨어 만들예정
+    secret: string;
   };
   port: string | undefined;
   database: {
