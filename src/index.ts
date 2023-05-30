@@ -1,5 +1,4 @@
 import express from 'express';
-import { start } from 'repl';
 import config from './config/index';
 import expressLoader from './loaders/expressLoader';
 const { port } = config || 3000;

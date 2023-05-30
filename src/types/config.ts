@@ -2,12 +2,12 @@ export interface Config {
   jwt: {
     secret: string;
   };
-  port: string | undefined;
+  port: string;
   database: {
-    DB_HOST: string | undefined;
-    DB_USER: string | undefined;
-    DB_PASSWORD: string | undefined;
-    DB_NAME: string | undefined;
+    DB_HOST: string;
+    DB_USER: string;
+    DB_PASSWORD: string;
+    DB_NAME: string;
   };
   bcrypt: {
     saltRounds: number;

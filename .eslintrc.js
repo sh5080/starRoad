@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   root: true,
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
@@ -10,7 +10,6 @@ module.exports = {
   rules: {
     '@typescript-eslint/explicit-function-return-type': 0,
     '@typescript-eslint/ban-ts-ignore': 0,
-    '@typescript-eslint/no-namespace': [2, { allowDeclarations: true }],
     '@typescript-eslint/member-delimiter-style': 0,
     '@typescript-eslint/no-explicit-any': 0,
   },
