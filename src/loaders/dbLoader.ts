@@ -1,8 +1,8 @@
-import mysql from 'mysql2/promise';
+import mysql,{ Pool } from 'mysql2/promise';
 import config from '../config';
 
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = config.database;
-export let db:object; 
+export let db:Pool; 
 
 export const dbLoader = async () => {
   try {
