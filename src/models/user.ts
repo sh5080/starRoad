@@ -7,20 +7,21 @@ export const createUser = async (user: User) => {
   const connection = await pool.getConnection();
 	// console.log("여기2")
 
-  await connection.execute('INSERT INTO Users (name, email, password) VALUES (?, ?, ?)', [
+  await connection.execute('INSERT INTO users (name, userid, password, email) VALUES (?, ?, ?, ?)', [
     user.name,
-    user.email,
+    user.userid,
     user.password,
+    user.email,
   ]);
 
 };
 
-export const getUserByEmail = async (email: string) => {
+export const getUserById = async (userid: string) => {
   const pool = await db;
   const connection = await pool.getConnection();
-  const [rows] = await connection.execute('SELECT * FROM Users WHERE email = ?', [email]);
+  const [rows] = await connection.execute('SELECT * FROM users WHERE userid = ?', [userid]);
   if (Array.isArray(rows) && rows.length > 0) {
-    const userData = rows[0] as User;
+    const userData = rows[1] as User;
     return userData;
   }
   return null;
