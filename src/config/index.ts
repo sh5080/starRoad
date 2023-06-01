@@ -4,9 +4,10 @@ import { Config } from '../types/config';
 
 const config: Config = {
   jwt: {
-    secret: process.env.JWT_SECRET || '',
-  
-
+    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || '',
+    REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || '',
+    REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
+    ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN || '12h',
   },
   port: process.env.PORT || '',
   database: {

@@ -1,22 +1,23 @@
-import express from 'express';
+import { Application } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import userRoutes from '../api/routes/useRoutes';
-import { dbLoader } from '../loaders/dbLoader';
+import { db } from '../loaders/dbLoader';
+import errorHandler from '../api/middlewares/errorHandler';
+import routeLoader from './routeLoader'; // import routeLoader
 
-export default async function expressLoader(app: express.Application) {
+export default async function expressLoader(app: Application): Promise<Application> {
   app.use(bodyParser.json());
 
   app.use(cors());
 
-  app.get('/', (req, res) => {
-    res.send('Welcome to the homepage!');
-  });
+  // 라우터 세팅
+  routeLoader(app); // use routeLoader
 
-  app.use('/users', userRoutes);
-
-  const db = await dbLoader();
+  // db 세팅
   app.set('db', db);
+
+  // Error handling middleware
+  app.use(errorHandler);
 
   return app;
 }
