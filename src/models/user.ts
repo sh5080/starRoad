@@ -16,15 +16,20 @@ export const createUser = async (user: User) => {
 
 };
 
-export const getUserById = async (userId: string) => {
+export const getUserById = async (userId: string)=> {
   const pool = await db;
   const connection = await pool.getConnection();
-  const [rows] = await connection.execute('SELECT * FROM users WHERE userId = ?', [userId]);
+  const [rows] = await connection.execute('SELECT * FROM users WHERE userId = ?', [userId || null]);
+
   if (Array.isArray(rows) && rows.length > 0) {
-    const userData = rows[0] as User;
-    console.log(rows[0])
-    return userData;
+    const user = rows[0] as User;
+    console.log(user)
+    return user;
   }
-  return null;
+  // if (Array.isArray(rows) && rows.length > 0) {
+  //   console.log(rows[0]);
+  //   return rows;
+  // }
+  
 };
 

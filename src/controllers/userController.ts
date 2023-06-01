@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { signupUser, loginUser } from '../services/userService';
+import { signupUser, loginUser, getUser } from '../services/userService';
 import { User } from '../types/user';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -27,3 +28,21 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ error: '로그인이 실패했습니다.' });
   }
 };
+
+
+export const getUserinfo = async (req: Request, res: Response) => {
+  try {
+    let  { userId }:  ParamsDictionary = req.params;
+
+    const userData = await getUser(userId);
+    if (!userData) {
+      return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+    }
+
+    res.status(200).json(userId);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: '사용자 조회에 실패했습니다.' });
+  }
+};
+

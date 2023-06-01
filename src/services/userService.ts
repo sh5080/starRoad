@@ -21,6 +21,7 @@ export const signupUser = async (name: string, userId: string, password: string,
 
 export const loginUser = async (userId: string, password: string) => {
   const user = await getUserById(userId);
+  //console.log(user)
   if (!user) {
     throw new Error('존재하지 않는 아이디입니다.');
   }
@@ -33,4 +34,17 @@ export const loginUser = async (userId: string, password: string) => {
   const token = jwt.sign({ userId: user.userId }, jwtSecret);
 
   return token;
+};
+
+
+
+export const getUser = async (userId: string) => {
+  const user = await getUserById(userId);
+  //console.log(user)
+  if (!user) {
+    throw new Error('없는 사용자 입니다.');
+  }
+  const { password, ...userData } = user;
+
+  return userData;
 };
