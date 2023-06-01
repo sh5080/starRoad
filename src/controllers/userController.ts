@@ -4,9 +4,9 @@ import { User } from '../types/user';
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, userid, password, email }: User = req.body;
+    const { name, userId, password, email }: User = req.body;
     
-    const message = await signupUser(name, userid, password, email);
+    const message = await signupUser(name, userId, password, email);
 
     res.status(201).json({ message });
   } catch (err) {
@@ -18,9 +18,9 @@ export const signup = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { userid, password }: User = req.body;
+    const { userId, password }: User = req.body;
     
-    const token = await loginUser(userid, password);
+    const token = await loginUser(userId, password);
 
     res.json({ token });
   } catch (err) {
