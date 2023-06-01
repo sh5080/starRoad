@@ -21,10 +21,10 @@ export const getUserById = async (userid: string) => {
   const connection = await pool.getConnection();
   const [rows] = await connection.execute('SELECT * FROM users WHERE userid = ?', [userid]);
   if (Array.isArray(rows) && rows.length > 0) {
-    const userData = rows[1] as User;
+    const userData = rows[0] as User;
+    console.log(rows[0])
     return userData;
   }
   return null;
 };
-
 

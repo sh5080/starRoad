@@ -12,14 +12,18 @@ const signup = async (req: Request, res: Response) => {
   try {
     const { name, userid, password, email }: User = req.body;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    // console.log("여기")
 
-    await createUser({ name, userid, password: hashedPassword, email }); // 여기서 오류 
+    const findUserid = await getUserById(userid);
+    if (findUserid) {
+      return res.status(400).json({ error: '이미 사용중인 아이디입니다.' });
+    }
 
-    res.status(201).json({ message: 'User created successfully' });
+    await createUser({ name, userid, password: hashedPassword, email });
+
+    res.status(201).json({ message: '회원가입이 성공적으로 완료되었습니다.' });
   } catch (err) {
     res.status(500).json({
-      error: '서버 에러',
+      error: '회원가입에 실패했습니다.',
     });
   }
 };
@@ -29,7 +33,7 @@ const login = async (req: Request, res: Response) => {
     const { userid, password }: User = req.body;
     const user = await getUserById(userid);
     if (!user) {
-      return res.status(401).json({ error: '이메일이 존재하지 않습니다.' });
+      return res.status(401).json({ error: '존재하지 않는 아이디 입니다.' });
     }
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
@@ -41,7 +45,7 @@ const login = async (req: Request, res: Response) => {
 
     res.json({ token });
   } catch (err) {
-    res.status(500).json({ error: '서버 에러' });
+    res.status(500).json({ error: '로그인이 실패했습니다.' });
   }
 };
 
