@@ -2,7 +2,7 @@ import { Application } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { db } from '../loaders/dbLoader';
-import errorHandler from '../api/middlewares/errorHandler';
+import {errorHandler} from '../api/middlewares/errorHandler';
 import routeLoader from './routeLoader'; // import routeLoader
 
 export default async function expressLoader(app: Application): Promise<Application> {
