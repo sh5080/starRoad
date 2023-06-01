@@ -1,30 +1,32 @@
 import { db } from '../loaders/dbLoader';
-import { User } from '../types/user';
+import { UserType } from '../types/user';
 
-export const createUser = async (user: User) => {
+export const createUser = async (user: UserType): Promise<void> => {
   const pool = db;
-	// console.log("여기1")
   const connection = await pool.getConnection();
-	// console.log("여기2")
-
-  await connection.execute('INSERT INTO users (name, userId, password, email) VALUES (?, ?, ?, ?)', [
-    user.name,
-    user.userId,
-    user.password,
-    user.email,
-  ]);
-
+  try {
+    await connection.execute('INSERT INTO users (name, userId, password, email) VALUES (?, ?, ?, ?)', [
+      user.name,
+      user.userId,
+      user.password,
+      user.email,
+    ]);
+  } finally {
+    connection.release(); // 연결 해제
+  }
 };
 
-export const getUserById = async (userId: string) => {
+export const getUserById = async (userId: string): Promise<UserType | null> => {
   const pool = await db;
   const connection = await pool.getConnection();
-  const [rows] = await connection.execute('SELECT * FROM users WHERE userId = ?', [userId]);
-  if (Array.isArray(rows) && rows.length > 0) {
-    const userData = rows[0] as User;
-    console.log(rows[0])
-    return userData;
+  try {
+    const [rows] = await connection.execute('SELECT * FROM users WHERE userId = ?', [userId]);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const userData = rows[0] as UserType;
+      return userData;
+    }
+    return null;
+  } finally {
+    connection.release(); // 연결 해제
   }
-  return null;
 };
-

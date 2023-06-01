@@ -1,25 +1,31 @@
+import { RowDataPacket } from 'mysql2';
 import bcrypt from 'bcrypt';
 import { createUser, getUserById } from '../models/user';
 import jwt from 'jsonwebtoken';
 import config from '../config';
+import { UserType } from '../types/user';
+import { db } from '../loaders/dbLoader';
 
 const { saltRounds } = config.bcrypt;
-const jwtSecret = config.jwt.secret;
+const ACCESS_TOKEN_SECRET = config.jwt.ACCESS_TOKEN_SECRET;
+const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
+const ACCESS_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
+const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 
-export const signupUser = async (name: string, userId: string, password: string, email: string) => {
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  
-  const findUserid = await getUserById(userId);
+export const signupUser = async (user: UserType): Promise<string> => {
+  const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+
+  const findUserid = await getUserById(user.userId);
   if (findUserid) {
     throw new Error('이미 사용중인 아이디입니다.');
   }
 
-  await createUser({ name, userId, password: hashedPassword, email });
+  await createUser({ ...user, password: hashedPassword });
 
   return '회원가입이 성공적으로 완료되었습니다.';
 };
 
-export const loginUser = async (userId: string, password: string) => {
+export const loginUser = async (userId: string, password: string): Promise<object> => {
   const user = await getUserById(userId);
   if (!user) {
     throw new Error('존재하지 않는 아이디입니다.');
@@ -30,7 +36,13 @@ export const loginUser = async (userId: string, password: string) => {
     throw new Error('비밀번호가 일치하지 않습니다.');
   }
 
-  const token = jwt.sign({ userId: user.userId }, jwtSecret);
+  const accessToken: string = jwt.sign({ userId: user.userId }, ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+  });
 
-  return token;
+  const refreshToken: string = jwt.sign({ userId: user.userId }, REFRESH_TOKEN_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+  });
+
+  return { accessToken, refreshToken };
 };
