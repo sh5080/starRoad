@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { signupUser, loginUser, getUser } from '../services/userService';
+import { signupUser, loginUser, getUser, updateUser } from '../services/userService';
 import { UserType } from '../types/user';
 import { AppError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
@@ -78,3 +78,31 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
     }
   }
 };
+
+export const updateUserInfo = async (req: CustomRequest, res: Response) => {
+  // req는 언제든 조회
+  try {
+    // req.user가 없는 경우 에러 처리
+    if (!req.user) {
+      throw new AppError('인증이 필요합니다.', 401);
+    }
+
+    const { userId } = req.user;
+    const updateData = req.body;
+
+    const updatedUserData = await updateUser(userId, updateData);
+
+    if (!updatedUserData) {
+      return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+    }
+    res.status(200).json(updatedUserData); 
+  } catch (err) {
+    console.error(err);
+    if (err instanceof AppError) {
+      res.status(err.status).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: '사용자 정보 업데이트에 실패했습니다.' });
+    }
+  }
+};
+

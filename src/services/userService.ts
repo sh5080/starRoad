@@ -2,7 +2,7 @@
 // ENTITY : db에서 가져온값. 1 ROW 1 ENTITY
 
 import bcrypt from 'bcrypt';
-import { createUser, getUserById } from '../models/user';
+import { createUser, getUserById, updateUserById } from '../models/user';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import { UserType } from '../types/user';
@@ -58,4 +58,17 @@ export const getUser = async (userId: string) => {
   const { password, ...userData } = user;
 
   return userData;
+};
+
+export const updateUser = async (userId: string, updateData: Partial<UserType>) => {
+  if (updateData.password) {
+    const salt = await bcrypt.genSalt();
+    updateData.password = await bcrypt.hash(updateData.password, salt);
+  }
+  const updatedUser = await updateUserById(userId, updateData);
+
+  if (!updatedUser) {
+    throw new AppError('사용자 정보 업데이트에 실패했습니다.', 500);
+  }
+  return '회원정보 수정이 정상적으로 완료되었습니다.';
 };

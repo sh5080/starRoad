@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { signup, login, getUserInfo } from '../../controllers/userController';
+import { signup, login, getUserInfo, updateUserInfo } from '../../controllers/userController';
 import { validateToken } from '../middlewares/jwt';
 
 const router = Router();
@@ -7,6 +7,7 @@ const router = Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.get('/mypage', validateToken, getUserInfo);
+router.patch('/mypage', validateToken, updateUserInfo);
 
 export default router;
 

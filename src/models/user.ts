@@ -1,3 +1,4 @@
+import { OkPacket } from 'mysql2';
 import { db } from '../loaders/dbLoader';
 import { UserType } from '../types/user';
 
@@ -31,3 +32,26 @@ export const getUserById = async (userId: string): Promise<UserType | null> => {
     connection.release(); // 연결 해제
   }
 };
+
+export const updateUserById = async (userId: string, updateData: Partial<Pick<UserType, 'email' | 'password'>>): Promise<UserType | null> => {
+  const pool = await db;
+  const connection = await pool.getConnection();
+  try {
+    //사용자 데이터 업데이트
+    const [result] = await connection.query<OkPacket>('UPDATE User SET ? WHERE userId = ?', [updateData, userId]);
+
+    if (!result.affectedRows) {
+      return null;
+    }
+    //업데이트된 사용자 데이터 가져옴
+    const [updatedUserRows] = await connection.execute('SELECT * FROM User WHERE userId = ?', [userId]);
+    if (Array.isArray(updatedUserRows) && updatedUserRows.length > 0) {
+      const updatedUser = updatedUserRows[0] as UserType;
+      return updatedUser;
+    }
+    return null;
+  } finally {
+    connection.release(); // 연결 해제
+  }
+};
+
