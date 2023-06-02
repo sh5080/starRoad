@@ -24,7 +24,7 @@ export const signupUser = async (user: UserType): Promise<string> => {
 
   await createUser({ ...user, password: hashedPassword });
 
-  return '회원가입이 성공적으로 완료되었습니다.';
+  return '회원가입이 정상적으로 완료되었습니다.';
 };
 
 export const loginUser = async (userId: string, password: string): Promise<object> => {
@@ -55,7 +55,7 @@ export const getUser = async (userId: string) => {
   if (!user) {
     throw new AppError('없는 사용자 입니다.', 404);
   }
-  const { password, ...userData } = user;
+  const { id, password, ...userData } = user;
 
   return userData;
 };
