@@ -4,6 +4,7 @@ export interface TravelPlan {
   startDate: Date;
   endDate: Date;
   destination: string;
+  locations: TravelLocation[];
   createdAt?: Date;
   updatedAt?: Date;
 }
