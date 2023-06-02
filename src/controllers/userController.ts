@@ -48,6 +48,22 @@ export const login = async (req: Request, res: Response) => {
     }
   }
 };
+export const logout = async (req: CustomRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      throw new AppError('인증이 필요합니다.', 401);
+    }
+    res.status(200).json({ message: '로그아웃 되었습니다.' });
+  } catch (err) {
+    console.error(err);
+    if (err instanceof AppError) {
+      res.status(err.status).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: '로그아웃 실패했습니다.' });
+    }
+  }
+};
+
 
 interface CustomRequest extends Request {
   user?: JwtPayload & { userId: string };

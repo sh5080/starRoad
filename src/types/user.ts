@@ -4,4 +4,5 @@ export interface UserType {
   userId: string;
   password: string;
   email: string;
+  accessToken: string;
 }
