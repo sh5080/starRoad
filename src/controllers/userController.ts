@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { signupUser, loginUser, getUser, updateUser } from '../services/userService';
+import { signupUser, loginUser, getUser, updateUser, deleteUser } from '../services/userService';
 import { UserType } from '../types/user';
 import { AppError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
@@ -106,3 +106,22 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
   }
 };
 
+export const deleteUserInfo = async (req: CustomRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      throw new AppError('인증이 필요합니다.', 401);
+    }
+
+    const { userId } = req.user;
+    const message = await deleteUser(userId);
+
+    res.status(200).json({ message });
+  } catch (err) {
+    console.error(err);
+    if (err instanceof AppError) {
+      res.status(err.status).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: '사용자 정보 삭제에 실패했습니다.' });
+    }
+  }
+};

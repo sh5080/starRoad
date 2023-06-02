@@ -55,3 +55,19 @@ export const updateUserById = async (userId: string, updateData: Partial<Pick<Us
   }
 };
 
+export const deleteUserById = async (userId: string): Promise<boolean> => {
+  const pool = await db;
+  const connection = await pool.getConnection();
+
+  try {
+    const [result] = await connection.query<OkPacket>('DELETE FROM User WHERE userId = ?', [userId]);
+
+    if (result.affectedRows > 0) {
+      return true; // 삭제 성공
+    }
+
+    return false; // 삭제 실패
+  } finally {
+    connection.release();
+  }
+};

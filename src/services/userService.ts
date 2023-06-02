@@ -2,7 +2,7 @@
 // ENTITY : db에서 가져온값. 1 ROW 1 ENTITY
 
 import bcrypt from 'bcrypt';
-import { createUser, getUserById, updateUserById } from '../models/user';
+import { createUser, getUserById, updateUserById, deleteUserById } from '../models/user';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import { UserType } from '../types/user';
@@ -71,4 +71,14 @@ export const updateUser = async (userId: string, updateData: Partial<UserType>) 
     throw new AppError('사용자 정보 업데이트에 실패했습니다.', 500);
   }
   return '회원정보 수정이 정상적으로 완료되었습니다.';
+};
+
+export const deleteUser = async (userId: string) => {
+  const deletedUser = await deleteUserById(userId);
+
+  if (!deletedUser) {
+    throw new Error('사용자 정보 삭제에 실패했습니다.');
+  }
+
+  return '회원정보가 성공적으로 삭제되었습니다.';
 };
