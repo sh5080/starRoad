@@ -1,8 +1,5 @@
-// DTO : 어떤형식으로 데이터가 가야하는지
-// ENTITY : db에서 가져온값. 1 ROW 1 ENTITY
-
 import bcrypt from 'bcrypt';
-import { createUser, getUserById, updateUserById, deleteUserById } from '../models/user';
+import { createUser, getUserById, updateUserById, deleteUserById } from '../models/userModel';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import { UserType } from '../types/user';

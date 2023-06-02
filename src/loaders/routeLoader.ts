@@ -1,12 +1,14 @@
 import { Application, Request, Response } from 'express';
-import userRoutes from '../api/routes/useRoutes';
+import userRouter from '../api/routes/useRoutes';
+import travelRouter from '../api/routes/travelRoutes';
 
 const routeLoader = (app: Application): Application => {
   app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to the homepage!');
   });
 
-  app.use('/users', userRoutes);
+  app.use('/users', userRouter);
+  app.use('/travels', travelRouter);
 
   return app;
 };

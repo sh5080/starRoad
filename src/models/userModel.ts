@@ -3,8 +3,8 @@ import { db } from '../loaders/dbLoader';
 import { UserType } from '../types/user';
 
 export const createUser = async (user: UserType): Promise<void> => {
-  const pool = db;
-  const connection = await pool.getConnection();
+  // const pool = db;
+  const connection = await db.getConnection();
   try {
     await connection.execute('INSERT INTO User (name, userId, password, email) VALUES (?, ?, ?, ?)', [
       user.name,
@@ -19,8 +19,8 @@ export const createUser = async (user: UserType): Promise<void> => {
 
 // 로그인,정보 조회시 사용
 export const getUserById = async (userId: string): Promise<UserType | null> => {
-  const pool = await db;
-  const connection = await pool.getConnection();
+  // const pool = await db;
+  const connection = await db.getConnection();
   try {
     const [rows] = await connection.execute('SELECT * FROM User WHERE userId = ?', [userId]);
     if (Array.isArray(rows) && rows.length > 0) {
