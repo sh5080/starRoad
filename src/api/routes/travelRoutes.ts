@@ -1,10 +1,14 @@
 import { Router } from 'express';
-import { createTravelPlanController } from '../../controllers/travelController';
+import { createTravelPlanController, getTravelPlanController } from '../../controllers/travelController';
 import { validateToken } from '../middlewares/jwt';
 
 const router = Router();
 
+// 여행 일정 등록
 router.post('/', validateToken, createTravelPlanController);
+
+// 여행 일정 조회
+router.get('/', validateToken, getTravelPlanController);
 
 export default router;
 
