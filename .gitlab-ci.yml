@@ -1,9 +1,0 @@
-image: alpine:latest
-
-push_to_github:
-  script:
-    - apk add --no-cache git
-    - git clone "https://${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}@github.com/sh5080/starRoad.git"
-    - cd starRoad
-    - git pull "https://gitlab.com/prpn97/Back-end.git"
-    - git push "https://${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}@github.com/sh5080/starRoad.git"
