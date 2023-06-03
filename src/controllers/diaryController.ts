@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createDiary, getAllDiary, getOneDiary, updateDiary } from '../services/diaryService';
+import { createDiary, deleteDiary, getAllDiary, getMyDiary, getOneDiary, updateDiary } from '../services/diaryService';
 
 
 import { AppError } from '../api/middlewares/errorHandler';
@@ -40,6 +40,22 @@ interface CustomRequest extends Request {
         res.status(500).json({ error: '전체 여행기 조회에 실패했습니다.' });
       }
     };
+    export const getMyDiaryController = async (req: CustomRequest, res: Response) => {
+        try {
+          const userId = req.user?.userId;
+      
+          if (!userId) {
+            throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
+          }
+      
+          const diaries = await getMyDiary(userId);
+      
+          res.status(200).json(diaries);
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: '내 다이어리 조회에 실패했습니다.' });
+        }
+      };
   export const getOneDiaryController = async (req: Request, res: Response) => {
       try {
         const diaryId = parseInt(req.params.diaryId, 10);
@@ -72,3 +88,21 @@ export const updateDiaryController = async (req: CustomRequest, res: Response) =
     res.status(500).json({ error: '여행기 수정에 실패했습니다.' });
   }
 };
+
+export const deleteDiaryController = async (req: CustomRequest, res: Response) => {
+    try {
+      const diaryId = parseInt(req.params.diaryId, 10);
+      const userId = req.user?.userId;
+  
+      if (!userId) {
+        throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
+      }
+  
+      await deleteDiary(diaryId, userId);
+  
+      res.status(200).json({ message: '여행기 삭제가 완료되었습니다.' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: '여행기 삭제에 실패했습니다.' });
+    }
+  };

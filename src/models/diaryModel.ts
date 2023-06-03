@@ -27,6 +27,16 @@ export const getAllDiaryById = async (): Promise<DiaryType[]> => {
     connection.release();
   }
 };
+export const getMyDiaryById = async (userId: string): Promise<DiaryType[]> => {
+  const pool = db;
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.execute('SELECT * FROM TravelDiary WHERE userId = ?', [userId]);
+    return rows as DiaryType[];
+  } finally {
+    connection.release();
+  }
+};
 export const getOneDiaryById = async (diaryId: number): Promise<DiaryType | null> => {
   const pool = db;
   const connection = await pool.getConnection();
@@ -51,6 +61,16 @@ export const updateDiaryById = async (diary: DiaryType, diaryId: number): Promis
       diary.image,
       diaryId
     ]);
+  } finally {
+    connection.release();
+  }
+};
+
+export const deleteDiaryById = async (diaryId: number): Promise<void> => {
+  const pool = db;
+  const connection = await pool.getConnection();
+  try {
+    await connection.execute('DELETE FROM TravelDiary WHERE diaryId = ?', [diaryId]);
   } finally {
     connection.release();
   }
