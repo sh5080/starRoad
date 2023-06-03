@@ -1,19 +1,34 @@
 import { db } from '../loaders/dbLoader';
 import { DiaryType } from '../types/diary';
-
+import { TravelPlan } from '../types/travel';
 export const createDiaryById = async (diary: DiaryType): Promise<void> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    await connection.execute('INSERT INTO TravelDiary (userId, title, content, image) VALUES (?, ?, ?, ?)', [
+    await connection.execute('INSERT INTO TravelDiary (userId, planId, title, content, image, destination) VALUES (?, ?, ?, ?, ?, ?)', [
       diary.userId,
+      diary.planId,
       diary.title,
       diary.content,
       diary.image,
-      //추후 여행일정 필요한 경우 planId 추가
+      diary.destination
     ]);
   } finally {
     connection.release(); // 연결 해제
+  }
+};
+export const getPlanById = async (planId: number, userId: string): Promise<TravelPlan | null> => {
+  const pool = db;
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.execute('SELECT * FROM TravelPlan WHERE planId = ? AND userId = ?', [planId, userId]);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const plan = rows[0] as TravelPlan;
+      return plan;
+    }
+    return null;
+  } finally {
+    connection.release();
   }
 };
 export const getAllDiaryById = async (): Promise<DiaryType[]> => {

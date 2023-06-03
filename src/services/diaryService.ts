@@ -1,16 +1,25 @@
-import { createDiaryById, getAllDiaryById, getMyDiaryById, getOneDiaryById, updateDiaryById, deleteDiaryById } from '../models/diaryModel';
+import { createDiaryById, getPlanById, getAllDiaryById, getMyDiaryById, getOneDiaryById, updateDiaryById, deleteDiaryById } from '../models/diaryModel';
 import { DiaryType } from '../types/diary';
 import { AppError } from '../api/middlewares/errorHandler';
+import { TravelPlan } from '../types/travel';
 
-export const createDiary = async (diary: DiaryType) => {
-  try {
-    await createDiaryById(diary);
-    return '여행기 생성이 완료되었습니다.';
-  } catch (error) {
-    console.error(error);
-    throw new AppError('여행기 생성에 실패했습니다.', 500);
-  }
-};
+export const createDiary = async (diary: DiaryType, plan:TravelPlan) => {
+    try {
+        if (!plan.planId) {
+            throw new AppError('플랜 ID가 없습니다.', 400);
+          }
+      const planData = await getPlanById(plan.planId, plan.userId);  // call the function
+      if (!planData) {
+        throw new AppError('플랜을 찾을 수 없습니다.', 404);
+      }
+      diary.destination = plan.destination; 
+      await createDiaryById(diary);
+      return '여행기 생성이 완료되었습니다.';
+    } catch (error) {
+      console.error(error);
+      throw new AppError('여행기 생성에 실패했습니다.', 500);
+    }
+  };
 
 export const getAllDiary = async (): Promise<DiaryType[]> => {
   try {

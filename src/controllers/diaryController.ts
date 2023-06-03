@@ -4,6 +4,7 @@ import { createDiary, deleteDiary, getAllDiary, getMyDiary, getOneDiary, updateD
 
 import { AppError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
+import { getPlanById } from '../models/diaryModel';
 
 interface CustomRequest extends Request {
     user?: JwtPayload & { userId: string };
@@ -11,13 +12,23 @@ interface CustomRequest extends Request {
 
   export const createDiaryController = async (req: CustomRequest, res: Response) => {
     try {
-      const { title, content, image } = req.body;
+      const { title, content, image, planId } = req.body;
       const userId = req.user?.userId;
   
       if (!userId) {
         throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
       }
-      await createDiary({ userId, title, content, image });
+  
+      // 해당 유저의 플랜인지 유효성 검사
+      const plan = await getPlanById(planId, userId);
+      if (!plan) {
+        throw new AppError('플랜을 찾을 수 없습니다.', 404);
+      }
+  
+      const { destination } = plan; // 플랜의 destination 값
+  
+      // diary 생성
+      await createDiary({ userId, planId, title, content, image, destination }, plan);
   
       res.status(201).json({ message: '여행기가 생성되었습니다.' });
     } catch (error) {
@@ -25,6 +36,7 @@ interface CustomRequest extends Request {
       res.status(500).json({ error: '여행기 생성에 실패했습니다.' });
     }
   };
+  
   export const getAllDiaryController = async (req: Request, res: Response) => {
     try {
         // 다이어리 조회
@@ -42,18 +54,21 @@ interface CustomRequest extends Request {
     };
     export const getMyDiaryController = async (req: CustomRequest, res: Response) => {
         try {
-          const userId = req.user?.userId;
+          const userId = req.params.userId;
       
           if (!userId) {
             throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
           }
-      
+          const loggedInUserId = req.user?.userId; 
+          if (userId !== loggedInUserId) {
+            throw new AppError('사용자 아이디가 일치하지 않습니다.', 403);
+          }
           const diaries = await getMyDiary(userId);
       
           res.status(200).json(diaries);
         } catch (error) {
           console.error(error);
-          res.status(500).json({ error: '내 다이어리 조회에 실패했습니다.' });
+          res.status(500).json({ error: '내 여행기 조회에 실패했습니다.' });
         }
       };
   export const getOneDiaryController = async (req: Request, res: Response) => {

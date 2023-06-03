@@ -1,7 +1,8 @@
 export interface DiaryType {
     userId: string;
-   // planId: number;
+    planId: number;
     title: string;
     content: string;
     image?: string;
+    destination: string;
   }
