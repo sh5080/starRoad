@@ -20,7 +20,7 @@ export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<num
 export const createTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('INSERT INTO TravelLocation (planId, date, location) VALUES (?,?,?'),
+    await connection.execute('INSERT INTO TravelLocation (planId, date, location) VALUES (?,?,?)'),
       [travelLocation.planId, travelLocation.date, travelLocation.location];
   } finally {
     connection.release();
