@@ -93,7 +93,7 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
     }
   }
 };
-
+// 회원 정보 수정
 export const updateUserInfo = async (req: CustomRequest, res: Response) => {
   try {
     // req.user가 없는 경우 에러 처리
@@ -120,6 +120,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
   }
 };
 
+// 회원 탈퇴
 export const deleteUserInfo = async (req: CustomRequest, res: Response) => {
   try {
     if (!req.user) {

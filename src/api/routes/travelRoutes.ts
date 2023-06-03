@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { createTravelPlanController, getTravelPlanController } from '../../controllers/travelController';
+import {
+  createTravelPlanController,
+  getTravelPlanController,
+  updateTravelPlanController,
+  deleteTravelPlanController,
+  deleteTravelLocationController,
+	updateTravelLocationController,
+} from '../../controllers/travelController';
 import { validateToken } from '../middlewares/jwt';
 
 const router = Router();
@@ -9,6 +16,18 @@ router.post('/', validateToken, createTravelPlanController);
 
 // 여행 일정 조회
 router.get('/', validateToken, getTravelPlanController);
+
+// 여행 일정 수정
+router.put('/:planId', validateToken, updateTravelPlanController);
+
+// 특정 일정의 특정 날짜 장소 수정
+router.put('/location/:planId/:date', validateToken, updateTravelLocationController);
+
+// 여행 일정 삭제
+router.delete('/:planId', validateToken, deleteTravelPlanController);
+
+// 특정 일정의 특정 날짜 장소 삭제
+router.delete('/location/:planId/:date', validateToken, deleteTravelLocationController);
 
 export default router;
 

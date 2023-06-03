@@ -10,6 +10,7 @@ export interface TravelPlan {
 }
 
 export interface TravelLocation {
+  userId: string;
   planId: number;
   date: string;
   location: string;

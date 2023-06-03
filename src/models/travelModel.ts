@@ -2,6 +2,10 @@ import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
 
 // DB 여행일정 등록
+/**
+ * 예시
+ *
+ */
 export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<number> => {
   const connection = await db.getConnection();
   try {
@@ -20,8 +24,12 @@ export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<num
 export const createTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('INSERT INTO TravelLocation (planId, date, location) VALUES (?,?,?)'),
-      [travelLocation.planId, travelLocation.date, travelLocation.location];
+    await connection.execute('INSERT INTO TravelLocation (userId, planId, date, location) VALUES (?, ?, ?, ?)', [
+      travelLocation.userId,
+      travelLocation.planId,
+      travelLocation.date,
+      travelLocation.location,
+    ]);
   } finally {
     connection.release();
   }
@@ -33,31 +41,8 @@ export const getTravelPlansModel = async (userId: string): Promise<TravelPlan[]>
   try {
     const [rows] = await connection.query('SELECT * FROM TravelPlan WHERE userId = ?', [userId]);
     return rows as TravelPlan[];
-    /**
-     * [
-    {
-        "planId": 1,
-        "userId": "user1",
-        "startDate": "2023-01-01",
-        "endDate": "2023-01-07",
-        "destination": "Paris",
-        "created_at": "2022-12-01T00:00:00.000Z",
-        "updated_at": "2022-12-01T00:00:00.000Z"
-    },
-    {
-        "planId": 2,
-        "userId": "user1",
-        "startDate": "2023-02-01",
-        "endDate": "2023-02-07",
-        "destination": "London",
-        "created_at": "2022-12-15T00:00:00.000Z",
-        "updated_at": "2022-12-15T00:00:00.000Z"
-    },
-    // ... 추가 여행일정
-]
-     */
   } finally {
-    connection.release(); // connection release
+    connection.release();
   }
 };
 
@@ -67,6 +52,57 @@ export const getTravelLocationsModel = async (planId: number): Promise<TravelLoc
   try {
     const [rows] = await connection.query('SELECT * FROM TravelLocation WHERE planId = ?', [planId]);
     return rows as TravelLocation[];
+  } finally {
+    connection.release();
+  }
+};
+
+// DB에 여행 일정 수정
+export const updateTravelPlanModel = async (travelPlan: TravelPlan): Promise<void> => {
+  const connection = await db.getConnection();
+  try {
+    await connection.execute(
+      'UPDATE TravelPlan SET startDate = ?, endDate = ?, destination = ? WHERE planId = ? AND userId = ?',
+      [travelPlan.startDate, travelPlan.endDate, travelPlan.destination, travelPlan.planId, travelPlan.userId]
+    );
+  } finally {
+    connection.release();
+  }
+};
+
+// 날짜별 장소 수정
+export const updateTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
+  const connection = await db.getConnection();
+  try {
+    await connection.execute('UPDATE TravelLocation SET location = ? WHERE planId = ? AND date = ? AND userId = ?', [
+      travelLocation.location,
+      travelLocation.planId,
+      travelLocation.date,
+      travelLocation.userId,
+    ]);
+  } finally {
+    connection.release();
+  }
+};
+
+// 여행 일정 삭제
+export const deleteTravelPlanModel = async (userId: string, planId: number): Promise<void> => {
+  const connection = await db.getConnection();
+  try {
+    // Delete from TravelLocation table first
+    await connection.execute('DELETE FROM TravelLocation WHERE planId = ?', [planId]);
+    // Then delete from TravelPlan table
+    await connection.execute('DELETE FROM TravelPlan WHERE userId = ? AND planId = ?', [userId, planId]);
+  } finally {
+    connection.release();
+  }
+};
+
+// 특정일정 특정날짜별 장소 삭제 (사실상 장소를 null로 설정)
+export const deleteTravelLocationModel = async (planId: number, date: string): Promise<void> => {
+  const connection = await db.getConnection();
+  try {
+    await connection.execute('UPDATE TravelLocation SET location = NULL WHERE planId = ? AND date = ?', [planId, date]);
   } finally {
     connection.release();
   }

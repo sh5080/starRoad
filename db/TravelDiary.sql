@@ -1,6 +1,6 @@
 CREATE TABLE `TravelDiary` (
     `diaryId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `userId` INT UNSIGNED,
+    `userId` VARCHAR(20) NOT NULL,
     `planId` INT UNSIGNED,
     `title` VARCHAR(100),
     `content` TEXT,

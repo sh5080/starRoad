@@ -1,6 +1,6 @@
 CREATE TABLE `TravelPlan` (
     `planId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `userId` INT UNSIGNED,
+    `userId` VARCHAR(20) NOT NULL,
     `startDate` DATE,
     `endDate` DATE,
     `destination` VARCHAR(100),
