@@ -6,7 +6,7 @@ const router = Router();
 
 router.post('/signup', signup);
 router.post('/login', login);
-router.post('/logout',logout);
+router.post('/logout', validateToken ,logout);
 router.get('/mypage', validateToken, getUserInfo);
 router.patch('/mypage', validateToken, updateUserInfo);
 router.delete('/mypage', validateToken, deleteUserInfo);
