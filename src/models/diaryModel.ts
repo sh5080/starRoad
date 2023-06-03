@@ -41,3 +41,17 @@ export const getOneDiaryById = async (diaryId: number): Promise<DiaryType | null
     connection.release();
   }
 };
+export const updateDiaryById = async (diary: DiaryType, diaryId: number): Promise<void>=> {
+  const pool = db;
+  const connection = await pool.getConnection();
+  try {
+    await connection.execute('UPDATE TravelDiary SET title = ?, content = ?, image = ? WHERE diaryId = ?', [
+      diary.title,
+      diary.content,
+      diary.image,
+      diaryId
+    ]);
+  } finally {
+    connection.release();
+  }
+};

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createDiary, getAllDiary, getOneDiary } from '../services/diaryService';
+import { createDiary, getAllDiary, getOneDiary, updateDiary } from '../services/diaryService';
 
 
 import { AppError } from '../api/middlewares/errorHandler';
@@ -56,3 +56,19 @@ interface CustomRequest extends Request {
       }
     };
 
+export const updateDiaryController = async (req: CustomRequest, res: Response) => {
+  try {
+    const { diary, diaryId } = req.body;
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
+    }
+
+    await updateDiary(diary, diaryId, userId);
+
+    res.status(200).json({ message: '여행기 수정이 완료되었습니다.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: '여행기 수정에 실패했습니다.' });
+  }
+};
