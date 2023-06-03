@@ -1,12 +1,13 @@
 import { Router } from 'express';
-import { createDiaryController } from '../../controllers/diaryController';
+import { createDiaryController,getAllDiaryController,getOneDiaryController } from '../../controllers/diaryController';
 import { validateToken } from '../middlewares/jwt';
 
 const router = Router();
 
 router.post('/', validateToken, createDiaryController);
-// router.get('/diary', validateToken, getDiaryInfo);
-// router.patch('/diary', validateToken, updateDiaryInfo);
-// router.delete('/diary', validateToken, deleteDiaryInfo);
+router.get('/', validateToken, getAllDiaryController);
+router.get('/:diaryId', validateToken, getOneDiaryController);
+// router.patch('/', validateToken, updateDiaryController);
+// router.delete('/', validateToken, deleteDiaryController);
 
 export default router;

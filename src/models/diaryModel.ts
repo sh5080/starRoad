@@ -16,3 +16,28 @@ export const createDiaryById = async (diary: DiaryType): Promise<void> => {
     connection.release(); // 연결 해제
   }
 };
+export const getAllDiaryById = async (): Promise<DiaryType[]> => {
+  const pool = db;
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.execute('SELECT * FROM TravelDiary');
+    const diary = rows as DiaryType[];
+    return diary;
+  } finally {
+    connection.release();
+  }
+};
+export const getOneDiaryById = async (diaryId: number): Promise<DiaryType | null> => {
+  const pool = db;
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.execute('SELECT * FROM TravelDiary WHERE diaryId = ?', [diaryId]);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const diary = rows[0] as DiaryType;
+      return diary;
+    }
+    return null;
+  } finally {
+    connection.release();
+  }
+};

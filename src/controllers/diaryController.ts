@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-import { createDiary } from '../services/diaryService';
+import { createDiary, getAllDiary, getOneDiary } from '../services/diaryService';
+
+
 import { AppError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
 
@@ -23,3 +25,34 @@ interface CustomRequest extends Request {
       res.status(500).json({ error: '여행기 생성에 실패했습니다.' });
     }
   };
+  export const getAllDiaryController = async (req: Request, res: Response) => {
+    try {
+        // 다이어리 조회
+        const diary = await getAllDiary();
+    
+        if (!diary) {
+          throw new AppError('전체 여행기를 찾을 수 없습니다.', 404);
+        }
+    
+        res.status(200).json(diary);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: '전체 여행기 조회에 실패했습니다.' });
+      }
+    };
+  export const getOneDiaryController = async (req: Request, res: Response) => {
+      try {
+        const diaryId = parseInt(req.params.diaryId, 10);
+        const diary = await getOneDiary(diaryId);
+      
+        if (!diary) {
+          return res.status(404).json({ error: '여행기를 찾을 수 없습니다.' });
+        }
+      
+        res.status(200).json(diary);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: '여행기 조회에 실패했습니다.' });
+      }
+    };
+
