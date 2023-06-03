@@ -9,6 +9,7 @@ const routeLoader = (app: Application): Application => {
   });
 
   app.use('/users', userRouter);
+  
   app.use('/travels', travelRouter);
   app.use('/diaries', diaryRouter);
 

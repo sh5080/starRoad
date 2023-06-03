@@ -3,7 +3,6 @@ import { signupUser, loginUser, getUser, updateUser, deleteUser } from '../servi
 import { UserType } from '../types/user';
 import { AppError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
-
 // 회원가입
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -84,7 +83,7 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
     if (!userData) {
       return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
     }
-    res.status(200).json(userData);
+    res.status(200).json({ userData });
   } catch (err) {
     console.error(err);
     if (err instanceof AppError) {
@@ -96,7 +95,6 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
 };
 
 export const updateUserInfo = async (req: CustomRequest, res: Response) => {
-  // req는 언제든 조회
   try {
     // req.user가 없는 경우 에러 처리
     if (!req.user) {
@@ -111,7 +109,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
     if (!updatedUserData) {
       return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
     }
-    res.status(200).json(updatedUserData); 
+    res.status(200).json({ updatedUserData });
   } catch (err) {
     console.error(err);
     if (err instanceof AppError) {
