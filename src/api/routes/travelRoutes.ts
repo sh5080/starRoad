@@ -5,7 +5,7 @@ import {
   updateTravelPlanController,
   deleteTravelPlanController,
   deleteTravelLocationController,
-	updateTravelLocationController,
+  updateTravelLocationController,
 } from '../../controllers/travelController';
 import { validateToken } from '../middlewares/jwt';
 
@@ -20,13 +20,13 @@ router.get('/', validateToken, getTravelPlanController);
 // 여행 일정 수정
 router.put('/:plan_id', validateToken, updateTravelPlanController);
 
-// 특정 일정의 특정 날짜 장소 수정
+// 특정 날짜 장소 수정
 router.put('/location/:plan_id/:date', validateToken, updateTravelLocationController);
 
 // 여행 일정 삭제
 router.delete('/:plan_id', validateToken, deleteTravelPlanController);
 
-// 특정 일정의 특정 날짜 장소 삭제
+// 특정 날짜 장소 삭제
 router.delete('/location/:plan_id/:date', validateToken, deleteTravelLocationController);
 
 export default router;

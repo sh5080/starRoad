@@ -74,12 +74,16 @@ export const updateTravelPlanModel = async (travelPlan: TravelPlan): Promise<voi
 export const updateTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('UPDATE travel_location SET location = ? WHERE plan_id = ? AND date = ? AND user_id = ?', [
-      travelLocation.location,
-      travelLocation.plan_id,
-      travelLocation.date,
-      travelLocation.user_id,
-    ]);
+    await connection.execute(
+      'UPDATE travel_location SET location = ?, date = ? WHERE plan_id = ? AND date = ? AND user_id = ?',
+      [
+        travelLocation.location,
+        travelLocation.newDate,
+        travelLocation.plan_id,
+        travelLocation.date,
+        travelLocation.user_id,
+      ]
+    );
   } finally {
     connection.release();
   }
@@ -89,9 +93,7 @@ export const updateTravelLocationModel = async (travelLocation: TravelLocation):
 export const deleteTravelPlanModel = async (user_id: string, plan_id: number): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    // Delete from TravelLocation table first
     await connection.execute('DELETE FROM travel_location WHERE plan_id = ?', [plan_id]);
-    // Then delete from TravelPlan table
     await connection.execute('DELETE FROM travel_plan WHERE user_id = ? AND plan_id = ?', [user_id, plan_id]);
   } finally {
     connection.release();
@@ -102,7 +104,10 @@ export const deleteTravelPlanModel = async (user_id: string, plan_id: number): P
 export const deleteTravelLocationModel = async (plan_id: number, date: string): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND date = ?', [plan_id, date]);
+    await connection.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND date = ?', [
+      plan_id,
+      date,
+    ]);
   } finally {
     connection.release();
   }

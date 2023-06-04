@@ -1,4 +1,3 @@
-import { TravelPlan, TravelLocation } from '../types/travel';
 import { AppError } from '../api/middlewares/errorHandler';
 import { Request, Response } from 'express';
 import {
@@ -109,7 +108,7 @@ export const updateTravelPlanController = async (req: CustomRequest, res: Respon
   }
 };
 
-// 특정 날짜 특정 장소 수정
+// 특정 날짜 +  특정 장소 수정
 export const updateTravelLocationController = async (req: CustomRequest, res: Response) => {
   // 로그인 확인
   if (!req.user) {
@@ -119,12 +118,12 @@ export const updateTravelLocationController = async (req: CustomRequest, res: Re
   try {
     const { user_id } = req.user;
     const { plan_id, date } = req.params;
-    const { location } = req.body;
+    const { location, newDate } = req.body;
 
     // 각 날짜별 장소 수정
-    await updateTravelLocation(user_id, Number(plan_id), date, location);
+    await updateTravelLocation(user_id, Number(plan_id), date, newDate, location);
 
-    res.status(200).json({ message: '여행 장소가 성공적으로 수정되었습니다.' });
+    res.status(200).json({ message: '여행 장소와 날짜가 성공적으로 수정되었습니다.' });
   } catch (err) {
     console.error(err);
     if (err instanceof AppError) {

@@ -63,7 +63,7 @@ export const deleteUserById = async (user_id: string): Promise<boolean> => {
   const connection = await pool.getConnection();
 
   try {
-    const [result] = await connection.query<OkPacket>('DELETE FROM user WHERE user_id = ?', [user_id]);
+    const [result] = await connection.query<OkPacket>('UPDATE user SET activated = 0 WHERE user_id = ?', [user_id]);
 
     if (result.affectedRows > 0) {
       return true; // 삭제 성공

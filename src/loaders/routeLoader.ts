@@ -14,8 +14,8 @@ const routeLoader = (app: Application): Application => {
   app.use('/travels', travelRouter);
   app.use('/diaries', diaryRouter);
   app.use('/comments', commentRouter);
-
   app.use('/admin', adminRouter);
+
   return app;
 };
 

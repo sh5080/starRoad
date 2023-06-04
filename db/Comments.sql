@@ -5,7 +5,7 @@ CREATE TABLE `comment` (
     `comment` TEXT,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`commentId`),
+    PRIMARY KEY (`comment_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
     FOREIGN KEY (`diary_id`) REFERENCES `travel_diary` (`diary_id`)
 );

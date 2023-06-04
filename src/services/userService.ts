@@ -12,9 +12,9 @@ const ACCESS_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 
 export const signupUser = async (user: UserType): Promise<string> => {
-  const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+  const hashedPassword = await bcrypt.hash(String(user.password), saltRounds);
 
-  const findUserId = await getUserById(user.user_id);
+  const findUserId = await getUserById(String(user.user_id));
   if (findUserId) {
     throw new AppError('이미 존재하는 아이디입니다.', 409);
   }
@@ -30,7 +30,12 @@ export const loginUser = async (user_id: string, password: string): Promise<obje
   if (!user) {
     throw new AppError('없는 사용자 입니다.', 404);
   }
-  const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+  if (!user.activated) {
+    throw new AppError('탈퇴한 회원입니다.', 400);
+  }
+
+  const isPasswordMatch = await bcrypt.compare(password, String(user.password));
   if (!isPasswordMatch) {
     throw new AppError('비밀번호가 일치하지 않습니다.', 401);
   }

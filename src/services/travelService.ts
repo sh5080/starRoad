@@ -13,7 +13,6 @@ import { AppError } from '../api/middlewares/errorHandler';
 
 // 여행 일정 등록
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
-
   if (!travelPlan.user_id || !travelPlan.start_date || !travelPlan.end_date || !travelPlan.destination) {
     throw new AppError('여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
@@ -64,13 +63,14 @@ export const updateTravelLocation = async (
   user_id: string,
   plan_id: number,
   date: string,
+  newDate: string,
   location: string
 ): Promise<void> => {
-  if (!user_id || !plan_id || !date || !location) {
+  if (!user_id || !plan_id || !date || !location || !newDate) {
     throw new AppError('여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
-  await updateTravelLocationModel({ user_id, plan_id, date, location });
+  await updateTravelLocationModel({ user_id, plan_id, date, newDate, location });
 };
 
 // 여행 일정 삭제

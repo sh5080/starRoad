@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { signupUser, loginUser, getUser, updateUser, deleteUser } from '../services/userService';
 import { UserType } from '../types/user';
 import { AppError } from '../api/middlewares/errorHandler';
@@ -26,7 +26,7 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 // 로그인
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { user_id, password }: UserType = req.body;
 
@@ -34,17 +34,19 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: '로그인에 필요한 정보가 제공되지 않았습니다.' });
     }
 
+    const userData = await getUser(user_id);
+
+    console.log(userData);
+    if (!userData.activated) {
+      return res.status(400).json({ error: '탈퇴한 회원입니다.' });
+    }
+
     const token = await loginUser(user_id, password);
 
-    // 두 개의 토큰을 보내줌
     res.json({ token });
   } catch (err) {
     console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '로그인에 실패했습니다.' });
-    }
+    next(err); // 에러를 next 함수를 통해 errorHandler 미들웨어로 전달합니다.
   }
 };
 export const logout = async (req: CustomRequest, res: Response) => {
@@ -62,7 +64,6 @@ export const logout = async (req: CustomRequest, res: Response) => {
     }
   }
 };
-
 
 interface CustomRequest extends Request {
   user?: JwtPayload & { user_id: string };

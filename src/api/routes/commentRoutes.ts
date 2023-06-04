@@ -2,13 +2,12 @@ import { Router } from 'express';
 import { validateToken } from '../middlewares/jwt';
 import { ensureAdmin } from '../middlewares/admin';
 import {
-    createCommentController,
-    getCommentsByDiaryController,
-    getAllCommentsController,
-    // updateCommentController,
-    // deleteCommentController,
-  } from '../../controllers/commentController';
-
+  createCommentController,
+  getCommentsByDiaryController,
+  getAllCommentsController,
+  // updateCommentController,
+  // deleteCommentController,
+} from '../../controllers/commentController';
 
 const router = Router();
 

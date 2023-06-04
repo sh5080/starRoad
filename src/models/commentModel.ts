@@ -13,10 +13,10 @@ export const createCommentModel = async (comment: CommentType): Promise<void> =>
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    await connection.execute('INSERT INTO comment (user_id, diary_id, comment) VALUES (?, ?, ?)', [
+    await connection.execute('INSERT INTO Comment (user_id, diary_id, comment) VALUES (?, ?, ?)', [
       comment.user_id,
       comment.diary_id,
-      comment.comment,
+      comment.comment
     ]);
   } finally {
     connection.release(); // 연결 해제
