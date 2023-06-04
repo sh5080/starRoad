@@ -4,12 +4,12 @@ import { getAllUsersService, updateUserService, deleteUserService } from '../ser
 import { JwtPayload } from 'jsonwebtoken';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string; role: string };
+  user?: JwtPayload & { user_id: string; role: string };
   params: {
     id?: string; // Add this
   };
   body: {
-    userId?: string; // Add this
+    user_id?: string; // Add this
   };
 }
 export const getAllUsersController = async (req: CustomRequest, res: Response) => {

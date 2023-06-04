@@ -6,7 +6,7 @@ import config from '../../config/index';
 import { AppError } from '../middlewares/errorHandler';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string; role: string };
+  user?: JwtPayload & { user_id: string; role: string };
 }
 const ACCESS_TOKEN_SECRET = config.jwt.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
@@ -27,7 +27,7 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
   }
 
   try {
-    req.user = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as JwtPayload & { userId: string; role: string };
+    req.user = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as JwtPayload & { user_id: string; role: string };
     next();
     // next(req.user);
   } catch (err: any) {
@@ -39,19 +39,19 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
 
       try {
         const decodedRefreshToken = (await jwt.verify(refreshToken, REFRESH_TOKEN_SECRET)) as JwtPayload & {
-          userId: string;
+          user_id: string;
           role: string;
         };
 
         const newAccessToken = jwt.sign(
-          { userId: decodedRefreshToken.userId, role: decodedRefreshToken.role },
+          { user_id: decodedRefreshToken.user_id, role: decodedRefreshToken.role },
           ACCESS_TOKEN_SECRET,
           {
             expiresIn: ACCESS_TOKEN_EXPIRES_IN,
           }
         );
 
-        req.user = { userId: decodedRefreshToken.userId, role: decodedRefreshToken.role };
+        req.user = { user_id: decodedRefreshToken.user_id, role: decodedRefreshToken.role };
         res.status(200).json({ accessToken: newAccessToken });
         next();
       } catch (err: any) {

@@ -13,70 +13,72 @@ import { AppError } from '../api/middlewares/errorHandler';
 
 // 여행 일정 등록
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
-  if (!travelPlan.userId || !travelPlan.startDate || !travelPlan.endDate || !travelPlan.destination) {
+
+  if (!travelPlan.user_id || !travelPlan.start_date || !travelPlan.end_date || !travelPlan.destination) {
     throw new AppError('여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
-  const planId = await createTravelPlanModel(travelPlan);
-  return planId;
+  const plan_id = await createTravelPlanModel(travelPlan);
+  return plan_id;
 };
 
 // 여행 날짜별 장소 등록
 export const createTravelLocation = async (travelLocation: TravelLocation): Promise<void> => {
-  if (!travelLocation.userId || !travelLocation.planId || !travelLocation.date || !travelLocation.location) {
+  
+  if (!travelLocation.user_id || !travelLocation.plan_id || !travelLocation.date || !travelLocation.location) {
     throw new AppError('여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
   await createTravelLocationModel(travelLocation);
 };
 
+
 // 여행 일정 조회
-export const getTravelPlans = async (userId: string): Promise<TravelPlan[]> => {
-  const travelPlans = await getTravelPlansModel(userId);
+export const getTravelPlans = async (user_id: string): Promise<TravelPlan[]> => {
+  const travelPlans = await getTravelPlansModel(user_id);
   return travelPlans;
 };
 // 여행 날짜별 장소 조회.
-export const getTravelLocations = async (planId: number): Promise<TravelLocation[]> => {
-  const travelLocations = await getTravelLocationsModel(planId);
+export const getTravelLocations = async (plan_id: number): Promise<TravelLocation[]> => {
+  const travelLocations = await getTravelLocationsModel(plan_id);
   return travelLocations;
 };
 
 // 여행 일정 수정
 export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
   if (
-    !travelPlan.planId ||
-    !travelPlan.userId ||
-    !travelPlan.startDate ||
-    !travelPlan.endDate ||
+    !travelPlan.plan_id ||
+    !travelPlan.user_id ||
+    !travelPlan.start_date ||
+    !travelPlan.end_date ||
     !travelPlan.destination
   ) {
     throw new AppError('여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
-  console.log(travelPlan);
 
   await updateTravelPlanModel(travelPlan);
 };
 
 // 여행 날짜별 장소 수정
 export const updateTravelLocation = async (
-  userId: string,
-  planId: number,
+  user_id: string,
+  plan_id: number,
   date: string,
   location: string
 ): Promise<void> => {
-  if (!userId || !planId || !date || !location) {
+  if (!user_id || !plan_id || !date || !location) {
     throw new AppError('여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
-  await updateTravelLocationModel({ userId, planId, date, location });
+  await updateTravelLocationModel({ user_id, plan_id, date, location });
 };
 
 // 여행 일정 삭제
-export const deleteTravelPlan = async (userId: string, planId: number): Promise<void> => {
-  await deleteTravelPlanModel(userId, planId);
+export const deleteTravelPlan = async (user_id: string, plan_id: number): Promise<void> => {
+  await deleteTravelPlanModel(user_id, plan_id);
 };
 
 // 여행 날짜별 장소 삭제
-export const deleteTravelLocation = async (planId: number, date: string): Promise<void> => {
-  await deleteTravelLocationModel(planId, date);
+export const deleteTravelLocation = async (plan_id: number, date: string): Promise<void> => {
+  await deleteTravelLocationModel(plan_id, date);
 };

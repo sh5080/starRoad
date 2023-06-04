@@ -14,7 +14,7 @@ import {
 import { JwtPayload } from 'jsonwebtoken';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string};
+  user?: JwtPayload & { user_id: string};
 }
 
 // 여행 일정 등록 + 날짜별 장소 등록
@@ -24,13 +24,13 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
   }
   try {
     const { locations, ...travelPlan } = req.body;
-    const { userId } = req.user;
+    const { user_id } = req.user;
 
     // 여행 일정 등록
-    const planId = Number(await createTravelPlan(travelPlan));
+    const plan_id = Number(await createTravelPlan(travelPlan));
     // 각 날짜별 장소 등록
     for (const location of locations) {
-      await createTravelLocation({ ...location, userId, planId });
+      await createTravelLocation({ ...location, user_id, plan_id });
     }
 
     res.status(201).json({ message: '여행 계획 및 장소가 성공적으로 등록되었습니다.' });
@@ -49,19 +49,19 @@ export const getTravelPlanController = async (req: CustomRequest, res: Response)
     throw new AppError('인증이 필요합니다.', 401);
   }
   try {
-    const { userId } = req.user;
+    const { user_id } = req.user;
 
-    // 내 여행 일정 조회 해서 여행 일정 데이터에 있는 planId 를 통해서 장소 데이터 조회
+    // 내 여행 일정 조회 해서 여행 일정 데이터에 있는 plan_id 를 통해서 장소 데이터 조회
 
-    const travelPlanData = await getTravelPlans(userId); // 여행 일정 데이터
+    const travelPlanData = await getTravelPlans(user_id); // 여행 일정 데이터
     if (!travelPlanData) {
       return res.status(404).json({ error: '여행 일정을 찾을 수 없습니다.' });
     }
 
     for (const plan of travelPlanData) {
-      // planId가 정의되어 있으면 해당 장소 정보를 조회합니다.
-      if (plan.planId !== undefined) {
-        plan.locations = await getTravelLocations(plan.planId);
+      // plan_id가 정의되어 있으면 해당 장소 정보를 조회합니다.
+      if (plan.plan_id !== undefined) {
+        plan.locations = await getTravelLocations(plan.plan_id);
       }
     }
 
@@ -76,10 +76,6 @@ export const getTravelPlanController = async (req: CustomRequest, res: Response)
   }
 };
 
-interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string };
-}
-
 // 여행 일정 수정
 export const updateTravelPlanController = async (req: CustomRequest, res: Response) => {
   // 로그인 확인
@@ -88,16 +84,16 @@ export const updateTravelPlanController = async (req: CustomRequest, res: Respon
   }
 
   try {
-    const { planId } = req.params;
-    const { startDate, endDate, destination } = req.body;
-    const { userId } = req.user;
+    const { plan_id } = req.params;
+    const { start_date, end_date, destination } = req.body;
+    const { user_id } = req.user;
 
     // 여행 일정 수정
     await updateTravelPlan({
-      planId: Number(planId),
-      userId,
-      startDate,
-      endDate,
+      plan_id: Number(plan_id),
+      user_id,
+      start_date,
+      end_date,
       destination,
       locations: [],
     });
@@ -121,12 +117,12 @@ export const updateTravelLocationController = async (req: CustomRequest, res: Re
   }
 
   try {
-    const { userId } = req.user;
-    const { planId, date } = req.params;
+    const { user_id } = req.user;
+    const { plan_id, date } = req.params;
     const { location } = req.body;
 
     // 각 날짜별 장소 수정
-    await updateTravelLocation(userId, Number(planId), date, location);
+    await updateTravelLocation(user_id, Number(plan_id), date, location);
 
     res.status(200).json({ message: '여행 장소가 성공적으로 수정되었습니다.' });
   } catch (err) {
@@ -147,10 +143,10 @@ export const deleteTravelPlanController = async (req: CustomRequest, res: Respon
   }
 
   try {
-    const { userId } = req.user;
-    const { planId } = req.params;
+    const { user_id } = req.user;
+    const { plan_id } = req.params;
 
-    await deleteTravelPlan(userId, Number(planId));
+    await deleteTravelPlan(user_id, Number(plan_id));
 
     res.status(200).json({ message: '여행 일정이 성공적으로 삭제되었습니다.' });
   } catch (err) {
@@ -171,11 +167,11 @@ export const deleteTravelLocationController = async (req: CustomRequest, res: Re
   }
 
   try {
-    const { planId, date } = req.params;
-    console.log(planId, date);
+    const { plan_id, date } = req.params;
+    console.log(plan_id, date);
 
     // 특정 날짜의 장소 삭제
-    await deleteTravelLocation(Number(planId), date);
+    await deleteTravelLocation(Number(plan_id), date);
 
     res.status(200).json({ message: '해당 날짜의 여행 장소가 성공적으로 삭제되었습니다.' });
   } catch (err) {

@@ -1,5 +1,5 @@
 import { JwtPayload } from 'jsonwebtoken';
 
 export interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string };
+  user?: JwtPayload & { user_id: string };
 }

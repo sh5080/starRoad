@@ -13,9 +13,9 @@ const router = Router();
 
 router.post('/', validateToken, createDiaryController);
 router.get('/', validateToken, getAllDiaryController);
-router.get('/:userId', validateToken, getMyDiaryController);
-router.get('/:diaryId', validateToken, getOneDiaryController);
+router.get('/:user_id', validateToken, getMyDiaryController);
+router.get('/:diary_id', validateToken, getOneDiaryController);
 router.patch('/', validateToken, updateDiaryController);
-router.delete('/:diaryId', validateToken, deleteDiaryController);
+router.delete('/:diary_id', validateToken, deleteDiaryController);
 
 export default router;

@@ -1,5 +1,5 @@
 import { Application, Request, Response } from 'express';
-import userRouter from '../api/routes/useRoutes';
+import userRouter from '../api/routes/userRoutes';
 import travelRouter from '../api/routes/travelRoutes';
 import diaryRouter from '../api/routes/diaryRoutes';
 import commentRouter from '../api/routes/commentRoutes';

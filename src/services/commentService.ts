@@ -1,6 +1,7 @@
 import { 
     createCommentModel,
-    getCommentsByDiaryModel
+    getCommentsByDiaryModel,
+    getAllCommentsModel
 
 } from '../models/commentModel';
 
@@ -9,9 +10,9 @@ import { AppError } from '../api/middlewares/errorHandler';
 
 export const createComment = async (comment: CommentType): Promise<void> => {
   try {
-    const { userId, diaryId, comment: commentText } = comment;
+    const { user_id, diary_id, comment: commentText } = comment;
   
-      await createCommentModel({ userId, diaryId, comment: commentText });
+      await createCommentModel({ user_id, diary_id, comment: commentText });
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
@@ -21,8 +22,16 @@ export const createComment = async (comment: CommentType): Promise<void> => {
     }
   }
 };
-export const getCommentsByDiary = async (diaryId: number, page: number, limit: number): Promise<CommentType[]> => {
-    const comments = await getCommentsByDiaryModel(diaryId, page, limit); // pagination 적용
+export const getCommentsByDiary = async (diary_id: number, page: number, limit: number): Promise<CommentType[]> => {
+    const comments = await getCommentsByDiaryModel(diary_id, page, limit); // pagination 적용
     return comments;
   };
   
+  export const getAllComments = async (): Promise<CommentType[]> => {
+    try {
+      const comments = await getAllCommentsModel();
+      return comments;
+    } catch (error) {
+      throw new Error('댓글 조회에 실패했습니다.');
+    }
+  };

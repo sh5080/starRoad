@@ -3,7 +3,7 @@ import { AppError } from '../middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string; role: string };
+  user?: JwtPayload & { user_id: string; role: string };
 }
 export const ensureAdmin = (req: CustomRequest, res: Response, next: NextFunction) => {
   if (req.user?.role !== 'ADMIN') {

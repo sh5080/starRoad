@@ -1,5 +1,5 @@
 export interface CommentType {
-    userId: string;
-    diaryId: number;
+    user_id: string;
+    diary_id: number;
     comment: string;
   }

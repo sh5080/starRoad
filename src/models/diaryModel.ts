@@ -7,19 +7,19 @@ export const createDiaryById = async (diary: DiaryType): Promise<void> => {
   try {
     await connection.execute(
       'INSERT INTO travel_diary (user_id, plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?, ?)',
-      [diary.userId, diary.planId, diary.title, diary.content, diary.image, diary.destination]
+      [diary.user_id, diary.plan_id, diary.title, diary.content, diary.image, diary.destination]
     );
   } finally {
     connection.release(); // 연결 해제
   }
 };
-export const getPlanById = async (planId: number, userId: string): Promise<TravelPlan | null> => {
+export const getPlanById = async (plan_id: number, user_id: string): Promise<TravelPlan | null> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND user_id = ?', [
-      planId,
-      userId,
+      plan_id,
+      user_id,
     ]);
     if (Array.isArray(rows) && rows.length > 0) {
       const plan = rows[0] as TravelPlan;
@@ -41,21 +41,21 @@ export const getAllDiaryById = async (): Promise<DiaryType[]> => {
     connection.release();
   }
 };
-export const getMyDiaryById = async (userId: string): Promise<DiaryType[]> => {
+export const getMyDiaryById = async (user_id: string): Promise<DiaryType[]> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM travel_diary WHERE user_id = ?', [userId]);
+    const [rows] = await connection.execute('SELECT * FROM travel_diary WHERE user_id = ?', [user_id]);
     return rows as DiaryType[];
   } finally {
     connection.release();
   }
 };
-export const getOneDiaryById = async (diaryId: number): Promise<DiaryType | null> => {
+export const getOneDiaryById = async (diary_id: number): Promise<DiaryType | null> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM travel_diary WHERE diary_id = ?', [diaryId]);
+    const [rows] = await connection.execute('SELECT * FROM travel_diary WHERE diary_id = ?', [diary_id]);
     if (Array.isArray(rows) && rows.length > 0) {
       const diary = rows[0] as DiaryType;
       return diary;
@@ -65,7 +65,7 @@ export const getOneDiaryById = async (diaryId: number): Promise<DiaryType | null
     connection.release();
   }
 };
-export const updateDiaryById = async (diary: DiaryType, diaryId: number): Promise<void> => {
+export const updateDiaryById = async (diary: DiaryType, diary_id: number): Promise<void> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
@@ -73,18 +73,18 @@ export const updateDiaryById = async (diary: DiaryType, diaryId: number): Promis
       diary.title,
       diary.content,
       diary.image,
-      diaryId,
+      diary_id,
     ]);
   } finally {
     connection.release();
   }
 };
 
-export const deleteDiaryById = async (diaryId: number): Promise<void> => {
+export const deleteDiaryById = async (diary_id: number): Promise<void> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    await connection.execute('DELETE FROM travel_diary WHERE diary_id = ?', [diaryId]);
+    await connection.execute('DELETE FROM travel_diary WHERE diary_id = ?', [diary_id]);
   } finally {
     connection.release();
   }
