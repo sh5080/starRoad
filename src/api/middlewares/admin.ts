@@ -3,12 +3,12 @@ import { AppError } from '../middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string };
+  user?: JwtPayload & { userId: string; role: string };
 }
-
 export const ensureAdmin = (req: CustomRequest, res: Response, next: NextFunction) => {
   if (req.user?.role !== 'ADMIN') {
-    next(new AppError('관리자 권한이 필요합니다.', 403));
+    console.log(req.user);
+    return res.status(403).json({ message: '관리자 권한이 없습니다.' });
   }
   next();
 };

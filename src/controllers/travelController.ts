@@ -14,7 +14,7 @@ import {
 import { JwtPayload } from 'jsonwebtoken';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string };
+  user?: JwtPayload & { userId: string};
 }
 
 // 여행 일정 등록 + 날짜별 장소 등록

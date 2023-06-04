@@ -10,7 +10,7 @@ export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<num
   const connection = await db.getConnection();
   try {
     const [rows] = await connection.execute(
-      'INSERT INTO TravelPlan (userId, startDate, endDate, destination) VALUES (?, ?, ?, ?)',
+      'INSERT INTO travel_plan (user_id, startDate, endDate, destination) VALUES (?, ?, ?, ?)',
       [travelPlan.userId, travelPlan.startDate, travelPlan.endDate, travelPlan.destination]
     );
     const insertId = (rows as any).insertId;
@@ -24,7 +24,7 @@ export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<num
 export const createTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('INSERT INTO TravelLocation (userId, planId, date, location) VALUES (?, ?, ?, ?)', [
+    await connection.execute('INSERT INTO travel_location (user_id, plan_id, date, location) VALUES (?, ?, ?, ?)', [
       travelLocation.userId,
       travelLocation.planId,
       travelLocation.date,
@@ -39,7 +39,7 @@ export const createTravelLocationModel = async (travelLocation: TravelLocation):
 export const getTravelPlansModel = async (userId: string): Promise<TravelPlan[]> => {
   const connection = await db.getConnection();
   try {
-    const [rows] = await connection.query('SELECT * FROM TravelPlan WHERE userId = ?', [userId]);
+    const [rows] = await connection.query('SELECT * FROM travel_plan WHERE user_id = ?', [userId]);
     return rows as TravelPlan[];
   } finally {
     connection.release();
@@ -50,7 +50,7 @@ export const getTravelPlansModel = async (userId: string): Promise<TravelPlan[]>
 export const getTravelLocationsModel = async (planId: number): Promise<TravelLocation[]> => {
   const connection = await db.getConnection();
   try {
-    const [rows] = await connection.query('SELECT * FROM TravelLocation WHERE planId = ?', [planId]);
+    const [rows] = await connection.query('SELECT * FROM travel_location WHERE plan_id = ?', [planId]);
     return rows as TravelLocation[];
   } finally {
     connection.release();
@@ -62,7 +62,7 @@ export const updateTravelPlanModel = async (travelPlan: TravelPlan): Promise<voi
   const connection = await db.getConnection();
   try {
     await connection.execute(
-      'UPDATE TravelPlan SET startDate = ?, endDate = ?, destination = ? WHERE planId = ? AND userId = ?',
+      'UPDATE travel_plan SET startDate = ?, endDate = ?, destination = ? WHERE plan_id = ? AND user_id = ?',
       [travelPlan.startDate, travelPlan.endDate, travelPlan.destination, travelPlan.planId, travelPlan.userId]
     );
   } finally {
@@ -74,7 +74,7 @@ export const updateTravelPlanModel = async (travelPlan: TravelPlan): Promise<voi
 export const updateTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('UPDATE TravelLocation SET location = ? WHERE planId = ? AND date = ? AND userId = ?', [
+    await connection.execute('UPDATE travel_location SET location = ? WHERE plan_id = ? AND date = ? AND user_id = ?', [
       travelLocation.location,
       travelLocation.planId,
       travelLocation.date,
@@ -90,9 +90,9 @@ export const deleteTravelPlanModel = async (userId: string, planId: number): Pro
   const connection = await db.getConnection();
   try {
     // Delete from TravelLocation table first
-    await connection.execute('DELETE FROM TravelLocation WHERE planId = ?', [planId]);
+    await connection.execute('DELETE FROM travel_location WHERE plan_id = ?', [planId]);
     // Then delete from TravelPlan table
-    await connection.execute('DELETE FROM TravelPlan WHERE userId = ? AND planId = ?', [userId, planId]);
+    await connection.execute('DELETE FROM travel_plan WHERE user_id = ? AND plan_id = ?', [userId, planId]);
   } finally {
     connection.release();
   }
@@ -102,7 +102,7 @@ export const deleteTravelPlanModel = async (userId: string, planId: number): Pro
 export const deleteTravelLocationModel = async (planId: number, date: string): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('UPDATE TravelLocation SET location = NULL WHERE planId = ? AND date = ?', [planId, date]);
+    await connection.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND date = ?', [planId, date]);
   } finally {
     connection.release();
   }

@@ -14,7 +14,7 @@ const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 export const signupUser = async (user: UserType): Promise<string> => {
   const hashedPassword = await bcrypt.hash(user.password, saltRounds);
 
-  const findUserId = await getUserById(user.user_id);
+  const findUserId = await getUserById(user.userId);
   if (findUserId) {
     throw new AppError('이미 존재하는 아이디입니다.', 409);
   }
@@ -35,11 +35,11 @@ export const loginUser = async (user_id: string, password: string): Promise<obje
     throw new AppError('비밀번호가 일치하지 않습니다.', 401);
   }
 
-  const accessToken: string = jwt.sign({ user_id: user.user_id }, ACCESS_TOKEN_SECRET, {
+  const accessToken: string = jwt.sign({ userId: user.userId, role: user.role }, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRES_IN,
   });
 
-  const refreshToken: string = jwt.sign({ user_id: user.user_id }, REFRESH_TOKEN_SECRET, {
+  const refreshToken: string = jwt.sign({ userId: user.userId, role: user.role }, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRES_IN,
   });
 

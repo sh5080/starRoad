@@ -8,7 +8,7 @@ export const createUser = async (user: UserType): Promise<void> => {
   try {
     await connection.execute('INSERT INTO user (name, user_id, password, email) VALUES (?, ?, ?, ?)', [
       user.name,
-      user.user_id,
+      user.userId,
       user.password,
       user.email,
     ]);
@@ -18,11 +18,11 @@ export const createUser = async (user: UserType): Promise<void> => {
 };
 
 // 로그인,정보 조회시 사용
-export const getUserById = async (user_id: string): Promise<UserType | null> => {
+export const getUserById = async (userId: string): Promise<UserType | null> => {
   // const pool = await db;
   const connection = await db.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM user WHERE user_id = ?', [user_id]);
+    const [rows] = await connection.execute('SELECT * FROM user WHERE user_id = ?', [userId]);
     if (Array.isArray(rows) && rows.length > 0) {
       const userData = rows[0] as UserType;
       return userData;
@@ -33,18 +33,21 @@ export const getUserById = async (user_id: string): Promise<UserType | null> => 
   }
 };
 
-export const updateUserById = async (user_id: string, updateData: Partial<Pick<UserType, 'email' | 'password'>>): Promise<UserType | null> => {
+export const updateUserById = async (
+  userId: string,
+  updateData: Partial<Pick<UserType, 'email' | 'password'>>
+): Promise<UserType | null> => {
   const pool = await db;
   const connection = await pool.getConnection();
   try {
     //사용자 데이터 업데이트
-    const [result] = await connection.query<OkPacket>('UPDATE user SET ? WHERE user_id = ?', [updateData, user_id]);
+    const [result] = await connection.query<OkPacket>('UPDATE user SET ? WHERE user_id = ?', [updateData, userId]);
 
     if (!result.affectedRows) {
       return null;
     }
     //업데이트된 사용자 데이터 가져옴
-    const [updatedUserRows] = await connection.execute('SELECT * FROM user WHERE user_id = ?', [user_id]);
+    const [updatedUserRows] = await connection.execute('SELECT * FROM user WHERE user_id = ?', [userId]);
     if (Array.isArray(updatedUserRows) && updatedUserRows.length > 0) {
       const updatedUser = updatedUserRows[0] as UserType;
       return updatedUser;
@@ -55,12 +58,12 @@ export const updateUserById = async (user_id: string, updateData: Partial<Pick<U
   }
 };
 
-export const deleteUserById = async (user_id: string): Promise<boolean> => {
+export const deleteUserById = async (userId: string): Promise<boolean> => {
   const pool = await db;
   const connection = await pool.getConnection();
 
   try {
-    const [result] = await connection.query<OkPacket>('DELETE FROM user WHERE user_id = ?', [user_id]);
+    const [result] = await connection.query<OkPacket>('DELETE FROM user WHERE user_id = ?', [userId]);
 
     if (result.affectedRows > 0) {
       return true; // 삭제 성공

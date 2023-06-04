@@ -6,7 +6,7 @@ import config from '../../config/index';
 import { AppError } from '../middlewares/errorHandler';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string };
+  user?: JwtPayload & { userId: string; role: string };
 }
 const ACCESS_TOKEN_SECRET = config.jwt.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
@@ -15,6 +15,7 @@ const ACCESS_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 // 유효성 검사 및 재발급 jwt 미들웨어
 export const validateToken = async (req: CustomRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
+
   const accessToken = authHeader && authHeader.split(' ')[1];
 
   if (req.method === 'GET' && !accessToken) {
@@ -26,7 +27,7 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
   }
 
   try {
-    req.user = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as JwtPayload & { userId: string };
+    req.user = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as JwtPayload & { userId: string; role: string };
     next();
     // next(req.user);
   } catch (err: any) {
@@ -39,13 +40,18 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
       try {
         const decodedRefreshToken = (await jwt.verify(refreshToken, REFRESH_TOKEN_SECRET)) as JwtPayload & {
           userId: string;
+          role: string;
         };
 
-        const newAccessToken = jwt.sign({ userId: decodedRefreshToken.userId }, ACCESS_TOKEN_EXPIRES_IN, {
-          expiresIn: ACCESS_TOKEN_EXPIRES_IN,
-        });
+        const newAccessToken = jwt.sign(
+          { userId: decodedRefreshToken.userId, role: decodedRefreshToken.role },
+          ACCESS_TOKEN_SECRET,
+          {
+            expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+          }
+        );
 
-        req.user = { userId: decodedRefreshToken.userId };
+        req.user = { userId: decodedRefreshToken.userId, role: decodedRefreshToken.role };
         res.status(200).json({ accessToken: newAccessToken });
         next();
       } catch (err: any) {
