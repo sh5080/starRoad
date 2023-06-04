@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { createDiaryController, getAllDiaryController, getMyDiaryController, getOneDiaryController, updateDiaryController, deleteDiaryController } from '../../controllers/diaryController';
+import { 
+    createDiaryController, 
+    getAllDiaryController, 
+    getMyDiaryController, 
+    getOneDiaryController, 
+    updateDiaryController, 
+    deleteDiaryController 
+} from '../../controllers/diaryController';
 import { validateToken } from '../middlewares/jwt';
 
 const router = Router();

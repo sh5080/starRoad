@@ -1,4 +1,12 @@
-import { createDiaryById, getPlanById, getAllDiaryById, getMyDiaryById, getOneDiaryById, updateDiaryById, deleteDiaryById } from '../models/diaryModel';
+import { 
+    createDiaryById, 
+    getPlanById, 
+    getAllDiaryById, 
+    getMyDiaryById, 
+    getOneDiaryById, 
+    updateDiaryById, 
+    deleteDiaryById 
+} from '../models/diaryModel';
 import { DiaryType } from '../types/diary';
 import { AppError } from '../api/middlewares/errorHandler';
 import { TravelPlan } from '../types/travel';
@@ -8,7 +16,7 @@ export const createDiary = async (diary: DiaryType, plan:TravelPlan) => {
         if (!plan.planId) {
             throw new AppError('플랜 ID가 없습니다.', 400);
           }
-      const planData = await getPlanById(plan.planId, plan.userId);  // call the function
+      const planData = await getPlanById(plan.planId, plan.userId);  
       if (!planData) {
         throw new AppError('플랜을 찾을 수 없습니다.', 404);
       }
