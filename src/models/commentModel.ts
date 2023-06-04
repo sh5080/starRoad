@@ -1,6 +1,13 @@
-import { OkPacket } from 'mysql2';
 import { db } from '../loaders/dbLoader';
 import { CommentType } from '../types/comment';
+import { RowDataPacket, FieldPacket } from 'mysql2';
+
+interface QueryResult extends RowDataPacket {
+  comment_id: number;
+  user_id: string;
+  diary_id: number;
+  comment: string;
+}
 
 export const createCommentModel = async (comment: CommentType): Promise<void> => {
   const pool = db;
@@ -9,28 +16,33 @@ export const createCommentModel = async (comment: CommentType): Promise<void> =>
     await connection.execute('INSERT INTO comment (user_id, diary_id, comment) VALUES (?, ?, ?)', [
       comment.user_id,
       comment.diary_id,
-      comment.comment
+      comment.comment,
     ]);
   } finally {
     connection.release(); // 연결 해제
   }
 };
 
-export const getCommentsByDiaryModel = async (diary_id: number, page: number, limit: number): Promise<CommentType[]> => {
+export const getCommentsByDiaryModel = async (
+  diary_id: number,
+  page: number,
+  limit: number
+): Promise<CommentType[]> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
     const offset = (page - 1) * limit;
-    const [rows]:any[] = await connection.query(
-      'SELECT * FROM comment WHERE diary_id = ? LIMIT ? OFFSET ?', 
-      [diary_id, limit, offset]
-    );
+    const [rows] = (await connection.query('SELECT * FROM comment WHERE diary_id = ? LIMIT ? OFFSET ?', [
+      diary_id,
+      limit,
+      offset,
+    ])) as [QueryResult[], FieldPacket[]];
 
-    const comments: CommentType[] = rows.map((row: any) => ({
+    const comments: CommentType[] = rows.map((row: QueryResult) => ({
       comment_id: row.comment_id,
       user_id: row.user_id,
       diary_id: row.diary_id,
-      comment: row.comment
+      comment: row.comment,
     }));
 
     return comments;
