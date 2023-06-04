@@ -1,5 +1,6 @@
 import { 
     createCommentModel,
+    getCommentsByDiaryModel
 
 } from '../models/commentModel';
 
@@ -20,3 +21,8 @@ export const createComment = async (comment: CommentType): Promise<void> => {
     }
   }
 };
+export const getCommentsByDiary = async (diaryId: number, page: number, limit: number): Promise<CommentType[]> => {
+    const comments = await getCommentsByDiaryModel(diaryId, page, limit); // pagination 적용
+    return comments;
+  };
+  

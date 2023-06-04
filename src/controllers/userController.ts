@@ -8,7 +8,7 @@ export const signup = async (req: Request, res: Response) => {
   try {
     const user: UserType = req.body;
 
-    if (!user.userId || !user.password || !user.email || !user.name) {
+    if (!user.user_id || !user.password || !user.email || !user.name) {
       return res.status(400).json({ error: '회원가입에 필요한 정보가 제공되지 않았습니다.' });
     }
 
@@ -28,13 +28,13 @@ export const signup = async (req: Request, res: Response) => {
 // 로그인
 export const login = async (req: Request, res: Response) => {
   try {
-    const { userId, password }: UserType = req.body;
+    const { user_id, password }: UserType = req.body;
 
-    if (!userId || !password) {
+    if (!user_id || !password) {
       return res.status(400).json({ error: '로그인에 필요한 정보가 제공되지 않았습니다.' });
     }
 
-    const token = await loginUser(userId, password);
+    const token = await loginUser(user_id, password);
 
     // 두 개의 토큰을 보내줌
     res.json({ token });
@@ -65,7 +65,7 @@ export const logout = async (req: CustomRequest, res: Response) => {
 
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { userId: string };
+  user?: JwtPayload & { user_id: string };
 }
 
 // 내 정보 조회
@@ -77,8 +77,8 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
       throw new AppError('인증이 필요합니다.', 401);
     }
 
-    const { userId } = req.user;
-    const userData = await getUser(userId);
+    const { user_id } = req.user;
+    const userData = await getUser(user_id);
 
     if (!userData) {
       return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
@@ -101,10 +101,10 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
       throw new AppError('인증이 필요합니다.', 401);
     }
 
-    const { userId } = req.user;
+    const { user_id } = req.user;
     const updateData = req.body;
 
-    const updatedUserData = await updateUser(userId, updateData);
+    const updatedUserData = await updateUser(user_id, updateData);
 
     if (!updatedUserData) {
       return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
@@ -127,8 +127,8 @@ export const deleteUserInfo = async (req: CustomRequest, res: Response) => {
       throw new AppError('인증이 필요합니다.', 401);
     }
 
-    const { userId } = req.user;
-    const message = await deleteUser(userId);
+    const { user_id } = req.user;
+    const message = await deleteUser(user_id);
 
     res.status(200).json({ message });
   } catch (err) {

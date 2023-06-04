@@ -14,7 +14,7 @@ const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 export const signupUser = async (user: UserType): Promise<string> => {
   const hashedPassword = await bcrypt.hash(user.password, saltRounds);
 
-  const findUserId = await getUserById(user.userId);
+  const findUserId = await getUserById(user.user_id);
   if (findUserId) {
     throw new AppError('이미 존재하는 아이디입니다.', 409);
   }
@@ -24,8 +24,8 @@ export const signupUser = async (user: UserType): Promise<string> => {
   return '회원가입이 정상적으로 완료되었습니다.';
 };
 
-export const loginUser = async (userId: string, password: string): Promise<object> => {
-  const user = await getUserById(userId);
+export const loginUser = async (user_id: string, password: string): Promise<object> => {
+  const user = await getUserById(user_id);
 
   if (!user) {
     throw new AppError('없는 사용자 입니다.', 404);
@@ -35,19 +35,19 @@ export const loginUser = async (userId: string, password: string): Promise<objec
     throw new AppError('비밀번호가 일치하지 않습니다.', 401);
   }
 
-  const accessToken: string = jwt.sign({ userId: user.userId }, ACCESS_TOKEN_SECRET, {
+  const accessToken: string = jwt.sign({ user_id: user.user_id }, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRES_IN,
   });
 
-  const refreshToken: string = jwt.sign({ userId: user.userId }, REFRESH_TOKEN_SECRET, {
+  const refreshToken: string = jwt.sign({ user_id: user.user_id }, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRES_IN,
   });
 
   return { accessToken, refreshToken };
 };
 
-export const getUser = async (userId: string) => {
-  const user = await getUserById(userId);
+export const getUser = async (user_id: string) => {
+  const user = await getUserById(user_id);
 
   if (!user) {
     throw new AppError('없는 사용자 입니다.', 404);
@@ -57,12 +57,12 @@ export const getUser = async (userId: string) => {
   return userData;
 };
 
-export const updateUser = async (userId: string, updateData: Partial<UserType>) => {
+export const updateUser = async (user_id: string, updateData: Partial<UserType>) => {
   if (updateData.password) {
     const salt = await bcrypt.genSalt();
     updateData.password = await bcrypt.hash(updateData.password, salt);
   }
-  const updatedUser = await updateUserById(userId, updateData);
+  const updatedUser = await updateUserById(user_id, updateData);
 
   if (!updatedUser) {
     throw new AppError('사용자 정보 업데이트에 실패했습니다.', 500);
@@ -70,8 +70,8 @@ export const updateUser = async (userId: string, updateData: Partial<UserType>) 
   return '회원정보 수정이 정상적으로 완료되었습니다.';
 };
 
-export const deleteUser = async (userId: string) => {
-  const deletedUser = await deleteUserById(userId);
+export const deleteUser = async (user_id: string) => {
+  const deletedUser = await deleteUserById(user_id);
 
   if (!deletedUser) {
     throw new Error('사용자 정보 삭제에 실패했습니다.');

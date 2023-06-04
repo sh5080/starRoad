@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { createComment } from '../services/commentService';
+import { 
+    createComment,
+    getCommentsByDiary,
+
+} from '../services/commentService';
 import { getOneDiary } from '../services/diaryService';
 import { AppError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
@@ -36,3 +40,29 @@ export const createCommentController = async (req: CustomRequest, res: Response)
     }
   }
 };
+export const getCommentsByDiaryController = async (req: CustomRequest, res: Response) => {
+    try {
+        const { diaryId } = req.params;
+        const { page, limit } = req.query; // 변경된 부분
+        
+        console.log(req.query);
+      const loggedInUserId = req.user?.userId;
+    
+      if (!loggedInUserId) {
+        throw new AppError('로그인이 필요합니다.', 401);
+      }
+    
+      const comments = await getCommentsByDiary(Number(diaryId), Number(page), Number(limit)); // pagination 적용
+    
+      res.status(200).json({ comments });
+    } catch (error) {
+      console.error(error);
+    
+      if (error instanceof AppError) {
+        res.status(error.status).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: '댓글 조회에 실패했습니다.' });
+      }
+    }
+  };
+  
