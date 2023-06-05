@@ -6,7 +6,7 @@ import {
     getCommentsByDiaryController,
     getAllCommentsController,
     updateCommentController,
-    // deleteCommentController,
+    deleteCommentController,
   } from '../../controllers/commentController';
 
 
@@ -16,6 +16,6 @@ router.post('/', validateToken, createCommentController);
 router.get('/:diary_id', validateToken, getCommentsByDiaryController); //여행기별 댓글 조회
 router.get('/', validateToken, ensureAdmin, getAllCommentsController); //관리자 댓글 전체조회
 router.patch('/:comment_id', validateToken, updateCommentController);
-// router.delete('/comments/:commentId', validateToken, deleteCommentController);
+router.delete('/:comment_id', validateToken, deleteCommentController);
 
 export default router;

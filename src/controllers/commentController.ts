@@ -3,7 +3,8 @@ import {
     createComment,
     getCommentsByDiary,
     getAllComments,
-    updateComment
+    updateComment,
+    deleteComment
 
 } from '../services/commentService';
 import { getOneDiary } from '../services/diaryService';
@@ -72,7 +73,6 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
       const { comment_id } = req.params;
       const { comment } = req.body;
       const user_id = req.user?.user_id;
-      console.log(comment_id)
       if (comment === undefined) {
         throw new Error('댓글을 입력해 주세요.');
       }
@@ -86,5 +86,23 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
       } else {
         res.status(500).json({ error: '댓글 수정 실패했습니다.' });
       }
+    }
+  };
+
+  export const deleteCommentController = async (req: CustomRequest, res: Response) => {
+    try {
+      const { comment_id } = req.params;
+      const user_id = req.user?.user_id;
+  
+      if (!user_id) {
+        throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
+      }
+  
+      await deleteComment(Number(comment_id), user_id);
+  
+      res.status(200).json({ message: '댓글 삭제가 완료되었습니다.' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: '댓글 삭제에 실패했습니다.' });
     }
   };

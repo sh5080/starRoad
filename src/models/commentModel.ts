@@ -13,7 +13,7 @@ export const createCommentModel = async (comment: CommentType): Promise<void> =>
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    await connection.execute('INSERT INTO Comment (user_id, diary_id, comment) VALUES (?, ?, ?)', [
+    await connection.execute('INSERT INTO comment (user_id, diary_id, comment) VALUES (?, ?, ?)', [
       comment.user_id,
       comment.diary_id,
       comment.comment
@@ -82,3 +82,13 @@ export const getCommentModel = async (comment_id: number): Promise<CommentType |
     connection.release();
   }
 };
+export const deleteCommentModel = async (comment_id: number): Promise<void> => {
+  const pool = db;
+  const connection = await pool.getConnection();
+  try {
+    await connection.execute('DELETE FROM comment WHERE comment_id = ?', [comment_id]);
+  } finally {
+    connection.release();
+  }
+};
+

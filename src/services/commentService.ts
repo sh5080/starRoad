@@ -3,7 +3,8 @@ import {
     getCommentsByDiaryModel,
     getAllCommentsModel,
     updateCommentModel,
-    getCommentModel
+    getCommentModel,
+    deleteCommentModel
 
 } from '../models/commentModel';
 
@@ -15,6 +16,7 @@ export const createComment = async (comment: CommentType): Promise<void> => {
     const { user_id, diary_id, comment: commentText } = comment;
 
     await createCommentModel({ user_id, diary_id, comment: commentText });
+   // await createCommentModel(comment);
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
@@ -51,5 +53,24 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
       
     } catch (error) {
       throw new Error('댓글 수정에 실패했습니다.');
+    }
+  };
+
+  export const deleteComment = async (comment_id: number, user_id: string) => {
+    try {
+      const comment = await getCommentModel(comment_id);
+      if (!comment) {
+        throw new AppError('댓글을 찾을 수 없습니다.', 404);
+      }
+      if (comment.user_id !== user_id) {
+        throw new AppError('권한이 없습니다.', 403);
+      }
+  
+      await deleteCommentModel(comment_id);
+  
+      return '댓글 삭제가 완료되었습니다.';
+    } catch (error) {
+      console.error(error);
+      throw new AppError('댓글 삭제에 실패했습니다.', 500);
     }
   };
