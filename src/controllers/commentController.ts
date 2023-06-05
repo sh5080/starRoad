@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
-import { createComment, getCommentsByDiary, getAllComments } from '../services/commentService';
+import { 
+    createComment,
+    getCommentsByDiary,
+    getAllComments,
+    updateComment
+
+} from '../services/commentService';
 import { getOneDiary } from '../services/diaryService';
 import { AppError } from '../api/middlewares/errorHandler';
 import { CustomRequest } from '../types/customRequest';
@@ -28,36 +34,57 @@ export const createCommentController = async (req: CustomRequest, res: Response,
   }
 };
 export const getCommentsByDiaryController = async (req: CustomRequest, res: Response) => {
-  try {
-    const { diary_id } = req.params;
-    const { page, limit } = req.query; // 변경된 부분
-
-    //console.log(req.query);
-    const loggedInUserId = req.user?.user_id;
-
-    if (!loggedInUserId) {
-      throw new AppError('로그인이 필요합니다.', 401);
+    try {
+        const { diary_id } = req.params;
+        const { page, limit } = req.query; // 변경된 부분
+        
+        //console.log(req.query);
+      const loggedInUserId = req.user?.user_id;
+    
+      if (!loggedInUserId) {
+        throw new AppError('로그인이 필요합니다.', 401);
+      }
+    
+      const comments = await getCommentsByDiary(Number(diary_id), Number(page), Number(limit));
+    
+      res.status(200).json({ comments });
+    } catch (error) {
+      console.error(error);
+    
+      if (error instanceof AppError) {
+        res.status(error.status).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: '댓글 조회에 실패했습니다.' });
+      }
     }
-
-    const comments = await getCommentsByDiary(Number(diary_id), Number(page), Number(limit));
-
-    res.status(200).json({ comments });
-  } catch (error) {
-    console.error(error);
-
-    if (error instanceof AppError) {
-      res.status(error.status).json({ error: error.message });
-    } else {
+  };
+  export const getAllCommentsController = async (req: CustomRequest, res: Response) => {
+    try {
+      const comments = await getAllComments();
+      res.status(200).json(comments);
+    } catch (error) {
+      console.error(error);
       res.status(500).json({ error: '댓글 조회에 실패했습니다.' });
     }
-  }
-};
-export const getAllCommentsController = async (req: CustomRequest, res: Response) => {
-  try {
-    const comments = await getAllComments();
-    res.status(200).json(comments);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: '댓글 조회에 실패했습니다.' });
-  }
-};
+  };
+  export const updateCommentController = async (req: CustomRequest ,res: Response) => {
+    try {
+      const { comment_id } = req.params;
+      const { comment } = req.body;
+      const user_id = req.user?.user_id;
+      console.log(comment_id)
+      if (comment === undefined) {
+        throw new Error('댓글을 입력해 주세요.');
+      }
+  
+      await updateComment({comment}, Number(comment_id), user_id as string);
+      res.status(200).json({ message: '댓글이 성공적으로 수정되었습니다.' });
+    } catch (error) {
+      console.error(error);
+      if (error instanceof AppError) {
+        res.status(error.status).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: '댓글 수정 실패했습니다.' });
+      }
+    }
+  };

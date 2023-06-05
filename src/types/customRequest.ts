@@ -7,6 +7,7 @@ export interface CustomRequest extends Request {
     id?: string;
     diary_id?: string; // Add this if diary_id comes from params
     plan_id?: string;
+    comment_id?: string;
   };
   body: {
     user_id?: string;

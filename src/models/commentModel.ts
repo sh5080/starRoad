@@ -60,3 +60,25 @@ export const getAllCommentsModel = async (): Promise<CommentType[]> => {
     connection.release();
   }
 };
+
+export const updateCommentModel = async (comment_id: number, comment: CommentType): Promise<void> => {
+  const connection = await db.getConnection();
+  try {
+    await connection.execute('UPDATE comment SET comment = ? WHERE comment_id = ?', 
+    [comment.comment, comment_id]);
+  } finally {
+    connection.release();
+  }
+};
+export const getCommentModel = async (comment_id: number): Promise<CommentType | null> => {
+  const connection = await db.getConnection();
+  try {
+    const [rows] = await connection.execute('SELECT * FROM comment WHERE comment_id = ?', [comment_id]);
+    if (Array.isArray(rows) && rows.length > 0) {
+      return rows[0] as CommentType;
+    }
+    return null;
+  } finally {
+    connection.release();
+  }
+};
