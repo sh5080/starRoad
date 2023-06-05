@@ -5,8 +5,8 @@ CREATE TABLE `travel_diary` (
     `title` VARCHAR(100),
     `content` TEXT,
     `image` TEXT,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`diary_id`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
     FOREIGN KEY (`plan_id`) REFERENCES `travel_plan` (`plan_id`)

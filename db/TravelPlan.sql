@@ -4,8 +4,8 @@ CREATE TABLE `travel_plan` (
     `start_date` DATE,
     `end_date` DATE,
     `destination` VARCHAR(100),
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`plan_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 );
