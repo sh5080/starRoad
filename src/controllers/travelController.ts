@@ -1,4 +1,4 @@
-import { AppError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { Request, Response } from 'express';
 import {
   createTravelPlan,
@@ -19,7 +19,7 @@ interface CustomRequest extends Request {
 // 여행 일정 등록 + 날짜별 장소 등록
 export const createTravelPlanController = async (req: CustomRequest, res: Response) => {
   if (!req.user) {
-    throw new AppError('인증이 필요합니다.', 401);
+    throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
   }
   try {
     const { locations, ...travelPlan } = req.body;
@@ -45,7 +45,7 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
 // 여행 일정 조회
 export const getTravelPlanController = async (req: CustomRequest, res: Response) => {
   if (!req.user) {
-    throw new AppError('인증이 필요합니다.', 401);
+    throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
   }
   try {
     const { user_id } = req.user;

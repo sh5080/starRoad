@@ -9,12 +9,12 @@ import {
   deleteTravelPlanModel,
   deleteTravelLocationModel,
 } from '../models/travelModel';
-import { AppError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../api/middlewares/errorHandler';
 
 // 여행 일정 등록
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
   if (!travelPlan.user_id || !travelPlan.start_date || !travelPlan.end_date || !travelPlan.destination) {
-    throw new AppError('여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
   const plan_id = await createTravelPlanModel(travelPlan);
@@ -25,7 +25,7 @@ export const createTravelPlan = async (travelPlan: TravelPlan) => {
 export const createTravelLocation = async (travelLocation: TravelLocation): Promise<void> => {
   
   if (!travelLocation.user_id || !travelLocation.plan_id || !travelLocation.date || !travelLocation.location) {
-    throw new AppError('여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
   await createTravelLocationModel(travelLocation);
@@ -52,7 +52,7 @@ export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> =>
     !travelPlan.end_date ||
     !travelPlan.destination
   ) {
-    throw new AppError('여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
   await updateTravelPlanModel(travelPlan);
@@ -67,7 +67,7 @@ export const updateTravelLocation = async (
   location: string
 ): Promise<void> => {
   if (!user_id || !plan_id || !date || !location || !newDate) {
-    throw new AppError('여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
   await updateTravelLocationModel({ user_id, plan_id, date, newDate, location });

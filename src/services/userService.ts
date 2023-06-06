@@ -3,7 +3,7 @@ import { createUser, getUserById, updateUserById, deleteUserById } from '../mode
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import { UserType } from '../types/user';
-import { AppError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../api/middlewares/errorHandler';
 
 const { saltRounds } = config.bcrypt;
 const ACCESS_TOKEN_SECRET = config.jwt.ACCESS_TOKEN_SECRET;
@@ -16,7 +16,7 @@ export const signupUser = async (user: UserType): Promise<string> => {
 
   const findUserId = await getUserById(String(user.user_id));
   if (findUserId) {
-    throw new AppError('이미 존재하는 아이디입니다.', 409);
+    throw new AppError(CommonError.DUPLICATE_ENTRY,'이미 존재하는 아이디입니다.', 409);
   }
 
   await createUser({ ...user, password: hashedPassword });
@@ -28,16 +28,16 @@ export const loginUser = async (user_id: string, password: string): Promise<obje
   const user = await getUserById(user_id);
 
   if (!user) {
-    throw new AppError('없는 사용자 입니다.', 404);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'없는 사용자 입니다.', 404);
   }
 
   if (!user.activated) {
-    throw new AppError('탈퇴한 회원입니다.', 400);
+    throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'탈퇴한 회원입니다.', 400);
   }
 
   const isPasswordMatch = await bcrypt.compare(password, String(user.password));
   if (!isPasswordMatch) {
-    throw new AppError('비밀번호가 일치하지 않습니다.', 401);
+    throw new AppError(CommonError.AUTHENTICATION_ERROR,'비밀번호가 일치하지 않습니다.', 401);
   }
 
   const accessToken: string = jwt.sign({ user_id: user.user_id, role: user.role }, ACCESS_TOKEN_SECRET, {
@@ -55,7 +55,7 @@ export const getUser = async (user_id: string) => {
   const user = await getUserById(user_id);
 
   if (!user) {
-    throw new AppError('없는 사용자 입니다.', 404);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'없는 사용자 입니다.', 404);
   }
   const { id, password, ...userData } = user;
 
@@ -70,7 +70,7 @@ export const updateUser = async (user_id: string, updateData: Partial<UserType>)
   const updatedUser = await updateUserById(user_id, updateData);
 
   if (!updatedUser) {
-    throw new AppError('사용자 정보 업데이트에 실패했습니다.', 500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'사용자 정보 업데이트에 실패했습니다.', 500);
   }
   return '회원정보 수정이 정상적으로 완료되었습니다.';
 };

@@ -3,7 +3,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import config from '../../config/index';
-import { AppError } from '../middlewares/errorHandler';
+import { AppError, CommonError } from '../middlewares/errorHandler';
 
 interface CustomRequest extends Request {
   user?: JwtPayload & { user_id: string; role: string };
@@ -58,12 +58,12 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
         if (err.name === 'TokenExpiredError') {
           res.clearCookie('refreshToken');
           // return res.status(401).json({ message: '리프레쉬 토큰이 만료되었습니다. 다시 로그인 해주세요.' });
-          next(new AppError('리프레쉬 토큰이 만료되었습니다. 다시 로그인 해주세요.', 401));
+          next(new AppError(CommonError.TOKEN_EXPIRED_ERROR,'리프레쉬 토큰이 만료되었습니다. 다시 로그인 해주세요.', 401));
         }
-        next(new AppError('토큰이 유효하지 않습니다. 토큰을 확인해주세요.', 401));
+        next(new AppError(CommonError.TOKEN_EXPIRED_ERROR,'토큰이 유효하지 않습니다. 토큰을 확인해주세요.', 401));
       }
     } else {
-      next(new AppError('토큰이 유효하지 않습니다. 토큰을 확인해주세요.', 401));
+      next(new AppError(CommonError.TOKEN_EXPIRED_ERROR,'토큰이 유효하지 않습니다. 토큰을 확인해주세요.', 401));
     }
   }
 };

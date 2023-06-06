@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { signupUser, loginUser, getUser, updateUser, deleteUser } from '../services/userService';
 import { UserType } from '../types/user';
-import { AppError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
 // 회원가입
 export const signup = async (req: Request, res: Response) => {
@@ -52,7 +52,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const logout = async (req: CustomRequest, res: Response) => {
   try {
     if (!req.user) {
-      throw new AppError('인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
     }
     res.status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (err) {
@@ -75,7 +75,7 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
   try {
     // req.user가 없는 경우 에러 처리
     if (!req.user) {
-      throw new AppError('인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
     }
 
     const { user_id } = req.user;
@@ -99,7 +99,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
   try {
     // req.user가 없는 경우 에러 처리
     if (!req.user) {
-      throw new AppError('인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
     }
 
     const { user_id } = req.user;
@@ -125,7 +125,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
 export const deleteUserInfo = async (req: CustomRequest, res: Response) => {
   try {
     if (!req.user) {
-      throw new AppError('인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
     }
 
     const { user_id } = req.user;

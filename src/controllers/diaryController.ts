@@ -8,7 +8,7 @@ import {
     updateDiary 
 } from '../services/diaryService';
 
-import { AppError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
 import { getPlanById } from '../models/diaryModel';
 
@@ -22,13 +22,13 @@ interface CustomRequest extends Request {
       const user_id = req.user?.user_id;
   
       if (!user_id) {
-        throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
+        throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
       }
   
       // 해당 유저의 플랜인지 유효성 검사
       const plan = await getPlanById(plan_id, user_id);
       if (!plan) {
-        throw new AppError('플랜을 찾을 수 없습니다.', 404);
+        throw new AppError(CommonError.RESOURCE_NOT_FOUND,'플랜을 찾을 수 없습니다.', 404);
       }
   
       const { destination } = plan; // 플랜의 destination 값
@@ -38,8 +38,14 @@ interface CustomRequest extends Request {
   
       res.status(201).json({ message: '여행기가 생성되었습니다.' });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: '여행기 생성에 실패했습니다.' });
+      switch (error) {
+        case CommonError.AUTHENTICATION_ERROR:
+        case CommonError.RESOURCE_NOT_FOUND:
+          break;
+        default:
+          console.error(error);
+          res.status(500).json({ error: '여행기 생성에 실패했습니다.' });
+      }
     }
   };
   
@@ -49,7 +55,7 @@ interface CustomRequest extends Request {
         const diary = await getAllDiary();
     
         if (!diary) {
-          throw new AppError('전체 여행기를 찾을 수 없습니다.', 404);
+          throw new AppError(CommonError.RESOURCE_NOT_FOUND,'전체 여행기를 찾을 수 없습니다.', 404);
         }
     
         res.status(200).json(diary);
@@ -63,11 +69,11 @@ interface CustomRequest extends Request {
           const user_id = req.params.user_id;
       
           if (!user_id) {
-            throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
+            throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
           }
           const loggedInUserId = req.user?.user_id; 
           if (user_id !== loggedInUserId) {
-            throw new AppError('사용자 아이디가 일치하지 않습니다.', 403);
+            throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 아이디가 일치하지 않습니다.', 403);
           }
           const diaries = await getMyDiary(user_id);
       
@@ -83,9 +89,8 @@ interface CustomRequest extends Request {
         const diary = await getOneDiary(diary_id);
       
         if (!diary) {
-          return res.status(404).json({ error: '여행기를 찾을 수 없습니다.' });
+          throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행기를 찾을 수 없습니다.', 404);
         }
-      
         res.status(200).json(diary);
       } catch (error) {
         console.error(error);
@@ -98,7 +103,7 @@ export const updateDiaryController = async (req: CustomRequest, res: Response) =
     const { diary, diary_id } = req.body;
     const user_id = req.user?.user_id;
     if (!user_id) {
-      throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
     }
 
     await updateDiary(diary, diary_id, user_id);
@@ -116,9 +121,8 @@ export const deleteDiaryController = async (req: CustomRequest, res: Response) =
       const user_id = req.user?.user_id;
   
       if (!user_id) {
-        throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
+        throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
       }
-  
       await deleteDiary(diary_id, user_id);
   
       res.status(200).json({ message: '여행기 삭제가 완료되었습니다.' });

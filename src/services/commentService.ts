@@ -9,7 +9,7 @@ import {
 } from '../models/commentModel';
 
 import { CommentType } from '../types/comment';
-import { AppError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../api/middlewares/errorHandler';
 
 export const createComment = async (comment: CommentType): Promise<void> => {
   try {
@@ -40,14 +40,14 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
   };
   export const updateComment = async (newComment: CommentType, id: number, user_id: string): Promise<void> => {
     try {
-      const existingComment = await getCommentModel(id);
-      if (!existingComment) {
-        throw new AppError('존재하지 않는 댓글입니다.', 404);
-      }
+      // const existingComment = await getCommentModel(id);
+      // if (!existingComment) {
+      //   throw new AppError(CommonError.INVALID_INPUT,'존재하지 않는 댓글입니다.', 404);
+      // }
   
-      if (existingComment.user_id !== user_id) {
-        throw new AppError('댓글을 수정할 권한이 없습니다.', 403);
-      }
+      // if (existingComment.user_id !== user_id) {
+      //   throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'댓글을 수정할 권한이 없습니다.', 403);
+      // }
   
       await updateCommentModel(id,newComment);
       
@@ -60,10 +60,10 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
     try {
       const comment = await getCommentModel(id);
       if (!comment) {
-        throw new AppError('댓글을 찾을 수 없습니다.', 404);
+        throw new AppError(CommonError.RESOURCE_NOT_FOUND,'댓글을 찾을 수 없습니다.', 404);
       }
       if (comment.user_id !== user_id) {
-        throw new AppError('권한이 없습니다.', 403);
+        throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'권한이 없습니다.', 403);
       }
   
       await deleteCommentModel(id);
@@ -71,6 +71,6 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
       return '댓글 삭제가 완료되었습니다.';
     } catch (error) {
       console.error(error);
-      throw new AppError('댓글 삭제에 실패했습니다.', 500);
+      throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 삭제에 실패했습니다.', 500);
     }
   };
