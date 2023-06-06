@@ -4,6 +4,7 @@
 /Record.md
 /yarn-error.log
 /node_modules
+/yarn.lock
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos

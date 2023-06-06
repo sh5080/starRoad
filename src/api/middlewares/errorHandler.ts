@@ -16,11 +16,11 @@ export enum CommonError {
   //내부 서버 오류가 발생한 경우
   SERVER_ERROR = 'Server Error',
   //데이터베이스 관련 오류가 발생한 경우
-  DB_ERROR = 'DB Error' ,
+  DB_ERROR = 'DB Error',
 
   // ... 나머지 에러 이름들 ...
 
-  UNEXPECTED_ERROR = 'Unexpected Error'
+  UNEXPECTED_ERROR = 'Unexpected Error',
 }
 
 class AppError extends Error {
