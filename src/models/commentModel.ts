@@ -3,7 +3,7 @@ import { CommentType } from '../types/comment';
 import { RowDataPacket, FieldPacket } from 'mysql2';
 
 interface QueryResult extends RowDataPacket {
-  comment_id: number;
+  id: number;
   user_id: string;
   diary_id: number;
   comment: string;
@@ -39,7 +39,7 @@ export const getCommentsByDiaryModel = async (
     ])) as [QueryResult[], FieldPacket[]];
 
     const comments: CommentType[] = rows.map((row: QueryResult) => ({
-      comment_id: row.comment_id,
+      id: row.id,
       user_id: row.user_id,
       diary_id: row.diary_id,
       comment: row.comment,
@@ -61,19 +61,19 @@ export const getAllCommentsModel = async (): Promise<CommentType[]> => {
   }
 };
 
-export const updateCommentModel = async (comment_id: number, comment: CommentType): Promise<void> => {
+export const updateCommentModel = async (id: number, comment: CommentType): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('UPDATE comment SET comment = ? WHERE comment_id = ?', 
-    [comment.comment, comment_id]);
+    await connection.execute('UPDATE comment SET comment = ? WHERE id = ?', 
+    [comment.comment, id]);
   } finally {
     connection.release();
   }
 };
-export const getCommentModel = async (comment_id: number): Promise<CommentType | null> => {
+export const getCommentModel = async (id: number): Promise<CommentType | null> => {
   const connection = await db.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM comment WHERE comment_id = ?', [comment_id]);
+    const [rows] = await connection.execute('SELECT * FROM comment WHERE id = ?', [id]);
     if (Array.isArray(rows) && rows.length > 0) {
       return rows[0] as CommentType;
     }
@@ -82,11 +82,11 @@ export const getCommentModel = async (comment_id: number): Promise<CommentType |
     connection.release();
   }
 };
-export const deleteCommentModel = async (comment_id: number): Promise<void> => {
+export const deleteCommentModel = async (id: number): Promise<void> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    await connection.execute('DELETE FROM comment WHERE comment_id = ?', [comment_id]);
+    await connection.execute('DELETE FROM comment WHERE id = ?', [id]);
   } finally {
     connection.release();
   }

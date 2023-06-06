@@ -28,7 +28,7 @@ export const createCommentController = async (req: CustomRequest, res: Response,
 
     const createdCommentId = await createComment({ user_id: loggedInUserId, diary_id, comment });
 
-    res.status(201).json({ comment_id: createdCommentId, message: '댓글이 생성되었습니다.' });
+    res.status(201).json({ id: createdCommentId, message: '댓글이 생성되었습니다.' });
   } catch (error) {
     console.error(error);
     next(error instanceof AppError ? error : new AppError('댓글 생성에 실패했습니다.', 500));
@@ -37,9 +37,8 @@ export const createCommentController = async (req: CustomRequest, res: Response,
 export const getCommentsByDiaryController = async (req: CustomRequest, res: Response) => {
     try {
         const { diary_id } = req.params;
-        const { page, limit } = req.query; // 변경된 부분
-        
-        //console.log(req.query);
+        const { page, limit } = req.query; 
+
       const loggedInUserId = req.user?.user_id;
     
       if (!loggedInUserId) {
@@ -70,14 +69,14 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
   };
   export const updateCommentController = async (req: CustomRequest ,res: Response) => {
     try {
-      const { comment_id } = req.params;
+      const { id } = req.params;
       const { comment } = req.body;
       const user_id = req.user?.user_id;
       if (comment === undefined) {
         throw new Error('댓글을 입력해 주세요.');
       }
   
-      await updateComment({comment}, Number(comment_id), user_id as string);
+      await updateComment({comment}, Number(id), user_id as string);
       res.status(200).json({ message: '댓글이 성공적으로 수정되었습니다.' });
     } catch (error) {
       console.error(error);
@@ -91,14 +90,14 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
 
   export const deleteCommentController = async (req: CustomRequest, res: Response) => {
     try {
-      const { comment_id } = req.params;
+      const { id } = req.params;
       const user_id = req.user?.user_id;
   
       if (!user_id) {
         throw new AppError('사용자 정보를 찾을 수 없습니다.', 401);
       }
   
-      await deleteComment(Number(comment_id), user_id);
+      await deleteComment(Number(id), user_id);
   
       res.status(200).json({ message: '댓글 삭제가 완료되었습니다.' });
     } catch (error) {

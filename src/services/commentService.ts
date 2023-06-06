@@ -38,9 +38,9 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
       throw new Error('댓글 조회에 실패했습니다.');
     }
   };
-  export const updateComment = async (newComment: CommentType, comment_id: number, user_id: string): Promise<void> => {
+  export const updateComment = async (newComment: CommentType, id: number, user_id: string): Promise<void> => {
     try {
-      const existingComment = await getCommentModel(comment_id);
+      const existingComment = await getCommentModel(id);
       if (!existingComment) {
         throw new AppError('존재하지 않는 댓글입니다.', 404);
       }
@@ -49,16 +49,16 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
         throw new AppError('댓글을 수정할 권한이 없습니다.', 403);
       }
   
-      await updateCommentModel(comment_id,newComment);
+      await updateCommentModel(id,newComment);
       
     } catch (error) {
       throw new Error('댓글 수정에 실패했습니다.');
     }
   };
 
-  export const deleteComment = async (comment_id: number, user_id: string) => {
+  export const deleteComment = async (id: number, user_id: string) => {
     try {
-      const comment = await getCommentModel(comment_id);
+      const comment = await getCommentModel(id);
       if (!comment) {
         throw new AppError('댓글을 찾을 수 없습니다.', 404);
       }
@@ -66,7 +66,7 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
         throw new AppError('권한이 없습니다.', 403);
       }
   
-      await deleteCommentModel(comment_id);
+      await deleteCommentModel(id);
   
       return '댓글 삭제가 완료되었습니다.';
     } catch (error) {
