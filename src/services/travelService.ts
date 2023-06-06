@@ -23,14 +23,18 @@ export const createTravelPlan = async (travelPlan: TravelPlan) => {
 
 // 여행 날짜별 장소 등록
 export const createTravelLocation = async (travelLocation: TravelLocation): Promise<void> => {
-  
-  if (!travelLocation.user_id || !travelLocation.plan_id || !travelLocation.date || !travelLocation.location) {
+  if (
+    !travelLocation.user_id ||
+    !travelLocation.plan_id ||
+    !travelLocation.date ||
+    !travelLocation.location ||
+    !travelLocation.order
+  ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
   await createTravelLocationModel(travelLocation);
 };
-
 
 // 여행 일정 조회
 export const getTravelPlans = async (user_id: string): Promise<TravelPlan[]> => {
