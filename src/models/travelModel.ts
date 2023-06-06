@@ -24,12 +24,16 @@ export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<num
 export const createTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('INSERT INTO travel_location (user_id, plan_id, date, location) VALUES (?, ?, ?, ?)', [
-      travelLocation.user_id,
-      travelLocation.plan_id,
-      travelLocation.date,
-      travelLocation.location,
-    ]);
+    await connection.execute(
+      'INSERT INTO travel_location (user_id, plan_id, date, location, `order`) VALUES (?, ?, ?, ?, ?)', 
+      [
+        travelLocation.user_id,
+        travelLocation.plan_id,
+        travelLocation.date,
+        travelLocation.location,
+        travelLocation.order
+      ]
+    );
   } finally {
     connection.release();
   }

@@ -13,7 +13,7 @@ import {
 import { JwtPayload } from 'jsonwebtoken';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { user_id: string};
+  user?: JwtPayload & { user_id: string };
 }
 
 // 여행 일정 등록 + 날짜별 장소 등록
@@ -22,14 +22,17 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
     throw new AppError('인증이 필요합니다.', 401);
   }
   try {
-    const { locations, ...travelPlan } = req.body;
+    const { dates, ...travelPlan } = req.body;
     const { user_id } = req.user;
 
     // 여행 일정 등록
-    const plan_id = Number(await createTravelPlan(travelPlan));
+    const plan_id = Number(await createTravelPlan({ ...travelPlan, user_id }));
+
     // 각 날짜별 장소 등록
-    for (const location of locations) {
-      await createTravelLocation({ ...location, user_id, plan_id });
+    for (const dateObj of dates) {
+      for (const location of dateObj.locations) {
+        await createTravelLocation({ ...location, date: dateObj.date, user_id, plan_id });
+      }
     }
 
     res.status(201).json({ message: '여행 계획 및 장소가 성공적으로 등록되었습니다.' });
