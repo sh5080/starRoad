@@ -13,11 +13,12 @@ export const createDiaryById = async (diary: DiaryType): Promise<void> => {
     connection.release(); // 연결 해제
   }
 };
-export const getPlanById = async (plan_id: number, user_id: string): Promise<TravelPlan | null> => {
+export const getPlan = async (plan_id: number, user_id: string): Promise<TravelPlan | null> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND user_id = ?', [
+    const [rows] = await connection.execute(
+      'SELECT * FROM travel_plan WHERE plan_id = ? AND user_id = ?', [
       plan_id,
       user_id,
     ]);
@@ -34,7 +35,8 @@ export const getAllDiaryById = async (): Promise<DiaryType[]> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM travel_diary');
+    const [rows] = await connection.execute(
+      'SELECT * FROM travel_diary');
     const diary = rows as DiaryType[];
     return diary;
   } finally {
@@ -45,7 +47,8 @@ export const getMyDiaryById = async (user_id: string): Promise<DiaryType[]> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM travel_diary WHERE user_id = ?', [user_id]);
+    const [rows] = await connection.execute(
+      'SELECT * FROM travel_diary WHERE user_id = ?', [user_id]);
     return rows as DiaryType[];
   } finally {
     connection.release();
@@ -55,7 +58,8 @@ export const getOneDiaryById = async (diary_id: number): Promise<DiaryType | nul
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM travel_diary WHERE diary_id = ?', [diary_id]);
+    const [rows] = await connection.execute(
+      'SELECT * FROM travel_diary WHERE diary_id = ?', [diary_id]);
     if (Array.isArray(rows) && rows.length > 0) {
       const diary = rows[0] as DiaryType;
       return diary;
@@ -69,7 +73,8 @@ export const updateDiaryById = async (diary: DiaryType, diary_id: number): Promi
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    await connection.execute('UPDATE travel_diary SET title = ?, content = ?, image = ? WHERE diary_id = ?', [
+    await connection.execute(
+      'UPDATE travel_diary SET title = ?, content = ?, image = ? WHERE diary_id = ?', [
       diary.title,
       diary.content,
       diary.image,
@@ -84,7 +89,8 @@ export const deleteDiaryById = async (diary_id: number): Promise<void> => {
   const pool = db;
   const connection = await pool.getConnection();
   try {
-    await connection.execute('DELETE FROM travel_diary WHERE diary_id = ?', [diary_id]);
+    await connection.execute(
+      'DELETE FROM travel_diary WHERE diary_id = ?', [diary_id]);
   } finally {
     connection.release();
   }

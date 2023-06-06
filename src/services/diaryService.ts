@@ -1,6 +1,6 @@
 import { 
     createDiaryById, 
-    getPlanById, 
+    getPlan, 
     getAllDiaryById, 
     getMyDiaryById, 
     getOneDiaryById, 
@@ -11,23 +11,23 @@ import { DiaryType } from '../types/diary';
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { TravelPlan } from '../types/travel';
 
-export const createDiary = async (diary: DiaryType, plan:TravelPlan) => {
+export const createDiary = async (diary: DiaryType, user_id: string, plan_id: number) => {
     try {
-        if (!plan.plan_id) {
-            throw new AppError(CommonError.RESOURCE_NOT_FOUND,'존재하지 않는 일정 ID입니다.', 400);
-          }
-      // const planData = await getPlanById(plan.plan_id, plan.user_id);  
-      // if (!planData) {
-      //   throw new AppError('일정을 찾을 수 없습니다.', 404);
-      // }
-      diary.destination = plan.destination; 
+      const plan = await getPlan(plan_id,user_id);
+      if (!plan) {
+        throw new AppError(CommonError.UNAUTHORIZED_ACCESS,
+          '해당 일정에 대한 여행기를 작성할 권한이 없습니다.', 404);
+      }
+      const { destination } = plan; // 플랜의 destination 값
+      diary.destination = destination; 
       await createDiaryById(diary);
       return '여행기 생성이 완료되었습니다.';
-    } catch (error) {
-      console.error(error);
+    } 
+    catch (error) {
+      console.error(error)
       throw new AppError(CommonError.UNEXPECTED_ERROR,'여행기 생성에 실패했습니다.', 500);
     }
-  };
+  }
 
 export const getAllDiary = async (): Promise<DiaryType[]> => {
   try {
@@ -47,8 +47,6 @@ export const getMyDiary = async (user_id: string): Promise<DiaryType[]> => {
       throw new AppError(CommonError.UNEXPECTED_ERROR,'내 다이어리 조회에 실패했습니다.', 500);
     }
   };
-  
-
 export const getOneDiary = async (diary_id: number): Promise<DiaryType | null> => {
   try {
     const diary = await getOneDiaryById(diary_id);
