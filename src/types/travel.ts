@@ -15,4 +15,5 @@ export interface TravelLocation {
   date?: string;
   newDate?: string;
   location?: string;
+  order?: number;
 }
