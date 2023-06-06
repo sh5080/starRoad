@@ -9,18 +9,18 @@ export const signup = async (req: Request, res: Response) => {
     const user: UserType = req.body;
 
     if (!user.user_id || !user.password || !user.email || !user.name) {
-      return res.status(400).json({ error: '회원가입에 필요한 정보가 제공되지 않았습니다.' });
+      throw new AppError(CommonError.INVALID_INPUT,'회원가입에 필요한 정보가 제공되지 않았습니다.',400);
     }
-
     const message = await signupUser(user);
 
     res.status(201).json({ message });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '회원가입에 실패했습니다.' });
+  }catch (error) {
+    switch (error) {
+      case CommonError.INVALID_INPUT:
+        break;
+      default:
+        //console.error(error);
+        res.status(500).json({ error: '회원가입에 실패했습니다.' });
     }
   }
 };
@@ -31,22 +31,26 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { user_id, password }: UserType = req.body;
 
     if (!user_id || !password) {
-      return res.status(400).json({ error: '로그인에 필요한 정보가 제공되지 않았습니다.' });
+      throw new AppError(CommonError.INVALID_INPUT,'로그인에 필요한 정보가 제공되지 않았습니다.',400);
     }
-
     const userData = await getUser(user_id);
-
     console.log(userData);
+
     if (!userData.activated) {
-      return res.status(400).json({ error: '탈퇴한 회원입니다.' });
+      throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'탈퇴한 회원입니다.',400)
     }
-
     const token = await loginUser(user_id, password);
-
     res.json({ token });
-  } catch (err) {
-    console.error(err);
-    next(err); // 에러를 next 함수를 통해 errorHandler 미들웨어로 전달합니다.
+  } catch (error) {
+    switch (error) {
+      case CommonError.INVALID_INPUT:
+      case CommonError.UNAUTHORIZED_ACCESS:
+        next(error)
+        break;
+      default:
+        //console.error(error);
+        res.status(500).json({ error: '회원가입에 실패했습니다.' });
+    }
   }
 };
 export const logout = async (req: CustomRequest, res: Response) => {
@@ -55,12 +59,13 @@ export const logout = async (req: CustomRequest, res: Response) => {
       throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
     }
     res.status(200).json({ message: '로그아웃 되었습니다.' });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '로그아웃 실패했습니다.' });
+  }catch (error) {
+    switch (error) {
+      case CommonError.AUTHENTICATION_ERROR:
+        break;
+      default:
+        //console.error(error);
+        res.status(500).json({ error: '로그아웃에 실패했습니다.' });
     }
   }
 };
@@ -82,41 +87,45 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
     const userData = await getUser(user_id);
 
     if (!userData) {
-      return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND,'사용자를 찾을 수 없습니다.',404);
     }
     res.status(200).json({ userData });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '사용자 조회에 실패했습니다.' });
+  }catch (error) {
+    switch (error) {
+      case CommonError.AUTHENTICATION_ERROR:
+      case CommonError.RESOURCE_NOT_FOUND:
+        break;
+      default:
+        //console.error(error);
+        res.status(500).json({ error: '사용자 조회에 실패했습니다.' });
     }
   }
 };
 // 회원 정보 수정
 export const updateUserInfo = async (req: CustomRequest, res: Response) => {
   try {
-    // req.user가 없는 경우 에러 처리
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
 
     const { user_id } = req.user;
-    const updateData = req.body;
+    const { email, password } = req.body;
 
-    const updatedUserData = await updateUser(user_id, updateData);
-
-    if (!updatedUserData) {
-      return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+    if (!email || !password) {
+      throw new AppError(CommonError.INVALID_INPUT, '올바른 이메일과 비밀번호를 입력해주세요.', 400);
     }
+
+    const updatedUserData = await updateUser(user_id, { email, password });
+
     res.status(200).json({ updatedUserData });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '사용자 정보 업데이트에 실패했습니다.' });
+  } catch (error) {
+    switch (error) {
+      case CommonError.AUTHENTICATION_ERROR:
+      case CommonError.INVALID_INPUT:
+        break;
+      default:
+        console.error(error);
+        res.status(500).json({ error: '사용자 정보 업데이트에 실패했습니다.' });
     }
   }
 };

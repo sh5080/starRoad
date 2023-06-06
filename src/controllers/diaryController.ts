@@ -11,8 +11,6 @@ import {
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
 import { NextFunction } from 'connect';
-// import { getPlan } from '../models/diaryModel';
-
 interface CustomRequest extends Request {
     user?: JwtPayload & { user_id: string };
   }
@@ -62,7 +60,7 @@ export const getAllDiaryController = async (req: Request, res: Response) => {
         case CommonError.UNAUTHORIZED_ACCESS:
           break;
         default:
-          console.error(error);
+          //console.error(error);
           res.status(500).json({ error: '전체 여행기 조회에 실패했습니다.' });
       }
     }
@@ -78,8 +76,13 @@ export const getAllDiaryController = async (req: Request, res: Response) => {
     
         res.status(200).json(diaries);
       } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: '내 여행기 조회에 실패했습니다.' });
+        switch (error) {
+          case CommonError.AUTHENTICATION_ERROR:
+            break;
+          default:
+            //console.error(error);
+            res.status(500).json({ error: '내 여행기 조회에 실패했습니다.' });
+        }
       }
     };
 export const getOneDiaryController = async (req: Request, res: Response) => {
@@ -92,15 +95,23 @@ export const getOneDiaryController = async (req: Request, res: Response) => {
           '여행기를 찾을 수 없습니다.', 404);
       }
       res.status(200).json(diary);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: '여행기 조회에 실패했습니다.' });
+    }catch (error) {
+      switch (error) {
+        case CommonError.RESOURCE_NOT_FOUND:
+          break;
+        default:
+          //console.error(error);
+          res.status(500).json({ error: '여행기 조회에 실패했습니다.' });
+      }
     }
   };
+
 export const updateDiaryController = async (req: CustomRequest, res: Response) => {
   try {
-    const { diary, diary_id } = req.body;
+    const diary_id = parseInt(req.params.diary_id, 10);
+    const { diary } = req.body;
     const user_id = req.user?.user_id;
+
     if (!user_id) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR,
         '사용자 정보를 찾을 수 없습니다.', 401);
@@ -109,17 +120,23 @@ export const updateDiaryController = async (req: CustomRequest, res: Response) =
     await updateDiary(diary, diary_id, user_id);
 
     res.status(200).json({ message: '여행기 수정이 완료되었습니다.' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: '여행기 수정에 실패했습니다.' });
+  }catch (error) {
+    switch (error) {
+      case CommonError.AUTHENTICATION_ERROR:
+        break;
+      default:
+        //console.error(error);
+        res.status(500).json({ error: '여행기 수정에 실패했습니다.' });
+    }
   }
 };
+
 
 export const deleteDiaryController = async (req: CustomRequest, res: Response) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const user_id = req.user?.user_id;
-
+    console.log(user_id)
     if (!user_id) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR,
         '사용자 정보를 찾을 수 없습니다.', 401);
@@ -127,8 +144,13 @@ export const deleteDiaryController = async (req: CustomRequest, res: Response) =
     await deleteDiary(diary_id, user_id);
 
     res.status(200).json({ message: '여행기 삭제가 완료되었습니다.' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: '여행기 삭제에 실패했습니다.' });
+  }catch (error) {
+    switch (error) {
+      case CommonError.AUTHENTICATION_ERROR:
+        break;
+      default:
+        //console.error(error);
+        res.status(500).json({ error: '여행기 삭제에 실패했습니다.' });
+    }
   }
   };

@@ -63,17 +63,38 @@ export const getUser = async (user_id: string) => {
 };
 
 export const updateUser = async (user_id: string, updateData: Partial<UserType>) => {
+  // 기존 유저 정보 가져오기
+  const existingUser = await getUserById(user_id);
+
+  if (!existingUser) {
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'사용자 정보를 찾을 수 없습니다.', 404);
+  }
+
+  if (updateData.email && updateData.email === existingUser.email) {
+    throw new AppError(CommonError.INVALID_INPUT,'새로운 이메일을 입력해주세요.', 400);
+  }
+
   if (updateData.password) {
+    // 비밀번호가 변경되었는지 확인
+    const isSamePassword = await bcrypt.compare(updateData.password, existingUser.password || '');
+    if (isSamePassword) {
+      throw new AppError(CommonError.INVALID_INPUT,'새로운 비밀번호를 입력해주세요.', 400);
+    }
+    
+    // 새 비밀번호를 해시하여 저장
     const salt = await bcrypt.genSalt();
     updateData.password = await bcrypt.hash(updateData.password, salt);
   }
+
   const updatedUser = await updateUserById(user_id, updateData);
 
   if (!updatedUser) {
     throw new AppError(CommonError.UNEXPECTED_ERROR,'사용자 정보 업데이트에 실패했습니다.', 500);
   }
+
   return '회원정보 수정이 정상적으로 완료되었습니다.';
 };
+
 
 export const deleteUser = async (user_id: string) => {
   const deletedUser = await deleteUserById(user_id);
