@@ -9,7 +9,7 @@ export const createDiary = async (diary: DiaryType, user_id: string, plan_id: nu
     if (!plan) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '해당 일정에 대한 여행기를 작성할 권한이 없습니다.', 404);
     }
-    const { destination } = plan; // 플랜의 destination 값
+    const { destination } = plan; // 일정의 destination 값
     diary.destination = destination;
     await diaryModel.createDiaryById(diary);
     return '여행기 생성이 완료되었습니다.';
