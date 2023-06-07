@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import { AppError,CommonError } from "../types/AppError";
 import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
 

@@ -3,7 +3,7 @@ import * as userModel from '../models/userModel';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import { UserType } from '../types/user';
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../types/AppError';
 
 const { saltRounds } = config.bcrypt;
 const ACCESS_TOKEN_SECRET = config.jwt.ACCESS_TOKEN_SECRET;
@@ -16,7 +16,7 @@ export const signupUser = async (user: UserType): Promise<string> => {
 
   const findUserId = await userModel.getUserById(String(user.user_id));
   if (findUserId) {
-    throw new AppError(CommonError.DUPLICATE_ENTRY,'이미 존재하는 아이디입니다.', 409);
+    throw new AppError(CommonError.DUPLICATE_ENTRY, '이미 존재하는 아이디입니다.', 409);
   }
 
   await userModel.createUser({ ...user, password: hashedPassword });
@@ -28,16 +28,16 @@ export const loginUser = async (user_id: string, password: string): Promise<obje
   const user = await userModel.getUserById(user_id);
 
   if (!user) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'없는 사용자 입니다.', 404);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
   }
 
   if (!user.activated) {
-    throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'탈퇴한 회원입니다.', 400);
+    throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '탈퇴한 회원입니다.', 400);
   }
 
   const isPasswordMatch = await bcrypt.compare(password, String(user.password));
   if (!isPasswordMatch) {
-    throw new AppError(CommonError.AUTHENTICATION_ERROR,'비밀번호가 일치하지 않습니다.', 401);
+    throw new AppError(CommonError.AUTHENTICATION_ERROR, '비밀번호가 일치하지 않습니다.', 401);
   }
 
   const accessToken: string = jwt.sign({ user_id: user.user_id, role: user.role }, ACCESS_TOKEN_SECRET, {
@@ -55,7 +55,7 @@ export const getUser = async (user_id: string) => {
   const user = await userModel.getUserById(user_id);
 
   if (!user) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'없는 사용자 입니다.', 404);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
   }
   const { id, password, ...userData } = user;
 
@@ -67,20 +67,20 @@ export const updateUser = async (user_id: string, updateData: Partial<UserType>)
   const existingUser = await userModel.getUserById(user_id);
 
   if (!existingUser) {
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'사용자 정보를 찾을 수 없습니다.', 404);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보를 찾을 수 없습니다.', 404);
   }
 
   if (updateData.email && updateData.email === existingUser.email) {
-    throw new AppError(CommonError.INVALID_INPUT,'새로운 이메일을 입력해주세요.', 400);
+    throw new AppError(CommonError.INVALID_INPUT, '새로운 이메일을 입력해주세요.', 400);
   }
 
   if (updateData.password) {
     // 비밀번호가 변경되었는지 확인
     const isSamePassword = await bcrypt.compare(updateData.password, existingUser.password || '');
     if (isSamePassword) {
-      throw new AppError(CommonError.INVALID_INPUT,'새로운 비밀번호를 입력해주세요.', 400);
+      throw new AppError(CommonError.INVALID_INPUT, '새로운 비밀번호를 입력해주세요.', 400);
     }
-    
+
     // 새 비밀번호를 해시하여 저장
     const salt = await bcrypt.genSalt();
     updateData.password = await bcrypt.hash(updateData.password, salt);
@@ -89,12 +89,11 @@ export const updateUser = async (user_id: string, updateData: Partial<UserType>)
   const updatedUser = await userModel.updateUserById(user_id, updateData);
 
   if (!updatedUser) {
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'사용자 정보 업데이트에 실패했습니다.', 500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 업데이트에 실패했습니다.', 500);
   }
 
   return '회원정보 수정이 정상적으로 완료되었습니다.';
 };
-
 
 export const deleteUser = async (user_id: string) => {
   const deletedUser = await userModel.deleteUserById(user_id);

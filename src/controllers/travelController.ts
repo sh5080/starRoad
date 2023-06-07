@@ -1,4 +1,5 @@
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../types/AppError';
+
 import { Request, Response } from 'express';
 import * as travelService from '../services/travelService';
 import { CustomRequest } from '../types/customRequest';

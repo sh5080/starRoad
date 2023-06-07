@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserType } from '../types/user';
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from "../types/AppError";
 import { JwtPayload } from 'jsonwebtoken';
 
 // 회원가입

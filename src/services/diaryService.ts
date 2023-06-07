@@ -1,6 +1,6 @@
 import * as diaryModel from '../models/diaryModel';
 import { DiaryType } from '../types/diary';
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import { AppError,CommonError } from "../types/AppError";
 
 
 export const createDiary = async (diary: DiaryType, user_id: string, plan_id: number) => {

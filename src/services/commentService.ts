@@ -1,7 +1,8 @@
 import * as commentModel from '../models/commentModel';
 
 import { CommentType } from '../types/comment';
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import { AppError,CommonError } from "../types/AppError";
+
 
 export const createComment = async (comment: CommentType): Promise<void> => {
   try {

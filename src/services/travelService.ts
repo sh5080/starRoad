@@ -1,6 +1,6 @@
 import { TravelPlan, TravelLocation } from '../types/travel';
 import * as travelModel from '../models/travelModel';
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import { AppError, CommonError } from '../types/AppError';
 
 // 여행 일정 등록
 export const createPlan = async (travelPlan: TravelPlan) => {
