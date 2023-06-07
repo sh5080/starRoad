@@ -10,16 +10,15 @@ interface QueryResult extends RowDataPacket {
 }
 
 export const createCommentModel = async (comment: CommentType): Promise<void> => {
-  const pool = db;
-  const connection = await pool.getConnection();
   try {
-    await connection.execute('INSERT INTO comment (user_id, diary_id, comment) VALUES (?, ?, ?)', [
+    await db.execute('INSERT INTO comment (user_id, diary_id, comment) VALUES (?, ?, ?)', [
       comment.user_id,
       comment.diary_id,
-      comment.comment
+      comment.comment,
     ]);
-  } finally {
-    connection.release(); // 연결 해제
+  } catch (error) {
+    console.error(error);
+    throw new Error('댓글 생성에 실패했습니다.');
   }
 };
 
@@ -28,11 +27,9 @@ export const getCommentsByDiaryModel = async (
   page: number,
   limit: number
 ): Promise<CommentType[]> => {
-  const pool = db;
-  const connection = await pool.getConnection();
   try {
     const offset = (page - 1) * limit;
-    const [rows] = (await connection.query('SELECT * FROM comment WHERE diary_id = ? LIMIT ? OFFSET ?', [
+    const [rows] = (await db.query('SELECT * FROM comment WHERE diary_id = ? LIMIT ? OFFSET ?', [
       diary_id,
       limit,
       offset,
@@ -46,49 +43,49 @@ export const getCommentsByDiaryModel = async (
     }));
 
     return comments;
-  } finally {
-    connection.release(); // 연결 해제
+  } catch (error) {
+    console.error(error);
+    throw new Error('댓글 조회에 실패했습니다.');
   }
 };
 
 export const getAllCommentsModel = async (): Promise<CommentType[]> => {
-  const connection = await db.getConnection();
   try {
-    const [rows] = await connection.query('SELECT * FROM comment');
+    const [rows] = await db.query('SELECT * FROM comment');
     return rows as CommentType[];
-  } finally {
-    connection.release();
+  } catch (error) {
+    console.error(error);
+    throw new Error('모든 댓글 조회에 실패했습니다.');
   }
 };
 
 export const updateCommentModel = async (id: number, comment: CommentType): Promise<void> => {
-  const connection = await db.getConnection();
   try {
-    await connection.execute('UPDATE comment SET comment = ? WHERE id = ?', 
-    [comment.comment, id]);
-  } finally {
-    connection.release();
+    await db.execute('UPDATE comment SET comment = ? WHERE id = ?', [comment.comment, id]);
+  } catch (error) {
+    console.error(error);
+    throw new Error('댓글 업데이트에 실패했습니다.');
   }
 };
+
 export const getCommentModel = async (id: number): Promise<CommentType | null> => {
-  const connection = await db.getConnection();
   try {
-    const [rows] = await connection.execute('SELECT * FROM comment WHERE id = ?', [id]);
+    const [rows] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
     if (Array.isArray(rows) && rows.length > 0) {
       return rows[0] as CommentType;
     }
     return null;
-  } finally {
-    connection.release();
-  }
-};
-export const deleteCommentModel = async (id: number): Promise<void> => {
-  const pool = db;
-  const connection = await pool.getConnection();
-  try {
-    await connection.execute('DELETE FROM comment WHERE id = ?', [id]);
-  } finally {
-    connection.release();
+  } catch (error) {
+    console.error(error);
+    throw new Error('댓글 조회에 실패했습니다.');
   }
 };
 
+export const deleteCommentModel = async (id: number): Promise<void> => {
+  try {
+    await db.execute('DELETE FROM comment WHERE id = ?', [id]);
+  } catch (error) {
+    console.error(error);
+    throw new Error('댓글 삭제에 실패했습니다.');
+  }
+};
