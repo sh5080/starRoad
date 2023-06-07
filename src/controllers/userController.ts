@@ -19,7 +19,7 @@ export const signup = async (req: Request, res: Response) => {
       case CommonError.INVALID_INPUT:
         break;
       default:
-        //console.error(error);
+        console.error(error);
         res.status(500).json({ error: '회원가입에 실패했습니다.' });
     }
   }

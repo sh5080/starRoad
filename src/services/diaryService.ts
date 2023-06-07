@@ -1,15 +1,15 @@
 import {
   createDiaryById,
   getPlan,
-  getAllDiaryById,
-  getMyDiaryById,
+  getAllDiariesByUserId,
+  getMyDiariesByUserId,
   getOneDiaryById,
   updateDiaryById,
   deleteDiaryById,
 } from '../models/diaryModel';
 import { DiaryType } from '../types/diary';
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
-import { TravelPlan } from '../types/travel';
+
 
 export const createDiary = async (diary: DiaryType, user_id: string, plan_id: number) => {
   try {
@@ -27,18 +27,18 @@ export const createDiary = async (diary: DiaryType, user_id: string, plan_id: nu
   }
 };
 
-export const getAllDiary = async (): Promise<DiaryType[]> => {
+export const getAllDiaries = async (): Promise<DiaryType[]> => {
   try {
-    const diary = await getAllDiaryById();
+    const diary = await getAllDiariesByUserId();
     return diary;
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '전체 여행기 조회에 실패했습니다.', 500);
   }
 };
-export const getMyDiary = async (user_id: string): Promise<DiaryType[]> => {
+export const getMyDiaries = async (user_id: string): Promise<DiaryType[]> => {
   try {
-    const diary = await getMyDiaryById(user_id);
+    const diary = await getMyDiariesByUserId(user_id);
     return diary;
   } catch (error) {
     console.error(error);

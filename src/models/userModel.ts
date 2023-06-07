@@ -24,23 +24,13 @@ export const updateUserById = async (
   user_id: string,
   updateData: Partial<Pick<UserType, 'email' | 'password'>>
 ): Promise<UserType | null> => {
-  const [result] = await db.query<OkPacket>('UPDATE user SET ? WHERE user_id = ?', [updateData, user_id]);
-
-  if (!result.affectedRows) {
-    return null;
-  }
-
-  const [updatedUserRows] = await db.execute('SELECT * FROM user WHERE user_id = ?', [user_id]);
-  if (Array.isArray(updatedUserRows) && updatedUserRows.length > 0) {
-    const updatedUser = updatedUserRows[0] as UserType;
-    return updatedUser;
-  }
+  await db.execute('UPDATE user SET ? WHERE user_id = ?', [updateData, user_id]);
 
   return null;
 };
 
 export const deleteUserById = async (user_id: string): Promise<boolean> => {
-  const [result] = await db.query<OkPacket>('UPDATE user SET activated = 0 WHERE user_id = ?', [user_id]);
+  const [result] = await db.execute<OkPacket>('UPDATE user SET activated = 0 WHERE user_id = ?', [user_id]);
 
   if (result.affectedRows > 0) {
     return true; // 삭제 성공
@@ -48,3 +38,4 @@ export const deleteUserById = async (user_id: string): Promise<boolean> => {
 
   return false; // 삭제 실패
 };
+

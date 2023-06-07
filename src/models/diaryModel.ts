@@ -6,7 +6,8 @@ export const createDiaryById = async (diary: DiaryType): Promise<void> => {
   try {
     await db.execute(
       'INSERT INTO travel_diary (user_id, plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?, ?)',
-      [diary.user_id, diary.plan_id, diary.title, diary.content, diary.image, diary.destination]
+      [diary.user_id, diary.plan_id, diary.title, 
+        diary.content, diary.image, diary.destination]
     );
   } catch (error) {
     console.error(error);
@@ -27,11 +28,11 @@ export const getPlan = async (plan_id: number, user_id: string): Promise<TravelP
     return null;
   } catch (error) {
     console.error(error);
-    throw new Error('여행 계획을 가져오는 중에 오류가 발생했습니다.');
+    throw new Error('여행 일정을 가져오는 중에 오류가 발생했습니다.');
   }
 };
 
-export const getAllDiaryById = async (): Promise<DiaryType[]> => {
+export const getAllDiariesByUserId = async (): Promise<DiaryType[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary');
     const diary = rows as DiaryType[];
@@ -42,7 +43,7 @@ export const getAllDiaryById = async (): Promise<DiaryType[]> => {
   }
 };
 
-export const getMyDiaryById = async (user_id: string): Promise<DiaryType[]> => {
+export const getMyDiariesByUserId = async (user_id: string): Promise<DiaryType[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE user_id = ?', [user_id]);
     return rows as DiaryType[];

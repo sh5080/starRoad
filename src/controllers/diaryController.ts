@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { 
     createDiary, 
     deleteDiary, 
-    getAllDiary, 
-    getMyDiary, 
+    getAllDiaries, 
+    getMyDiaries, 
     getOneDiary, 
     updateDiary 
 } from '../services/diaryService';
@@ -45,10 +45,10 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
   }
 };
 
-export const getAllDiaryController = async (req: Request, res: Response) => {
+export const getAllDiariesController = async (req: Request, res: Response) => {
   try {
       // 다이어리 조회
-      const diary = await getAllDiary();
+      const diary = await getAllDiaries();
       if (!diary) {
         throw new AppError(CommonError.RESOURCE_NOT_FOUND,
           '전체 여행기를 찾을 수 없습니다.', 404);
@@ -65,14 +65,14 @@ export const getAllDiaryController = async (req: Request, res: Response) => {
       }
     }
   };
-  export const getMyDiaryController = async (req: CustomRequest, res: Response) => {
+  export const getMyDiariesController = async (req: CustomRequest, res: Response) => {
       try {
         const user_id = req.user?.user_id;
         if (!user_id) {
           throw new AppError(CommonError.AUTHENTICATION_ERROR,
             '사용자 정보를 찾을 수 없습니다.', 401);
         }
-        const diaries = await getMyDiary(user_id);
+        const diaries = await getMyDiaries(user_id);
     
         res.status(200).json(diaries);
       } catch (error) {

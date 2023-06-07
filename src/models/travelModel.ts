@@ -1,7 +1,7 @@
 import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
 
-export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<number> => {
+export const createTravelPlan = async (travelPlan: TravelPlan): Promise<number> => {
   try {
     const [rows] = await db.execute(
       'INSERT INTO travel_plan (user_id, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
@@ -15,7 +15,7 @@ export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<num
   }
 };
 
-export const createTravelLocationModel = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
+export const createTravelLocation = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
   try {
     await db.execute(
       'INSERT INTO travel_location (plan_id, date, location, `order`, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
@@ -34,9 +34,9 @@ export const createTravelLocationModel = async (travelLocation: TravelLocation, 
   }
 };
 
-export const getTravelPlansModel = async (user_id: string): Promise<TravelPlan[]> => {
+export const getTravelPlansByUserId = async (user_id: string): Promise<TravelPlan[]> => {
   try {
-    const [rows] = await db.query('SELECT * FROM travel_plan WHERE user_id = ?', [user_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE user_id = ?', [user_id]);
     return rows as TravelPlan[];
   } catch (error) {
     console.error(error);
@@ -44,9 +44,9 @@ export const getTravelPlansModel = async (user_id: string): Promise<TravelPlan[]
   }
 };
 
-export const getTravelLocationsModel = async (plan_id: number): Promise<TravelLocation[]> => {
+export const getTravelLocationsByPlanId = async (plan_id: number): Promise<TravelLocation[]> => {
   try {
-    const [rows] = await db.query('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
     return rows as TravelLocation[];
   } catch (error) {
     console.error(error);
@@ -54,7 +54,7 @@ export const getTravelLocationsModel = async (plan_id: number): Promise<TravelLo
   }
 };
 
-export const updateTravelPlanModel = async (travelPlan: TravelPlan): Promise<void> => {
+export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
   try {
     await db.execute(
       'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ? AND user_id = ?',
@@ -66,7 +66,7 @@ export const updateTravelPlanModel = async (travelPlan: TravelPlan): Promise<voi
   }
 };
 
-export const updateTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
+export const updateTravelLocation = async (travelLocation: TravelLocation): Promise<void> => {
   try {
     await db.execute(
       'UPDATE travel_location SET location = ?, date = ?, `order` = ? WHERE plan_id = ? AND location_id = ?',
@@ -84,7 +84,7 @@ export const updateTravelLocationModel = async (travelLocation: TravelLocation):
   }
 };
 
-export const deleteTravelPlanModel = async (user_id: string, plan_id: number): Promise<void> => {
+export const deleteTravelPlan = async (user_id: string, plan_id: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM travel_location WHERE plan_id = ?', [plan_id]);
     await db.execute('DELETE FROM travel_plan WHERE user_id = ? AND plan_id = ?', [user_id, plan_id]);
@@ -94,7 +94,7 @@ export const deleteTravelPlanModel = async (user_id: string, plan_id: number): P
   }
 };
 
-export const deleteTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
+export const deleteTravelLocation = async (travelLocation: TravelLocation): Promise<void> => {
   try {
     await db.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND location_id = ?', [
       travelLocation.plan_id,

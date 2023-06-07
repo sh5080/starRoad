@@ -29,7 +29,7 @@ export const getCommentsByDiaryModel = async (
 ): Promise<CommentType[]> => {
   try {
     const offset = (page - 1) * limit;
-    const [rows] = (await db.query('SELECT * FROM comment WHERE diary_id = ? LIMIT ? OFFSET ?', [
+    const [rows] = (await db.execute('SELECT * FROM comment WHERE diary_id = ? LIMIT ? OFFSET ?', [
       diary_id,
       limit,
       offset,
@@ -51,7 +51,7 @@ export const getCommentsByDiaryModel = async (
 
 export const getAllCommentsModel = async (): Promise<CommentType[]> => {
   try {
-    const [rows] = await db.query('SELECT * FROM comment');
+    const [rows] = await db.execute('SELECT * FROM comment');
     return rows as CommentType[];
   } catch (error) {
     console.error(error);
