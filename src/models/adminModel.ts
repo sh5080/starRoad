@@ -80,6 +80,16 @@ export const getUserInfoDiaryModel = async (user_id: string): Promise<DiaryType[
   }
 };
 
+// [관리자] 회원이 작성한 다이어리 삭제하기
+export const deleteDiaryByAdminModel = async (user_id: string, diary_id: number): Promise<void> => {
+  const connection = await db.getConnection();
+  try {
+    await connection.execute('DELETE FROM travel_diary WHERE user_id = ? AND diary_id = ?', [user_id, diary_id]);
+  } finally {
+    connection.release();
+  }
+};
+
 // [관리자] 회원이 작성한 다이어리 댓글 모두 조회하기
 export const getUserInfoDiaryCommentModel = async (
   user_id: string,

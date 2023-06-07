@@ -39,6 +39,12 @@ export const getUserInfoDiaryService = async (user_id: string): Promise<DiaryTyp
   return travelDiaries;
 };
 
+// [관리자] 회원이 작성한 다이어리 삭제하기
+export const deleteDiaryByAdminService = async (user_id: string, diary_id: number): Promise<string> => {
+  await adminModel.deleteDiaryByAdminModel(user_id, diary_id);
+  return '다이어리가 정상적으로 삭제되었습니다.';
+};
+
 // [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기
 export const getUserInfoCommentService = async (user_id: string, diary_id: number): Promise<CommentType[]> => {
   const diaryComments = await adminModel.getUserInfoDiaryCommentModel(user_id, diary_id);
