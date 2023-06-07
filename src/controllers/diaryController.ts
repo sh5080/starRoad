@@ -115,7 +115,6 @@ export const deleteDiaryController = async (req: CustomRequest, res: Response) =
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const username = req.user?.username;
-    console.log(username);
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }

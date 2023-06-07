@@ -27,7 +27,7 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
       const comments = await commentModel.getAllCommentsModel();
       return comments;
     } catch (error) {
-      throw new Error('댓글 조회에 실패했습니다.');
+      throw new Error('댓글 조회 실패했습니다.');
     }
   };
   export const updateComment = async (newComment: CommentType, id: number, username: string): Promise<void> => {
@@ -47,7 +47,7 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
       switch (error) {
         case CommonError.INVALID_INPUT:
           case CommonError.UNAUTHORIZED_ACCESS: 
-          break;
+
           default:
             console.error(error);
             (new AppError(CommonError.UNEXPECTED_ERROR,'댓글 수정에 실패했습니다.', 500));

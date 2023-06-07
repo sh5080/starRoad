@@ -11,7 +11,8 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
   } else {
     res.status(500).send({
       error: {
-        message: 'Unexpected error occurred',
+        //message: 'Unexpected error occurred',
+        message: err instanceof Error ? err.message : 'Unexpected error occurred',
       },
     });
   }

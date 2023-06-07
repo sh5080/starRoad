@@ -55,7 +55,7 @@ export const getMyDiariesByUserId = async (username: string): Promise<DiaryType[
 
 export const getOneDiaryById = async (diary_id: number): Promise<DiaryType | null> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE diary_id = ?', [diary_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diary_id]);
     if (Array.isArray(rows) && rows.length > 0) {
       const diary = rows[0] as DiaryType;
       return diary;
@@ -70,7 +70,7 @@ export const getOneDiaryById = async (diary_id: number): Promise<DiaryType | nul
 export const updateDiaryById = async (diary: DiaryType, diary_id: number): Promise<void> => {
   try {
     await db.execute(
-      'UPDATE travel_diary SET title = ?, content = ?, image = ? WHERE diary_id = ?',
+      'UPDATE travel_diary SET title = ?, content = ?, image = ? WHERE id = ?',
       [diary.title, diary.content, diary.image, diary_id]
     );
   } catch (error) {
@@ -81,7 +81,7 @@ export const updateDiaryById = async (diary: DiaryType, diary_id: number): Promi
 
 export const deleteDiaryById = async (diary_id: number): Promise<void> => {
   try {
-    await db.execute('DELETE FROM travel_diary WHERE diary_id = ?', [diary_id]);
+    await db.execute('DELETE FROM travel_diary WHERE id = ?', [diary_id]);
   } catch (error) {
     console.error(error);
     throw new Error('여행기 삭제에 실패했습니다.');
