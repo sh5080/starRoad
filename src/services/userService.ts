@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { createUser, getUserById, updateUserById, deleteUserById } from '../models/userModel';
+import * as userModel from '../models/userModel';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import { UserType } from '../types/user';
@@ -14,18 +14,18 @@ const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 export const signupUser = async (user: UserType): Promise<string> => {
   const hashedPassword = await bcrypt.hash(String(user.password), saltRounds);
 
-  const findUserId = await getUserById(String(user.user_id));
+  const findUserId = await userModel.getUserById(String(user.user_id));
   if (findUserId) {
     throw new AppError(CommonError.DUPLICATE_ENTRY,'이미 존재하는 아이디입니다.', 409);
   }
 
-  await createUser({ ...user, password: hashedPassword });
+  await userModel.createUser({ ...user, password: hashedPassword });
 
   return '회원가입이 정상적으로 완료되었습니다.';
 };
 
 export const loginUser = async (user_id: string, password: string): Promise<object> => {
-  const user = await getUserById(user_id);
+  const user = await userModel.getUserById(user_id);
 
   if (!user) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND,'없는 사용자 입니다.', 404);
@@ -52,7 +52,7 @@ export const loginUser = async (user_id: string, password: string): Promise<obje
 };
 
 export const getUser = async (user_id: string) => {
-  const user = await getUserById(user_id);
+  const user = await userModel.getUserById(user_id);
 
   if (!user) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND,'없는 사용자 입니다.', 404);
@@ -64,7 +64,7 @@ export const getUser = async (user_id: string) => {
 
 export const updateUser = async (user_id: string, updateData: Partial<UserType>) => {
   // 기존 유저 정보 가져오기
-  const existingUser = await getUserById(user_id);
+  const existingUser = await userModel.getUserById(user_id);
 
   if (!existingUser) {
     throw new AppError(CommonError.UNEXPECTED_ERROR,'사용자 정보를 찾을 수 없습니다.', 404);
@@ -86,7 +86,7 @@ export const updateUser = async (user_id: string, updateData: Partial<UserType>)
     updateData.password = await bcrypt.hash(updateData.password, salt);
   }
 
-  const updatedUser = await updateUserById(user_id, updateData);
+  const updatedUser = await userModel.updateUserById(user_id, updateData);
 
   if (!updatedUser) {
     throw new AppError(CommonError.UNEXPECTED_ERROR,'사용자 정보 업데이트에 실패했습니다.', 500);
@@ -97,7 +97,7 @@ export const updateUser = async (user_id: string, updateData: Partial<UserType>)
 
 
 export const deleteUser = async (user_id: string) => {
-  const deletedUser = await deleteUserById(user_id);
+  const deletedUser = await userModel.deleteUserById(user_id);
 
   if (!deletedUser) {
     throw new Error('사용자 정보 삭제에 실패했습니다.');

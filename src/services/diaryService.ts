@@ -1,25 +1,17 @@
-import {
-  createDiaryById,
-  getPlan,
-  getAllDiariesByUserId,
-  getMyDiariesByUserId,
-  getOneDiaryById,
-  updateDiaryById,
-  deleteDiaryById,
-} from '../models/diaryModel';
+import * as diaryModel from '../models/diaryModel';
 import { DiaryType } from '../types/diary';
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
 
 
 export const createDiary = async (diary: DiaryType, user_id: string, plan_id: number) => {
   try {
-    const plan = await getPlan(plan_id, user_id);
+    const plan = await diaryModel.getPlan(plan_id, user_id);
     if (!plan) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '해당 일정에 대한 여행기를 작성할 권한이 없습니다.', 404);
     }
     const { destination } = plan; // 플랜의 destination 값
     diary.destination = destination;
-    await createDiaryById(diary);
+    await diaryModel.createDiaryById(diary);
     return '여행기 생성이 완료되었습니다.';
   } catch (error) {
     console.error(error);
@@ -29,7 +21,7 @@ export const createDiary = async (diary: DiaryType, user_id: string, plan_id: nu
 
 export const getAllDiaries = async (): Promise<DiaryType[]> => {
   try {
-    const diary = await getAllDiariesByUserId();
+    const diary = await diaryModel.getAllDiariesByUserId();
     return diary;
   } catch (error) {
     console.error(error);
@@ -38,7 +30,7 @@ export const getAllDiaries = async (): Promise<DiaryType[]> => {
 };
 export const getMyDiaries = async (user_id: string): Promise<DiaryType[]> => {
   try {
-    const diary = await getMyDiariesByUserId(user_id);
+    const diary = await diaryModel.getMyDiariesByUserId(user_id);
     return diary;
   } catch (error) {
     console.error(error);
@@ -47,7 +39,7 @@ export const getMyDiaries = async (user_id: string): Promise<DiaryType[]> => {
 };
 export const getOneDiary = async (diary_id: number): Promise<DiaryType | null> => {
   try {
-    const diary = await getOneDiaryById(diary_id);
+    const diary = await diaryModel.getOneDiaryById(diary_id);
     return diary;
   } catch (error) {
     console.error(error);
@@ -57,7 +49,7 @@ export const getOneDiary = async (diary_id: number): Promise<DiaryType | null> =
 
 export const updateDiary = async (newDiary: DiaryType, diary_id: number, user_id: string) => {
   try {
-    const diary = await getOneDiaryById(diary_id);
+    const diary = await diaryModel.getOneDiaryById(diary_id);
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
     }
@@ -65,7 +57,7 @@ export const updateDiary = async (newDiary: DiaryType, diary_id: number, user_id
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
 
-    await updateDiaryById(newDiary, diary_id);
+    await diaryModel.updateDiaryById(newDiary, diary_id);
 
     return '여행기 업데이트가 완료되었습니다.';
   } catch (error) {
@@ -76,7 +68,7 @@ export const updateDiary = async (newDiary: DiaryType, diary_id: number, user_id
 
 export const deleteDiary = async (diary_id: number, user_id: string) => {
   try {
-    const diary = await getOneDiaryById(diary_id);
+    const diary = await diaryModel.getOneDiaryById(diary_id);
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
     }
@@ -84,7 +76,7 @@ export const deleteDiary = async (diary_id: number, user_id: string) => {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
 
-    await deleteDiaryById(diary_id);
+    await diaryModel.deleteDiaryById(diary_id);
 
     return '여행기 삭제가 완료되었습니다.';
   } catch (error) {

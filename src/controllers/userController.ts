@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { signupUser, loginUser, getUser, updateUser, deleteUser } from '../services/userService';
+import * as userService from '../services/userService';
 import { UserType } from '../types/user';
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
@@ -11,7 +11,7 @@ export const signup = async (req: Request, res: Response) => {
     if (!user.user_id || !user.password || !user.email || !user.name) {
       throw new AppError(CommonError.INVALID_INPUT,'회원가입에 필요한 정보가 제공되지 않았습니다.',400);
     }
-    const message = await signupUser(user);
+    const message = await userService.signupUser(user);
 
     res.status(201).json({ message });
   }catch (error) {
@@ -33,13 +33,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     if (!user_id || !password) {
       throw new AppError(CommonError.INVALID_INPUT,'로그인에 필요한 정보가 제공되지 않았습니다.',400);
     }
-    const userData = await getUser(user_id);
+    const userData = await userService.getUser(user_id);
     console.log(userData);
 
     if (!userData.activated) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'탈퇴한 회원입니다.',400)
     }
-    const token = await loginUser(user_id, password);
+    const token = await userService.loginUser(user_id, password);
     res.json({ token });
   } catch (error) {
     switch (error) {
@@ -84,7 +84,7 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
     }
 
     const { user_id } = req.user;
-    const userData = await getUser(user_id);
+    const userData = await userService.getUser(user_id);
 
     if (!userData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND,'사용자를 찾을 수 없습니다.',404);
@@ -115,7 +115,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
       throw new AppError(CommonError.INVALID_INPUT, '올바른 이메일과 비밀번호를 입력해주세요.', 400);
     }
 
-    const updatedUserData = await updateUser(user_id, { email, password });
+    const updatedUserData = await userService.updateUser(user_id, { email, password });
 
     res.status(200).json({ updatedUserData });
   } catch (error) {
@@ -138,7 +138,7 @@ export const deleteUserInfo = async (req: CustomRequest, res: Response) => {
     }
 
     const { user_id } = req.user;
-    const message = await deleteUser(user_id);
+    const message = await userService.deleteUser(user_id);
 
     res.status(200).json({ message });
   } catch (err) {

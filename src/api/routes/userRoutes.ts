@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { signup, login, logout } from '../../controllers/userController';
+import * as userController from '../../controllers/userController';
 import { validateToken } from '../middlewares/jwt';
 
 const router = Router();
 
-router.post('/signup', signup);
-router.post('/login', login);
-router.post('/logout', validateToken ,logout);
+router.post('/signup', userController.signup);
+router.post('/login', userController.login);
+router.post('/logout', validateToken ,userController.logout);
 
 export default router;
 

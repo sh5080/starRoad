@@ -1,15 +1,6 @@
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { Request, Response } from 'express';
-import {
-  createPlan,
-  createLocation,
-  getPlans,
-  getLocations,
-  updatePlan,
-  updateLocation,
-  deletePlan,
-  deleteLocation,
-} from '../services/travelService';
+import * as travelService from '../services/travelService';
 import { CustomRequest } from '../types/customRequest';
 
 // 여행 일정 등록 + 날짜별 장소 등록
@@ -30,12 +21,12 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
     console.log('날짜별 장소 등록', locations);
 
     // 여행 일정 등록
-    const plan_id = Number(await createPlan(travelPlanWithUserId));
+    const plan_id = Number(await travelService.createPlan(travelPlanWithUserId));
     // 각 날짜별 장소 등록
     if (locations) {
       for (const location of locations) {
         console.log('location = ', location);
-        await createLocation(location, plan_id);
+        await travelService.createLocation(location, plan_id);
       }
     }
 
@@ -59,7 +50,7 @@ export const getTravelPlanController = async (req: CustomRequest, res: Response)
 
     // 내 여행 일정 조회 해서 여행 일정 데이터에 있는 plan_id 를 통해서 장소 데이터 조회
 
-    const travelPlanData = await getPlans(user_id); // 여행 일정 데이터
+    const travelPlanData = await travelService.getPlans(user_id); // 여행 일정 데이터
     if (!travelPlanData) {
       return res.status(404).json({ error: '여행 일정을 찾을 수 없습니다.' });
     }
@@ -67,7 +58,7 @@ export const getTravelPlanController = async (req: CustomRequest, res: Response)
     for (const plan of travelPlanData) {
       // plan_id가 정의되어 있으면 해당 장소 정보를 조회합니다.
       if (plan.plan_id !== undefined) {
-        plan.locations = await getLocations(plan.plan_id);
+        plan.locations = await travelService.getLocations(plan.plan_id);
       }
     }
 
@@ -105,7 +96,7 @@ export const updateTravelPlanController = async (req: CustomRequest, res: Respon
     });
 
     // 여행 일정 수정
-    await updatePlan({
+    await travelService.updatePlan({
       plan_id: Number(plan_id),
       user_id,
       start_date,
@@ -136,7 +127,7 @@ export const updateTravelLocationController = async (req: CustomRequest, res: Re
     const { location, newDate, order } = req.body;
 
     // 각 날짜별 장소 수정
-    await updateLocation({
+    await travelService.updateLocation({
       plan_id: Number(plan_id),
       location_id: Number(location_id),
       newDate,
@@ -166,7 +157,7 @@ export const deleteTravelPlanController = async (req: CustomRequest, res: Respon
     const { user_id } = req.user;
     const { plan_id } = req.params;
 
-    await deletePlan(user_id, Number(plan_id));
+    await travelService.deletePlan(user_id, Number(plan_id));
 
     res.status(200).json({ message: '여행 일정이 성공적으로 삭제되었습니다.' });
   } catch (err) {
@@ -195,7 +186,7 @@ export const deleteTravelLocationController = async (req: CustomRequest, res: Re
       location_id: Number(location_id),
     };
     // 특정 날짜의 장소 삭제
-    await deleteLocation(travelLocation);
+    await travelService.deleteLocation(travelLocation);
 
     res.status(200).json({ message: '해당 날짜의 여행 장소가 성공적으로 삭제되었습니다.' });
   } catch (err) {

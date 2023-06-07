@@ -1,12 +1,5 @@
 import { Request, Response } from 'express';
-import { 
-    createDiary, 
-    deleteDiary, 
-    getAllDiaries, 
-    getMyDiaries, 
-    getOneDiary, 
-    updateDiary 
-} from '../services/diaryService';
+import * as diaryService from '../services/diaryService';
 
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
@@ -23,15 +16,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
       throw new AppError(CommonError.AUTHENTICATION_ERROR,
         '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    // const plan = await getPlanById(plan_id, user_id);
-    // if (!plan) {
-    //   throw new AppError(CommonError.UNAUTHORIZED_ACCESS,
-    //     '해당 일정에 대한 여행기를 작성할 권한이 없습니다.', 404);
-    // }
-    // const { destination } = plan; // 플랜의 destination 값
-
-    // diary 생성
-    await createDiary({ user_id, plan_id, title, content, image }, user_id, plan_id);
+    await diaryService.createDiary({ user_id, plan_id, title, content, image }, user_id, plan_id);
     res.status(201).json({ message: '여행기가 생성되었습니다.' });
   } catch (error) {
     switch (error) {
@@ -48,7 +33,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
 export const getAllDiariesController = async (req: Request, res: Response) => {
   try {
       // 다이어리 조회
-      const diary = await getAllDiaries();
+      const diary = await diaryService.getAllDiaries();
       if (!diary) {
         throw new AppError(CommonError.RESOURCE_NOT_FOUND,
           '전체 여행기를 찾을 수 없습니다.', 404);
@@ -72,7 +57,7 @@ export const getAllDiariesController = async (req: Request, res: Response) => {
           throw new AppError(CommonError.AUTHENTICATION_ERROR,
             '사용자 정보를 찾을 수 없습니다.', 401);
         }
-        const diaries = await getMyDiaries(user_id);
+        const diaries = await diaryService.getMyDiaries(user_id);
     
         res.status(200).json(diaries);
       } catch (error) {
@@ -88,7 +73,7 @@ export const getAllDiariesController = async (req: Request, res: Response) => {
 export const getOneDiaryController = async (req: Request, res: Response) => {
     try {
       const diary_id = parseInt(req.params.diary_id, 10);
-      const diary = await getOneDiary(diary_id);
+      const diary = await diaryService.getOneDiary(diary_id);
     
       if (!diary) {
         throw new AppError(CommonError.RESOURCE_NOT_FOUND,
@@ -117,7 +102,7 @@ export const updateDiaryController = async (req: CustomRequest, res: Response) =
         '사용자 정보를 찾을 수 없습니다.', 401);
     }
 
-    await updateDiary(diary, diary_id, user_id);
+    await diaryService.updateDiary(diary, diary_id, user_id);
 
     res.status(200).json({ message: '여행기 수정이 완료되었습니다.' });
   }catch (error) {
@@ -141,7 +126,7 @@ export const deleteDiaryController = async (req: CustomRequest, res: Response) =
       throw new AppError(CommonError.AUTHENTICATION_ERROR,
         '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    await deleteDiary(diary_id, user_id);
+    await diaryService.deleteDiary(diary_id, user_id);
 
     res.status(200).json({ message: '여행기 삭제가 완료되었습니다.' });
   }catch (error) {

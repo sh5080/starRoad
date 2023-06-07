@@ -1,12 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { 
-    createComment,
-    getCommentsByDiary,
-    getAllComments,
-    updateComment,
-    deleteComment
-
-} from '../services/commentService';
+import * as commentService from '../services/commentService';
 import { getOneDiary } from '../services/diaryService';
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { CustomRequest } from '../types/customRequest';
@@ -25,7 +18,7 @@ export const createCommentController = async (req: CustomRequest, res: Response,
       return next(new AppError(
         CommonError.RESOURCE_NOT_FOUND,'유효하지 않은 여행기입니다.', 401));
     }
-    const createdCommentId = await createComment({ 
+    const createdCommentId = await commentService.createComment({ 
       user_id: loggedInUserId, diary_id, comment });
     res.status(201).json({ id: createdCommentId, message: '댓글이 생성되었습니다.' });
   } catch (error) {
@@ -52,7 +45,7 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
       throw new AppError(
       CommonError.AUTHENTICATION_ERROR,'인증되지 않은 사용자입니다.', 401);
       }
-      const comments = await getCommentsByDiary(Number(diary_id), Number(page), Number(limit));
+      const comments = await commentService.getCommentsByDiary(Number(diary_id), Number(page), Number(limit));
       res.status(200).json({ comments });
   }  catch (error) {
   switch (error) {
@@ -67,7 +60,7 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
   };
   export const getAllCommentsController = async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
-      const comments = await getAllComments();
+      const comments = await commentService.getAllComments();
       res.status(200).json(comments);
     } catch (error) {
   switch (error) {
@@ -89,7 +82,7 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
         throw new AppError(
           CommonError.INVALID_INPUT, '댓글을 입력해 주세요.',400);
       }
-      await updateComment({comment}, Number(id), user_id as string);
+      await commentService.updateComment({comment}, Number(id), user_id as string);
       res.status(200).json({ message: '댓글이 성공적으로 수정되었습니다.' });
     } catch (error) {
       switch (error) {
@@ -113,7 +106,7 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
         throw new AppError(
           CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
       }
-      await deleteComment(Number(id), user_id);
+      await commentService.deleteComment(Number(id), user_id);
       res.status(200).json({ message: '댓글 삭제가 완료되었습니다.' });
     } catch (error) {
       switch (error) {
