@@ -39,9 +39,9 @@ export const deleteUserByIdModel = async (id: number): Promise<void> => {
 };
 
 // [관리자] 회원이 작성한 일정 불러오기
-export const getUserInfoTravelModel = async (user_id: string): Promise<TravelPlan[]> => {
+export const getUserInfoTravelModel = async (username: string): Promise<TravelPlan[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE user_id = ?', [user_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
     const travelPlans = rows as TravelPlan[];
     console.log(travelPlans);
 
@@ -67,9 +67,9 @@ export const getUserInfoLocationModel = async (plan_id: number): Promise<TravelP
 };
 
 // [관리자] 회원이 작성한 다이어리 조회하기
-export const getUserInfoDiaryModel = async (user_id: string): Promise<DiaryType[]> => {
+export const getUserInfoDiaryModel = async (username: string): Promise<DiaryType[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE user_id = ?', [user_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
     const travelDiaries = rows as DiaryType[];
     console.log(travelDiaries);
 
@@ -81,19 +81,19 @@ export const getUserInfoDiaryModel = async (user_id: string): Promise<DiaryType[
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByAdminModel = async (user_id: string, diary_id: number): Promise<void> => {
+export const deleteDiaryByAdminModel = async (username: string, diary_id: number): Promise<void> => {
   const connection = await db.getConnection();
   try {
-    await connection.execute('DELETE FROM travel_diary WHERE user_id = ? AND diary_id = ?', [user_id, diary_id]);
+    await connection.execute('DELETE FROM travel_diary WHERE username = ? AND diary_id = ?', [username, diary_id]);
   } finally {
     connection.release();
   }
 };
 
 // [관리자] 회원이 작성한 다이어리 댓글 모두 조회하기
-export const getUserInfoDiaryCommentModel = async (user_id: string, diary_id: number): Promise<CommentType[]> => {
+export const getUserInfoDiaryCommentModel = async (username: string, diary_id: number): Promise<CommentType[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM comment WHERE diary_id = ? AND user_id = ?', [diary_id, user_id]);
+    const [rows] = await db.execute('SELECT * FROM comment WHERE diary_id = ? AND username = ?', [diary_id, username]);
     const diaryComments = rows as CommentType[];
     console.log(diaryComments);
 
@@ -105,14 +105,14 @@ export const getUserInfoDiaryCommentModel = async (user_id: string, diary_id: nu
 };
 
 // [관리자] 특정 회원이 작성한 모든 댓글 조회하기 ( LEFT JOIN을 통해서 다이어리 제목도 함께 조회 )
-export const getUserAllCommentModel = async (user_id: string): Promise<CommentType[]> => {
+export const getUserAllCommentModel = async (username: string): Promise<CommentType[]> => {
   try {
     const [rows] = await db.execute(
       'SELECT comment.*, travel_diary.title ' +
         'FROM comment ' +
         'LEFT JOIN travel_diary ON comment.diary_id = travel_diary.diary_id ' +
-        'WHERE comment.user_id = ?',
-      [user_id]
+        'WHERE comment.username = ?',
+      [username]
     );
     const userComments = rows as CommentType[];
     console.log(userComments);
@@ -126,12 +126,12 @@ export const getUserAllCommentModel = async (user_id: string): Promise<CommentTy
 
 // [관리자] 특정 회원이 작성한 댓글 삭제하기
 export const deleteCommentByAdminModel = async (
-  user_id: string,
+  username: string,
   diary_id: number,
   comment_id: number
 ): Promise<void> => {
   try {
-    await db.execute('DELETE FROM comment WHERE user_id = ? AND diary_id = ? AND comment_id = ?', [user_id, diary_id, comment_id]);
+    await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND comment_id = ?', [username, diary_id, comment_id]);
   } catch (error) {
     console.error(error);
     throw new Error('댓글을 삭제하는 중에 오류가 발생했습니다.');

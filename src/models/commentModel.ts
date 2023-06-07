@@ -4,15 +4,15 @@ import { RowDataPacket, FieldPacket } from 'mysql2';
 
 interface QueryResult extends RowDataPacket {
   id: number;
-  user_id: string;
+  username: string;
   diary_id: number;
   comment: string;
 }
 
 export const createCommentModel = async (comment: CommentType): Promise<void> => {
   try {
-    await db.execute('INSERT INTO comment (user_id, diary_id, comment) VALUES (?, ?, ?)', [
-      comment.user_id,
+    await db.execute('INSERT INTO comment (username, diary_id, comment) VALUES (?, ?, ?)', [
+      comment.username,
       comment.diary_id,
       comment.comment,
     ]);
@@ -37,7 +37,7 @@ export const getCommentsByDiaryModel = async (
 
     const comments: CommentType[] = rows.map((row: QueryResult) => ({
       id: row.id,
-      user_id: row.user_id,
+      username: row.username,
       diary_id: row.diary_id,
       comment: row.comment,
     }));

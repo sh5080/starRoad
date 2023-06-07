@@ -2,9 +2,9 @@ import { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
 import { TravelLocation } from '../types/travel';
 export interface CustomRequest extends Request {
-  user?: JwtPayload & { user_id: string; role: string };
+  user?: JwtPayload & { username: string; role: string };
   params: {
-    user_id?: string;
+    username?: string;
     id?: string;
     diary_id?: string; // Add this if diary_id comes from params
     plan_id?: string;
@@ -13,7 +13,7 @@ export interface CustomRequest extends Request {
     comment_id?: string;
   };
   body: {
-    user_id: string;
+    username: string;
     diary_id?: number; // Add this if diary_id comes from body
     comment?: string;
     title?: string;

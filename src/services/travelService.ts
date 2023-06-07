@@ -4,7 +4,7 @@ import { AppError, CommonError } from '../types/AppError';
 
 // 여행 일정 등록
 export const createPlan = async (travelPlan: TravelPlan) => {
-  if (!travelPlan.user_id || !travelPlan.start_date || !travelPlan.end_date || !travelPlan.destination) {
+  if (!travelPlan.username || !travelPlan.start_date || !travelPlan.end_date || !travelPlan.destination) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
   const plan_id = await travelModel.createTravelPlan(travelPlan);
@@ -31,8 +31,8 @@ export const createLocation = async (travelLocation: TravelLocation, plan_id: nu
 };
 
 // 여행 일정 조회
-export const getPlans = async (user_id: string): Promise<TravelPlan[]> => {
-  const travelPlans = await travelModel.getTravelPlansByUserId(user_id);
+export const getPlans = async (username: string): Promise<TravelPlan[]> => {
+  const travelPlans = await travelModel.getTravelPlansByUserId(username);
   return travelPlans;
 };
 // 여행 날짜별 장소 조회.
@@ -45,7 +45,7 @@ export const getLocations = async (plan_id: number): Promise<TravelLocation[]> =
 export const updatePlan = async (travelPlan: TravelPlan): Promise<void> => {
   if (
     !travelPlan.plan_id ||
-    !travelPlan.user_id ||
+    !travelPlan.username ||
     !travelPlan.start_date ||
     !travelPlan.end_date ||
     !travelPlan.destination
@@ -72,8 +72,8 @@ export const updateLocation = async (travelLocation: TravelLocation): Promise<vo
 };
 
 // 여행 일정 삭제
-export const deletePlan = async (user_id: string, plan_id: number): Promise<void> => {
-  await travelModel.deleteTravelPlan(user_id, plan_id);
+export const deletePlan = async (username: string, plan_id: number): Promise<void> => {
+  await travelModel.deleteTravelPlan(username, plan_id);
 };
 
 // 여행 날짜별 장소 삭제

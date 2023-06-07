@@ -5,8 +5,8 @@ import { TravelPlan } from '../types/travel';
 export const createDiaryById = async (diary: DiaryType): Promise<void> => {
   try {
     await db.execute(
-      'INSERT INTO travel_diary (user_id, plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?, ?)',
-      [diary.user_id, diary.plan_id, diary.title, 
+      'INSERT INTO travel_diary (username, plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?, ?)',
+      [diary.username, diary.plan_id, diary.title, 
         diary.content, diary.image, diary.destination]
     );
   } catch (error) {
@@ -15,11 +15,11 @@ export const createDiaryById = async (diary: DiaryType): Promise<void> => {
   }
 };
 
-export const getPlan = async (plan_id: number, user_id: string): Promise<TravelPlan | null> => {
+export const getPlan = async (plan_id: number, username: string): Promise<TravelPlan | null> => {
   try {
     const [rows] = await db.execute(
-      'SELECT * FROM travel_plan WHERE plan_id = ? AND user_id = ?',
-      [plan_id, user_id]
+      'SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?',
+      [plan_id, username]
     );
     if (Array.isArray(rows) && rows.length > 0) {
       const plan = rows[0] as TravelPlan;
@@ -43,9 +43,9 @@ export const getAllDiariesByUserId = async (): Promise<DiaryType[]> => {
   }
 };
 
-export const getMyDiariesByUserId = async (user_id: string): Promise<DiaryType[]> => {
+export const getMyDiariesByUserId = async (username: string): Promise<DiaryType[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE user_id = ?', [user_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
     return rows as DiaryType[];
   } catch (error) {
     console.error(error);

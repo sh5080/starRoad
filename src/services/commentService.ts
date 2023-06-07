@@ -6,9 +6,9 @@ import { AppError,CommonError } from "../types/AppError";
 
 export const createComment = async (comment: CommentType): Promise<void> => {
   try {
-    const { user_id, diary_id, comment: commentText } = comment;
+    const { username, diary_id, comment: commentText } = comment;
 
-    await commentModel.createCommentModel({ user_id, diary_id, comment: commentText });
+    await commentModel.createCommentModel({ username, diary_id, comment: commentText });
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
@@ -30,14 +30,14 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
       throw new Error('댓글 조회에 실패했습니다.');
     }
   };
-  export const updateComment = async (newComment: CommentType, id: number, user_id: string): Promise<void> => {
+  export const updateComment = async (newComment: CommentType, id: number, username: string): Promise<void> => {
     try {
       const existingComment = await commentModel.getCommentModel(id);
       if (!existingComment) {
         throw new AppError(CommonError.INVALID_INPUT,'존재하지 않는 댓글입니다.', 404);
       }
   
-      if (existingComment.user_id !== user_id) {
+      if (existingComment.username !== username) {
         throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'댓글을 수정할 권한이 없습니다.', 403);
       }
   
@@ -55,13 +55,13 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
     }
   };
 
-  export const deleteComment = async (id: number, user_id: string) => {
+  export const deleteComment = async (id: number, username: string) => {
     try {
       const comment = await commentModel.getCommentModel(id);
       if (!comment) {
         throw new AppError(CommonError.RESOURCE_NOT_FOUND,'댓글을 찾을 수 없습니다.', 404);
       }
-      if (comment.user_id !== user_id) {
+      if (comment.username !== username) {
         throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'권한이 없습니다.', 403);
       }
       await commentModel.deleteCommentModel(id);

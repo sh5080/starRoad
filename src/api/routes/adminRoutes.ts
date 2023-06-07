@@ -15,13 +15,13 @@ router.patch('/users/:id', validateToken, ensureAdmin, adminController.updateUse
 router.delete('/users/:id', validateToken, ensureAdmin, adminController.deleteUserController);
 
 // [관리자] 회원이 작성한 여행 일정 조회하기
-router.get('/users/:user_id/plans', validateToken, ensureAdmin, adminController.getAllUserInfoTravelController);
+router.get('/users/:username/plans', validateToken, ensureAdmin, adminController.getAllUserInfoTravelController);
 
 // [관리자] 회원이 작성한 여행 일정의 모든 장소 조회하기
 router.get('/users/:plan_id/locations', validateToken, ensureAdmin, adminController.getUserInfoAllLocationController);
 
 // [관리자] 회원이 작성한 여행 일정의 모든 일기 조회하기
-router.get('/users/:user_id/diary', validateToken, ensureAdmin, adminController.getUserInfoAllDiaryController);
+router.get('/users/:username/diary', validateToken, ensureAdmin, adminController.getUserInfoAllDiaryController);
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
 router.delete(
@@ -33,7 +33,7 @@ router.delete(
 
 // [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기
 router.get(
-  '/users/:user_id/diary/:diary_id/comments',
+  '/users/:username/diary/:diary_id/comments',
   validateToken,
   ensureAdmin,
   adminController.getUserInfoAllCommentController
@@ -41,13 +41,13 @@ router.get(
 
 // [관리자] 회원이 작성한 댓글 삭제하기
 router.delete(
-  '/users/:user_id/:diary_id/:comment_id/comments',
+  '/users/:username/:diary_id/:comment_id/comments',
   validateToken,
   ensureAdmin,
   adminController.deleteCommentByAdminController
 );
 
 // [관리자] 회원이 작성한 모든 댓글 조회하기
-router.get('/users/:user_id/comments', validateToken, ensureAdmin, adminController.getUserAllCommentsController);
+router.get('/users/:username/comments', validateToken, ensureAdmin, adminController.getUserAllCommentsController);
 
 export default router;

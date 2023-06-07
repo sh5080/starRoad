@@ -8,7 +8,7 @@ export const createCommentController = async (req: CustomRequest, res: Response,
   try {
     const { diary_id, comment } = req.body;
 
-    const loggedInUserId = req.user?.user_id;
+    const loggedInUserId = req.user?.username;
     if (!loggedInUserId) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증되지 않은 사용자입니다.', 401);
     }
@@ -17,7 +17,7 @@ export const createCommentController = async (req: CustomRequest, res: Response,
       return next(new AppError(CommonError.RESOURCE_NOT_FOUND, '유효하지 않은 여행기입니다.', 401));
     }
     const createdCommentId = await commentService.createComment({
-      user_id: loggedInUserId,
+      username: loggedInUserId,
       diary_id,
       comment,
     });
@@ -39,7 +39,7 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
     const { diary_id } = req.params;
     const { page, limit } = req.query;
 
-    const loggedInUserId = req.user?.user_id;
+    const loggedInUserId = req.user?.username;
 
     if (!loggedInUserId) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증되지 않은 사용자입니다.', 401);
@@ -74,11 +74,11 @@ export const updateCommentController = async (req: CustomRequest, res: Response,
   try {
     const { id } = req.params;
     const { comment } = req.body;
-    const user_id = req.user?.user_id;
+    const username = req.user?.username;
     if (!comment) {
       throw new AppError(CommonError.INVALID_INPUT, '댓글을 입력해 주세요.', 400);
     }
-    await commentService.updateComment({ comment }, Number(id), user_id as string);
+    await commentService.updateComment({ comment }, Number(id), username as string);
     res.status(200).json({ message: '댓글이 성공적으로 수정되었습니다.' });
   } catch (error) {
     switch (error) {
@@ -94,12 +94,12 @@ export const updateCommentController = async (req: CustomRequest, res: Response,
 export const deleteCommentController = async (req: CustomRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const user_id = req.user?.user_id;
+    const username = req.user?.username;
 
-    if (!user_id) {
+    if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    await commentService.deleteComment(Number(id), user_id);
+    await commentService.deleteComment(Number(id), username);
     res.status(200).json({ message: '댓글 삭제가 완료되었습니다.' });
   } catch (error) {
     switch (error) {

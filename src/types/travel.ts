@@ -1,6 +1,6 @@
 export interface TravelPlan {
   plan_id?: number;
-  user_id?: string;
+  username?: string;
   start_date?: Date;
   end_date?: Date;
   destination?: string;
@@ -10,7 +10,7 @@ export interface TravelPlan {
 }
 
 export interface TravelLocation {
-  user_id?: string;
+  username?: string;
   plan_id?: number;
   date?: string;
   newDate?: string;

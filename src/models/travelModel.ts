@@ -4,8 +4,8 @@ import { TravelPlan, TravelLocation } from '../types/travel';
 export const createTravelPlan = async (travelPlan: TravelPlan): Promise<number> => {
   try {
     const [rows] = await db.execute(
-      'INSERT INTO travel_plan (user_id, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
-      [travelPlan.user_id, travelPlan.start_date, travelPlan.end_date, travelPlan.destination]
+      'INSERT INTO travel_plan (username, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
+      [travelPlan.username, travelPlan.start_date, travelPlan.end_date, travelPlan.destination]
     );
     const insertId = (rows as any).insertId;
     return insertId;
@@ -34,9 +34,9 @@ export const createTravelLocation = async (travelLocation: TravelLocation, plan_
   }
 };
 
-export const getTravelPlansByUserId = async (user_id: string): Promise<TravelPlan[]> => {
+export const getTravelPlansByUserId = async (username: string): Promise<TravelPlan[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE user_id = ?', [user_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
     return rows as TravelPlan[];
   } catch (error) {
     console.error(error);
@@ -57,8 +57,8 @@ export const getTravelLocationsByPlanId = async (plan_id: number): Promise<Trave
 export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
   try {
     await db.execute(
-      'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ? AND user_id = ?',
-      [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id, travelPlan.user_id]
+      'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ? AND username = ?',
+      [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id, travelPlan.username]
     );
   } catch (error) {
     console.error(error);
@@ -84,10 +84,10 @@ export const updateTravelLocation = async (travelLocation: TravelLocation): Prom
   }
 };
 
-export const deleteTravelPlan = async (user_id: string, plan_id: number): Promise<void> => {
+export const deleteTravelPlan = async (username: string, plan_id: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM travel_location WHERE plan_id = ?', [plan_id]);
-    await db.execute('DELETE FROM travel_plan WHERE user_id = ? AND plan_id = ?', [user_id, plan_id]);
+    await db.execute('DELETE FROM travel_plan WHERE username = ? AND plan_id = ?', [username, plan_id]);
   } catch (error) {
     console.error(error);
     throw new Error('여행 일정 삭제에 실패했습니다.');

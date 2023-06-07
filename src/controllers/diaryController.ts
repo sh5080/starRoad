@@ -5,17 +5,17 @@ import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 import { NextFunction } from 'connect';
 interface CustomRequest extends Request {
-  user?: JwtPayload & { user_id: string };
+  user?: JwtPayload & { username: string };
 }
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { title, content, image, plan_id } = req.body;
-    const user_id = req.user?.user_id;
+    const username = req.user?.username;
 
-    if (!user_id) {
+    if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    await diaryService.createDiary({ user_id, plan_id, title, content, image }, user_id, plan_id);
+    await diaryService.createDiary({ username, plan_id, title, content, image }, username, plan_id);
     res.status(201).json({ message: '여행기가 생성되었습니다.' });
   } catch (error) {
     switch (error) {
@@ -50,11 +50,11 @@ export const getAllDiariesController = async (req: Request, res: Response) => {
 };
 export const getMyDiariesController = async (req: CustomRequest, res: Response) => {
   try {
-    const user_id = req.user?.user_id;
-    if (!user_id) {
+    const username = req.user?.username;
+    if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    const diaries = await diaryService.getMyDiaries(user_id);
+    const diaries = await diaryService.getMyDiaries(username);
 
     res.status(200).json(diaries);
   } catch (error) {
@@ -91,13 +91,13 @@ export const updateDiaryController = async (req: CustomRequest, res: Response) =
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const { diary } = req.body;
-    const user_id = req.user?.user_id;
+    const username = req.user?.username;
 
-    if (!user_id) {
+    if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
 
-    await diaryService.updateDiary(diary, diary_id, user_id);
+    await diaryService.updateDiary(diary, diary_id, username);
 
     res.status(200).json({ message: '여행기 수정이 완료되었습니다.' });
   } catch (error) {
@@ -114,12 +114,12 @@ export const updateDiaryController = async (req: CustomRequest, res: Response) =
 export const deleteDiaryController = async (req: CustomRequest, res: Response) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
-    const user_id = req.user?.user_id;
-    console.log(user_id);
-    if (!user_id) {
+    const username = req.user?.username;
+    console.log(username);
+    if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    await diaryService.deleteDiary(diary_id, user_id);
+    await diaryService.deleteDiary(diary_id, username);
 
     res.status(200).json({ message: '여행기 삭제가 완료되었습니다.' });
   } catch (error) {

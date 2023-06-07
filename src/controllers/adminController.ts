@@ -41,7 +41,7 @@ export const deleteUserController = async (req: CustomRequest, res: Response, ne
     const { id } = req.params;
     console.log(`${id} 회원 삭제중...`);
 
-    // const user = await getUser(String(user_id));
+    // const user = await getUser(String(username));
     // if (!user.activated) {
     //   return res.status(400).json({ message: '탈퇴한 회원입니다' });
     // }
@@ -60,9 +60,9 @@ export const deleteUserController = async (req: CustomRequest, res: Response, ne
 // [관리자] 회원이 작성한 여행 일정 조회하기
 export const getAllUserInfoTravelController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { user_id } = req.params;
+    const { username } = req.params;
 
-    const userTravelInfos = await adminService.getUserInfoTravelService(String(user_id));
+    const userTravelInfos = await adminService.getUserInfoTravelService(String(username));
     console.log('userInfo = ', userTravelInfos);
     res.status(200).json({ data: userTravelInfos, message: '회원이 작성한 여행 일정을 조회했습니다.' });
   } catch (err) {
@@ -91,9 +91,9 @@ export const getUserInfoAllLocationController = async (req: CustomRequest, res: 
 // [관리자] 회원이 작성한 다이어리 모두 조회하기
 export const getUserInfoAllDiaryController = async (req: CustomRequest, res: Response) => {
   try {
-    const { user_id } = req.params;
+    const { username } = req.params;
 
-    const userTravelDiaryInfos = await adminService.getUserInfoDiaryService(String(user_id));
+    const userTravelDiaryInfos = await adminService.getUserInfoDiaryService(String(username));
 
     res.status(200).json({ data: userTravelDiaryInfos, message: '회원이 작성한 다이어리를 조회했습니다.' });
   } catch (err) {
@@ -105,8 +105,8 @@ export const getUserInfoAllDiaryController = async (req: CustomRequest, res: Res
 // [관리자] 회원이 작성한 다이어리 삭제하기
 export const deleteDiaryByAdminController = async (req: CustomRequest, res: Response) => {
   try {
-    const { user_id, plan_id } = req.params;
-    const message = await adminService.deleteDiaryByAdminService(String(user_id), Number(plan_id));
+    const { username, plan_id } = req.params;
+    const message = await adminService.deleteDiaryByAdminService(String(username), Number(plan_id));
     res.status(200).json({ data: message });
   } catch (err) {
     console.error(err);
@@ -118,9 +118,9 @@ export const deleteDiaryByAdminController = async (req: CustomRequest, res: Resp
 // [관리자] 회원이 작성한 댓글 모두 조회하기
 export const getUserInfoAllCommentController = async (req: CustomRequest, res: Response) => {
   try {
-    const { user_id, diary_id } = req.params;
+    const { username, diary_id } = req.params;
 
-    const userTravelDiaryCommentInfos = await adminService.getUserInfoCommentService(String(user_id), Number(diary_id));
+    const userTravelDiaryCommentInfos = await adminService.getUserInfoCommentService(String(username), Number(diary_id));
 
     res
       .status(200)
@@ -134,9 +134,9 @@ export const getUserInfoAllCommentController = async (req: CustomRequest, res: R
 // [관리자] 특정 회원이 작성한 모든 댓글 조회하기
 export const getUserAllCommentsController = async (req: CustomRequest, res: Response) => {
   try {
-    const { user_id } = req.params;
+    const { username } = req.params;
 
-    const userAllComments = await adminService.getUserAllCommentService(String(user_id));
+    const userAllComments = await adminService.getUserAllCommentService(String(username));
 
     res.status(200).json({ data: userAllComments, message: '회원이 작성한 모든 댓글을 조회했습니다.' });
   } catch (err) {
@@ -148,9 +148,9 @@ export const getUserAllCommentsController = async (req: CustomRequest, res: Resp
 // [관리자] 특정 회원이 작성한 댓글 삭제하기
 export const deleteCommentByAdminController = async (req: CustomRequest, res: Response) => {
   try {
-    const { user_id, diary_id, comment_id } = req.params;
+    const { username, diary_id, comment_id } = req.params;
     const message = await adminService.deleteCommentByAdminService(
-      String(user_id),
+      String(username),
       Number(diary_id),
       Number(comment_id)
     );

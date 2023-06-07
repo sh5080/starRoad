@@ -22,8 +22,8 @@ export const deleteUserService = async (id: number): Promise<string> => {
 };
 
 // [관리자] 회원이 작성한 여행 일정 조회하기
-export const getUserInfoTravelService = async (user_id: string): Promise<TravelPlan[]> => {
-  const travelPlans = await adminModel.getUserInfoTravelModel(user_id);
+export const getUserInfoTravelService = async (username: string): Promise<TravelPlan[]> => {
+  const travelPlans = await adminModel.getUserInfoTravelModel(username);
   return travelPlans;
 };
 
@@ -34,35 +34,35 @@ export const getUserInfoTravelLocationService = async (plan_id: number): Promise
 };
 
 // [관리자] 회원이 작성한 다이어리 조회하기
-export const getUserInfoDiaryService = async (user_id: string): Promise<DiaryType[]> => {
-  const travelDiaries = await adminModel.getUserInfoDiaryModel(user_id);
+export const getUserInfoDiaryService = async (username: string): Promise<DiaryType[]> => {
+  const travelDiaries = await adminModel.getUserInfoDiaryModel(username);
   return travelDiaries;
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByAdminService = async (user_id: string, diary_id: number): Promise<string> => {
-  await adminModel.deleteDiaryByAdminModel(user_id, diary_id);
+export const deleteDiaryByAdminService = async (username: string, diary_id: number): Promise<string> => {
+  await adminModel.deleteDiaryByAdminModel(username, diary_id);
   return '다이어리가 정상적으로 삭제되었습니다.';
 };
 
 // [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기
-export const getUserInfoCommentService = async (user_id: string, diary_id: number): Promise<CommentType[]> => {
-  const diaryComments = await adminModel.getUserInfoDiaryCommentModel(user_id, diary_id);
+export const getUserInfoCommentService = async (username: string, diary_id: number): Promise<CommentType[]> => {
+  const diaryComments = await adminModel.getUserInfoDiaryCommentModel(username, diary_id);
   return diaryComments;
 };
 
 // [관리자] 특정 회원이 작성한 모든 댓글 조회하기
-export const getUserAllCommentService = async (user_id: string): Promise<CommentType[]> => {
-  const userComments = await adminModel.getUserAllCommentModel(user_id);
+export const getUserAllCommentService = async (username: string): Promise<CommentType[]> => {
+  const userComments = await adminModel.getUserAllCommentModel(username);
   return userComments;
 };
 
 // [관리자] 회원이 작성한 댓글 삭제하기
 export const deleteCommentByAdminService = async (
-  user_id: string,
+  username: string,
   diary_id: number,
   comment_id: number
 ): Promise<string> => {
-  await adminModel.deleteCommentByAdminModel(user_id, diary_id, comment_id);
+  await adminModel.deleteCommentByAdminModel(username, diary_id, comment_id);
   return '댓글이 정상적으로 삭제되었습니다.';
 };

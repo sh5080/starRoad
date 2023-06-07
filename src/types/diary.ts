@@ -1,5 +1,5 @@
 export interface DiaryType {
-    user_id?: string;
+    username?: string;
     plan_id?: number;
     title?: string;
     content?: string;

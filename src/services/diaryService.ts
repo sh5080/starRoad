@@ -3,9 +3,9 @@ import { DiaryType } from '../types/diary';
 import { AppError,CommonError } from "../types/AppError";
 
 
-export const createDiary = async (diary: DiaryType, user_id: string, plan_id: number) => {
+export const createDiary = async (diary: DiaryType, username: string, plan_id: number) => {
   try {
-    const plan = await diaryModel.getPlan(plan_id, user_id);
+    const plan = await diaryModel.getPlan(plan_id, username);
     if (!plan) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '해당 일정에 대한 여행기를 작성할 권한이 없습니다.', 404);
     }
@@ -28,9 +28,9 @@ export const getAllDiaries = async (): Promise<DiaryType[]> => {
     throw new AppError(CommonError.UNEXPECTED_ERROR, '전체 여행기 조회에 실패했습니다.', 500);
   }
 };
-export const getMyDiaries = async (user_id: string): Promise<DiaryType[]> => {
+export const getMyDiaries = async (username: string): Promise<DiaryType[]> => {
   try {
-    const diary = await diaryModel.getMyDiariesByUserId(user_id);
+    const diary = await diaryModel.getMyDiariesByUserId(username);
     return diary;
   } catch (error) {
     console.error(error);
@@ -47,13 +47,13 @@ export const getOneDiary = async (diary_id: number): Promise<DiaryType | null> =
   }
 };
 
-export const updateDiary = async (newDiary: DiaryType, diary_id: number, user_id: string) => {
+export const updateDiary = async (newDiary: DiaryType, diary_id: number, username: string) => {
   try {
     const diary = await diaryModel.getOneDiaryById(diary_id);
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
     }
-    if (diary.user_id !== user_id) {
+    if (diary.username !== username) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
 
@@ -66,13 +66,13 @@ export const updateDiary = async (newDiary: DiaryType, diary_id: number, user_id
   }
 };
 
-export const deleteDiary = async (diary_id: number, user_id: string) => {
+export const deleteDiary = async (diary_id: number, username: string) => {
   try {
     const diary = await diaryModel.getOneDiaryById(diary_id);
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
     }
-    if (diary.user_id !== user_id) {
+    if (diary.username !== username) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
 

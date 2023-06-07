@@ -14,7 +14,7 @@ const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 export const signupUser = async (user: UserType): Promise<string> => {
   const hashedPassword = await bcrypt.hash(String(user.password), saltRounds);
 
-  const findUserId = await userModel.getUserById(String(user.user_id));
+  const findUserId = await userModel.getUserById(String(user.username));
   if (findUserId) {
     throw new AppError(CommonError.DUPLICATE_ENTRY, '이미 존재하는 아이디입니다.', 409);
   }
@@ -24,8 +24,8 @@ export const signupUser = async (user: UserType): Promise<string> => {
   return '회원가입이 정상적으로 완료되었습니다.';
 };
 
-export const loginUser = async (user_id: string, password: string): Promise<object> => {
-  const user = await userModel.getUserById(user_id);
+export const loginUser = async (username: string, password: string): Promise<object> => {
+  const user = await userModel.getUserById(username);
 
   if (!user) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
@@ -40,19 +40,19 @@ export const loginUser = async (user_id: string, password: string): Promise<obje
     throw new AppError(CommonError.AUTHENTICATION_ERROR, '비밀번호가 일치하지 않습니다.', 401);
   }
 
-  const accessToken: string = jwt.sign({ user_id: user.user_id, role: user.role }, ACCESS_TOKEN_SECRET, {
+  const accessToken: string = jwt.sign({ username: user.username, role: user.role }, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRES_IN,
   });
 
-  const refreshToken: string = jwt.sign({ user_id: user.user_id, role: user.role }, REFRESH_TOKEN_SECRET, {
+  const refreshToken: string = jwt.sign({ username: user.username, role: user.role }, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRES_IN,
   });
 
   return { accessToken, refreshToken };
 };
 
-export const getUser = async (user_id: string) => {
-  const user = await userModel.getUserById(user_id);
+export const getUser = async (username: string) => {
+  const user = await userModel.getUserById(username);
 
   if (!user) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
@@ -62,9 +62,9 @@ export const getUser = async (user_id: string) => {
   return userData;
 };
 
-export const updateUser = async (user_id: string, updateData: Partial<UserType>) => {
+export const updateUser = async (username: string, updateData: Partial<UserType>) => {
   // 기존 유저 정보 가져오기
-  const existingUser = await userModel.getUserById(user_id);
+  const existingUser = await userModel.getUserById(username);
 
   if (!existingUser) {
     throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보를 찾을 수 없습니다.', 404);
@@ -86,7 +86,7 @@ export const updateUser = async (user_id: string, updateData: Partial<UserType>)
     updateData.password = await bcrypt.hash(updateData.password, salt);
   }
 
-  const updatedUser = await userModel.updateUserById(user_id, updateData);
+  const updatedUser = await userModel.updateUserById(username, updateData);
 
   if (!updatedUser) {
     throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 업데이트에 실패했습니다.', 500);
@@ -95,8 +95,8 @@ export const updateUser = async (user_id: string, updateData: Partial<UserType>)
   return '회원정보 수정이 정상적으로 완료되었습니다.';
 };
 
-export const deleteUser = async (user_id: string) => {
-  const deletedUser = await userModel.deleteUserById(user_id);
+export const deleteUser = async (username: string) => {
+  const deletedUser = await userModel.deleteUserById(username);
 
   if (!deletedUser) {
     throw new Error('사용자 정보 삭제에 실패했습니다.');

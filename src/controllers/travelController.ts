@@ -11,11 +11,11 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
   }
   try {
     const { locations, ...travelPlan } = req.body;
-    const { user_id } = req.user;
+    const { username } = req.user;
 
     const travelPlanWithUserId = {
       ...travelPlan,
-      user_id: user_id,
+      username: username,
     };
 
     console.log('여행 일정 등록', travelPlanWithUserId);
@@ -47,11 +47,11 @@ export const getTravelPlanController = async (req: CustomRequest, res: Response)
     throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
   }
   try {
-    const { user_id } = req.user;
+    const { username } = req.user;
 
     // 내 여행 일정 조회 해서 여행 일정 데이터에 있는 plan_id 를 통해서 장소 데이터 조회
 
-    const travelPlanData = await travelService.getPlans(user_id); // 여행 일정 데이터
+    const travelPlanData = await travelService.getPlans(username); // 여행 일정 데이터
     if (!travelPlanData) {
       return res.status(404).json({ error: '여행 일정을 찾을 수 없습니다.' });
     }
@@ -86,11 +86,11 @@ export const updateTravelPlanController = async (req: CustomRequest, res: Respon
   try {
     const { plan_id } = req.params;
     const { start_date, end_date, destination } = req.body;
-    const { user_id } = req.user;
+    const { username } = req.user;
 
     console.log('여행 일정 수정', {
       plan_id,
-      user_id,
+      username,
       start_date,
       end_date,
       destination,
@@ -99,7 +99,7 @@ export const updateTravelPlanController = async (req: CustomRequest, res: Respon
     // 여행 일정 수정
     await travelService.updatePlan({
       plan_id: Number(plan_id),
-      user_id,
+      username,
       start_date,
       end_date,
       destination,
@@ -155,10 +155,10 @@ export const deleteTravelPlanController = async (req: CustomRequest, res: Respon
   }
 
   try {
-    const { user_id } = req.user;
+    const { username } = req.user;
     const { plan_id } = req.params;
 
-    await travelService.deletePlan(user_id, Number(plan_id));
+    await travelService.deletePlan(username, Number(plan_id));
 
     res.status(200).json({ message: '여행 일정이 성공적으로 삭제되었습니다.' });
   } catch (err) {
