@@ -39,6 +39,14 @@ router.get(
   adminController.getUserInfoAllCommentController
 );
 
+// [관리자] 회원이 작성한 댓글 삭제하기
+router.delete(
+  '/users/:user_id/:diary_id/:comment_id/comments',
+  validateToken,
+  ensureAdmin,
+  adminController.deleteCommentByAdminController
+);
+
 // [관리자] 회원이 작성한 모든 댓글 조회하기
 router.get('/users/:user_id/comments', validateToken, ensureAdmin, adminController.getUserAllCommentsController);
 

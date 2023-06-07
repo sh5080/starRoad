@@ -102,7 +102,7 @@ export const getUserInfoAllDiaryController = async (req: CustomRequest, res: Res
   }
 };
 
-// [관리자] 회원이 작성한 다이어리 삭제하기 
+// [관리자] 회원이 작성한 다이어리 삭제하기
 export const deleteDiaryByAdminController = async (req: CustomRequest, res: Response) => {
   try {
     const { user_id, plan_id } = req.params;
@@ -142,5 +142,21 @@ export const getUserAllCommentsController = async (req: CustomRequest, res: Resp
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: '회원이 작성한 모든 댓글 조회에 실패했습니다.' });
+  }
+};
+
+// [관리자] 특정 회원이 작성한 댓글 삭제하기
+export const deleteCommentByAdminController = async (req: CustomRequest, res: Response) => {
+  try {
+    const { user_id, diary_id, comment_id } = req.params;
+    const message = await adminService.deleteCommentByAdminService(
+      String(user_id),
+      Number(diary_id),
+      Number(comment_id)
+    );
+    res.status(200).json({ data: message });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: '회원이 작성한 댓글 삭제에 실패했습니다.' });
   }
 };

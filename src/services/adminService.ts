@@ -56,3 +56,13 @@ export const getUserAllCommentService = async (user_id: string): Promise<Comment
   const userComments = await adminModel.getUserAllCommentModel(user_id);
   return userComments;
 };
+
+// [관리자] 회원이 작성한 댓글 삭제하기
+export const deleteCommentByAdminService = async (
+  user_id: string,
+  diary_id: number,
+  comment_id: number
+): Promise<string> => {
+  await adminModel.deleteCommentByAdminModel(user_id, diary_id, comment_id);
+  return '댓글이 정상적으로 삭제되었습니다.';
+};

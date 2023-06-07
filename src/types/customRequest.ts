@@ -10,6 +10,7 @@ export interface CustomRequest extends Request {
     plan_id?: string;
     date?: string;
     location_id?: string;
+    comment_id?: string;
   };
   body: {
     user_id: string;
