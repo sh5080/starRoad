@@ -3,18 +3,20 @@ import * as userService from '../services/userService';
 import { UserType } from '../types/user';
 import { AppError, CommonError } from '../api/middlewares/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
+
 // 회원가입
 export const signup = async (req: Request, res: Response) => {
   try {
     const user: UserType = req.body;
-
+    console.log(user);
+    
     if (!user.user_id || !user.password || !user.email || !user.name) {
-      throw new AppError(CommonError.INVALID_INPUT,'회원가입에 필요한 정보가 제공되지 않았습니다.',400);
+      throw new AppError(CommonError.INVALID_INPUT, '회원가입에 필요한 정보가 제공되지 않았습니다.', 400);
     }
     const message = await userService.signupUser(user);
 
     res.status(201).json({ message });
-  }catch (error) {
+  } catch (error) {
     switch (error) {
       case CommonError.INVALID_INPUT:
         break;
@@ -31,13 +33,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { user_id, password }: UserType = req.body;
 
     if (!user_id || !password) {
-      throw new AppError(CommonError.INVALID_INPUT,'로그인에 필요한 정보가 제공되지 않았습니다.',400);
+      throw new AppError(CommonError.INVALID_INPUT, '로그인에 필요한 정보가 제공되지 않았습니다.', 400);
     }
     const userData = await userService.getUser(user_id);
     console.log(userData);
 
     if (!userData.activated) {
-      throw new AppError(CommonError.UNAUTHORIZED_ACCESS,'탈퇴한 회원입니다.',400)
+      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '탈퇴한 회원입니다.', 400);
     }
     const token = await userService.loginUser(user_id, password);
     res.json({ token });
@@ -45,7 +47,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     switch (error) {
       case CommonError.INVALID_INPUT:
       case CommonError.UNAUTHORIZED_ACCESS:
-        next(error)
+        next(error);
         break;
       default:
         //console.error(error);
@@ -56,10 +58,10 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const logout = async (req: CustomRequest, res: Response) => {
   try {
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
     res.status(200).json({ message: '로그아웃 되었습니다.' });
-  }catch (error) {
+  } catch (error) {
     switch (error) {
       case CommonError.AUTHENTICATION_ERROR:
         break;
@@ -80,17 +82,17 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
   try {
     // req.user가 없는 경우 에러 처리
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
 
     const { user_id } = req.user;
     const userData = await userService.getUser(user_id);
 
     if (!userData) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND,'사용자를 찾을 수 없습니다.',404);
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '사용자를 찾을 수 없습니다.', 404);
     }
     res.status(200).json({ userData });
-  }catch (error) {
+  } catch (error) {
     switch (error) {
       case CommonError.AUTHENTICATION_ERROR:
       case CommonError.RESOURCE_NOT_FOUND:
@@ -134,7 +136,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
 export const deleteUserInfo = async (req: CustomRequest, res: Response) => {
   try {
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
 
     const { user_id } = req.user;
