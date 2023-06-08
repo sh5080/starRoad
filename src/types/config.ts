@@ -15,4 +15,9 @@ export interface Config {
   bcrypt: {
     saltRounds: number;
   };
+  google: {
+    CLIENT_ID: string;
+    CLIENT_SECRET: string;
+    REDIRECT_URI: string;
+  };
 }
