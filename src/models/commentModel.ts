@@ -28,25 +28,28 @@ export const getCommentsByDiaryModel = async (
   limit: number
 ): Promise<CommentType[]> => {
   try {
-    const offset = Math.floor((page - 1)) * limit;
+    const offset = Math.floor(page - 1) * limit;
 
- const [rows] = await db.query<RowDataPacket[]>(
-  'SELECT * FROM comment WHERE diary_id = ? LIMIT ? OFFSET ?', 
-  [diary_id, limit, offset]
-);
+    const [rows] = await db.query<RowDataPacket[]>(
+      `SELECT * FROM comment WHERE diary_id = ? LIMIT ${limit} OFFSET ${offset}`,
+      [diary_id, limit, offset]
+    );
 
-const comments: CommentType[] = rows.map((row) => ({
-  id: row['id'],
-  username: row['username'],
-  diary_id: row['diary_id'],
-  comment: row['comment'],
-}) as QueryResult);
+    const comments: CommentType[] = rows.map(
+      (row) =>
+        ({
+          id: row['id'],
+          username: row['username'],
+          diary_id: row['diary_id'],
+          comment: row['comment'],
+        } as QueryResult)
+    );
 
-return comments;
-} catch (error) {
-console.error(error);
-throw new Error('댓글 조회에 실패했습니다.');
-}
+    return comments;
+  } catch (error) {
+    console.error(error);
+    throw new Error('댓글 조회에 실패했습니다.');
+  }
 };
 
 export const getAllCommentsModel = async (): Promise<CommentType[]> => {

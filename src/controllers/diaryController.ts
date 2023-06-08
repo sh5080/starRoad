@@ -4,7 +4,7 @@ import * as diaryService from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 interface CustomRequest extends Request {
-  user?: JwtPayload & { username: string };
+  user?: JwtPayload & { user_id: string };
 }
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
