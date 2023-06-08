@@ -1,8 +1,8 @@
 import multer from 'multer';
-import fs from 'fs';
+import * as fs from 'node:fs';
 import { AppError, CommonError } from '../../types/AppError';
-import { v4 as uuidv4 } from 'uuid';
 import { Request, Response, NextFunction } from 'express';
+import * as crypto from 'node:crypto';
 
 if (!fs.existsSync('public')) {
   fs.mkdirSync('public');
@@ -18,12 +18,12 @@ const storage = multer.diskStorage({
     cb(null, './public');
   },
   filename: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
-    // With unique filename using uuid
-    cb(null, uuidv4() + '-' + file.originalname);
+    // 유니크한 파일명
+    cb(null, crypto.randomUUID() + '-' + file.originalname);
   },
 });
 
-// Initialize upload
+// 스토리지 초기화
 const upload = multer({ storage: storage });
 
 // 미들웨어 함수

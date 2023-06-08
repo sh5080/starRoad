@@ -48,9 +48,21 @@ const config: Config = {
     saltRounds: process.env.BCRYPT_SALT_ROUNDS ? Number(process.env.BCRYPT_SALT_ROUNDS) : 10,
   },
   google: {
-    CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
-    CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
-    REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || '',
+    CLIENT_ID:
+      process.env.CLIENT_ID ||
+      (() => {
+        throw new Error('CLIENT_ID 환경 변수가 필요합니다.');
+      })(),
+    CLIENT_SECRET:
+      process.env.CLIENT_SECRET ||
+      (() => {
+        throw new Error('CLIENT_SECRET 환경 변수가 필요합니다.');
+      })(),
+    REDIRECT_URI:
+      process.env.REDIRECT_URI ||
+      (() => {
+        throw new Error('REDIRECT_URI 환경 변수가 필요합니다.');
+      })(),
   },
 };
 
