@@ -1,14 +1,14 @@
-import { UserType } from '../types/user';
+import { User } from '../types/user';
 import { db } from '../loaders/dbLoader';
 import { TravelPlan } from '../types/travel';
-import { DiaryType } from '../types/diary';
-import { CommentType } from '../types/comment';
+import { Diary } from '../types/diary';
+import { Comment } from '../types/comment';
 
 // [관리자] 모든 회원 정보 불러오기
-export const getAllUsersModel = async (): Promise<UserType[]> => {
+export const getAllUsersModel = async (): Promise<User[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM user');
-    return rows as UserType[];
+    return rows as User[];
   } catch (error) {
     console.error(error);
     throw new Error('모든 회원 정보를 불러오는 중에 오류가 발생했습니다.');
@@ -16,11 +16,11 @@ export const getAllUsersModel = async (): Promise<UserType[]> => {
 };
 
 // [관리자] 회원 정보 업데이트
-export const updateUserByIdModel = async (id: number, user: Partial<UserType>): Promise<UserType> => {
+export const updateUserByIdModel = async (id: number, user: Partial<User>): Promise<User> => {
   try {
     await db.query('UPDATE user SET ? WHERE id = ?', [user, id]);
     const [rows] = await db.execute('SELECT * FROM user WHERE id = ?', [id]);
-    const [updatedUser] = rows as UserType[];
+    const [updatedUser] = rows as User[];
     return updatedUser;
   } catch (error) {
     console.error(error);
@@ -67,10 +67,10 @@ export const getUserInfoLocationModel = async (plan_id: number): Promise<TravelP
 };
 
 // [관리자] 회원이 작성한 다이어리 조회하기
-export const getUserInfoDiaryModel = async (username: string): Promise<DiaryType[]> => {
+export const getUserInfoDiaryModel = async (username: string): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
-    const travelDiaries = rows as DiaryType[];
+    const travelDiaries = rows as Diary[];
     console.log(travelDiaries);
 
     return travelDiaries;
@@ -91,10 +91,10 @@ export const deleteDiaryByAdminModel = async (username: string, diary_id: number
 };
 
 // [관리자] 회원이 작성한 다이어리 댓글 모두 조회하기
-export const getUserInfoDiaryCommentModel = async (username: string, diary_id: number): Promise<CommentType[]> => {
+export const getUserInfoDiaryCommentModel = async (username: string, diary_id: number): Promise<Comment[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE diary_id = ? AND username = ?', [diary_id, username]);
-    const diaryComments = rows as CommentType[];
+    const diaryComments = rows as Comment[];
     console.log(diaryComments);
 
     return diaryComments;
@@ -105,7 +105,7 @@ export const getUserInfoDiaryCommentModel = async (username: string, diary_id: n
 };
 
 // [관리자] 특정 회원이 작성한 모든 댓글 조회하기 ( LEFT JOIN을 통해서 다이어리 제목도 함께 조회 )
-export const getUserAllCommentModel = async (username: string): Promise<CommentType[]> => {
+export const getUserAllCommentModel = async (username: string): Promise<Comment[]> => {
   try {
     const [rows] = await db.execute(
       'SELECT comment.*, travel_diary.title ' +
@@ -114,7 +114,7 @@ export const getUserAllCommentModel = async (username: string): Promise<CommentT
         'WHERE comment.username = ?',
       [username]
     );
-    const userComments = rows as CommentType[];
+    const userComments = rows as Comment[];
     console.log(userComments);
 
     return userComments;

@@ -1,8 +1,9 @@
 import { OkPacket } from 'mysql2';
 import { db } from '../loaders/dbLoader';
-import { UserType } from '../types/user';
+import { User } from '../types/user';
+import { RowDataPacket } from 'mysql2';
 
-export const createUser = async (user: UserType): Promise<void> => {
+export const createUser = async (user: User): Promise<void> => {
   await db.execute('INSERT INTO user (name, username, password, email) VALUES (?, ?, ?, ?)', [
     user.name,
     user.username,
@@ -11,30 +12,40 @@ export const createUser = async (user: UserType): Promise<void> => {
   ]);
 };
 
-export const getUserById = async (username: string): Promise<UserType | null> => {
+export const getUserByUsername = async (username: string): Promise<User | null> => {
   const [rows] = await db.execute('SELECT * FROM user WHERE username = ?', [username]);
   if (Array.isArray(rows) && rows.length > 0) {
-    const userData = rows[0] as UserType;
+    const userData = rows[0] as User;
     return userData;
   }
   return null;
 };
 
-export const updateUserById = async (
-  username: string,
-  updateData: Partial<Pick<UserType, 'email' | 'password'>>
-): Promise<UserType | null> => {
-  await db.execute('UPDATE user SET ? WHERE username = ?', [updateData, username]);
+export const updateUserByUsername = async (
+  userId: string,
+  updateData: Partial<Pick<User, 'email' | 'password'>>
+): Promise<User | null> => {
+  const { email, password } = updateData;
 
-  return null;
+await db.execute(
+    'UPDATE user SET email = ?, password = ? WHERE username = ?',
+    [email, password, userId]
+  );
+
+
+  const updatedUser = await getUserByUsername(userId);
+  return updatedUser;
 };
 
-export const deleteUserById = async (username: string): Promise<boolean> => {
-  const [result] = await db.execute<OkPacket>('UPDATE user SET activated = 0 WHERE username = ?', [username]);
-
-  if (result.affectedRows > 0) {
-    return true; // 삭제 성공
+export const deleteUserByUsername = async (username: string): Promise<User | null> => {
+  const [result] = await db.execute<RowDataPacket[]>('SELECT * FROM user WHERE username = ?', [username]);
+  
+  if (result.length === 0) {
+    return null; // 사용자가 존재하지 않음
   }
 
-  return false; // 삭제 실패
+  const [deletedUser] = result;
+  await db.execute<OkPacket>('DELETE FROM user WHERE username = ?', [username]);
+
+  return deletedUser as User;
 };

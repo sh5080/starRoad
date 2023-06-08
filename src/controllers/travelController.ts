@@ -1,15 +1,15 @@
 import { AppError, CommonError } from '../types/AppError';
 
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import * as travelService from '../services/travelService';
 import { CustomRequest } from '../types/customRequest';
 
 // 여행 일정 등록 + 날짜별 장소 등록
-export const createTravelPlanController = async (req: CustomRequest, res: Response) => {
-  if (!req.user) {
-    throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
-  }
+export const createTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
+    if (!req.user) {
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
+    }
     const { locations, ...travelPlan } = req.body;
     const { username } = req.user;
 
@@ -20,6 +20,11 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
 
     console.log('여행 일정 등록', travelPlanWithUserId);
     console.log('날짜별 장소 등록', locations);
+    const extraFields = Object.keys(req.body).filter(key => key !== 'locations' && key !== 'start_date' && key !== 'end_date' && key !== 'destination');
+    console.log(extraFields)
+    if (extraFields.length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+    }
 
     // 여행 일정 등록
     const plan_id = Number(await travelService.createPlan(travelPlanWithUserId));
@@ -32,17 +37,14 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
     }
 
     res.status(201).json({ message: '여행 계획 및 장소가 성공적으로 등록되었습니다.' });
-  } catch (err) {
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '여행 계획 및 장소 등록에 실패했습니다.' });
-    }
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 // 여행 일정 조회
-export const getTravelPlanController = async (req: CustomRequest, res: Response) => {
+export const getTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
     throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
   }
@@ -64,18 +66,14 @@ export const getTravelPlanController = async (req: CustomRequest, res: Response)
     }
 
     res.status(200).json({ travelPlanData });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '여행 일정 조회에 실패했습니다.' });
-    }
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 // 여행 일정 수정
-export const updateTravelPlanController = async (req: CustomRequest, res: Response) => {
+export const updateTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   // 로그인 확인
   console.log();
 
@@ -106,18 +104,14 @@ export const updateTravelPlanController = async (req: CustomRequest, res: Respon
     });
 
     res.status(200).json({ message: '여행 일정이 성공적으로 수정되었습니다.' });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '여행 일정 수정에 실패했습니다.' });
-    }
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 // 특정 날짜 +  특정 장소 수정
-export const updateTravelLocationController = async (req: CustomRequest, res: Response) => {
+export const updateTravelLocationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   // 로그인 확인
   if (!req.user) {
     return res.status(401).json({ error: '인증이 필요합니다.' });
@@ -137,18 +131,14 @@ export const updateTravelLocationController = async (req: CustomRequest, res: Re
     });
 
     res.status(200).json({ message: '장소와 날짜가 성공적으로 수정되었습니다.' });
-  } catch (err) {
-    // error handling code
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    }
-    res.status(500).json({ error: '장소와 날짜 수정에 실패했습니다.' });
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 // 여행 일정 삭제
-export const deleteTravelPlanController = async (req: CustomRequest, res: Response) => {
+export const deleteTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   // 로그인 확인
   if (!req.user) {
     return res.status(401).json({ error: '인증이 필요합니다.' });
@@ -161,18 +151,14 @@ export const deleteTravelPlanController = async (req: CustomRequest, res: Respon
     await travelService.deletePlan(username, Number(plan_id));
 
     res.status(200).json({ message: '여행 일정이 성공적으로 삭제되었습니다.' });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '여행 일정 삭제에 실패했습니다.' });
-    }
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 // 특정 일정의 특정 날짜 장소 삭제
-export const deleteTravelLocationController = async (req: CustomRequest, res: Response) => {
+export const deleteTravelLocationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   // 로그인 확인
   if (!req.user) {
     return res.status(401).json({ error: '인증이 필요합니다.' });
@@ -190,12 +176,8 @@ export const deleteTravelLocationController = async (req: CustomRequest, res: Re
     await travelService.deleteLocation(travelLocation);
 
     res.status(200).json({ message: '해당 날짜의 여행 장소가 성공적으로 삭제되었습니다.' });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '여행 장소 삭제에 실패했습니다.' });
-    }
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };

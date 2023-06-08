@@ -1,10 +1,10 @@
 import * as commentModel from '../models/commentModel';
 
-import { CommentType } from '../types/comment';
+import { Comment } from '../types/comment';
 import { AppError,CommonError } from "../types/AppError";
 
 
-export const createComment = async (comment: CommentType): Promise<void> => {
+export const createComment = async (comment: Comment): Promise<void> => {
   try {
     const { username, diary_id, comment: commentText } = comment;
 
@@ -17,12 +17,12 @@ export const createComment = async (comment: CommentType): Promise<void> => {
     }
   }
 };
-export const getCommentsByDiary = async (diary_id: number, page: number, limit: number): Promise<CommentType[]> => {
+export const getCommentsByDiary = async (diary_id: number, page: number, limit: number): Promise<Comment[]> => {
     const comments = await commentModel.getCommentsByDiaryModel(diary_id, page, limit); // pagination 적용
     return comments;
   };
   
-  export const getAllComments = async (): Promise<CommentType[]> => {
+  export const getAllComments = async (): Promise<Comment[]> => {
     try {
       const comments = await commentModel.getAllCommentsModel();
       return comments;
@@ -30,7 +30,7 @@ export const getCommentsByDiary = async (diary_id: number, page: number, limit: 
       throw new Error('댓글 조회 실패했습니다.');
     }
   };
-  export const updateComment = async (newComment: CommentType, id: number, username: string): Promise<void> => {
+  export const updateComment = async (newComment: Comment, id: number, username: string): Promise<void> => {
     try {
       const existingComment = await commentModel.getCommentModel(id);
       if (!existingComment) {

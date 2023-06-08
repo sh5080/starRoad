@@ -1,16 +1,16 @@
 import * as adminModel from '../models/adminModel';
 import { TravelPlan } from '../types/travel';
-import { UserType } from '../types/user';
-import { DiaryType } from '../types/diary';
-import { CommentType } from '../types/comment';
+import { User } from '../types/user';
+import { Diary } from '../types/diary';
+import { Comment } from '../types/comment';
 
 // [관리자] 모든 회원 정보 불러오기
-export const getAllUsersService = async (): Promise<UserType[]> => {
+export const getAllUsersService = async (): Promise<User[]> => {
   return adminModel.getAllUsersModel();
 };
 
 // [관리자] 회원 정보 업데이트
-export const updateUserService = async (id: number, user: Partial<UserType>): Promise<UserType> => {
+export const updateUserService = async (id: number, user: Partial<User>): Promise<User> => {
   const updatedUser = await adminModel.updateUserByIdModel(id, user);
   return updatedUser;
 };
@@ -34,7 +34,7 @@ export const getUserInfoTravelLocationService = async (plan_id: number): Promise
 };
 
 // [관리자] 회원이 작성한 다이어리 조회하기
-export const getUserInfoDiaryService = async (username: string): Promise<DiaryType[]> => {
+export const getUserInfoDiaryService = async (username: string): Promise<Diary[]> => {
   const travelDiaries = await adminModel.getUserInfoDiaryModel(username);
   return travelDiaries;
 };
@@ -46,13 +46,13 @@ export const deleteDiaryByAdminService = async (username: string, diary_id: numb
 };
 
 // [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기
-export const getUserInfoCommentService = async (username: string, diary_id: number): Promise<CommentType[]> => {
+export const getUserInfoCommentService = async (username: string, diary_id: number): Promise<Comment[]> => {
   const diaryComments = await adminModel.getUserInfoDiaryCommentModel(username, diary_id);
   return diaryComments;
 };
 
 // [관리자] 특정 회원이 작성한 모든 댓글 조회하기
-export const getUserAllCommentService = async (username: string): Promise<CommentType[]> => {
+export const getUserAllCommentService = async (username: string): Promise<Comment[]> => {
   const userComments = await adminModel.getUserAllCommentModel(username);
   return userComments;
 };

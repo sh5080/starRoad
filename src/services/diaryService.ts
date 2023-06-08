@@ -1,10 +1,10 @@
 import * as diaryModel from '../models/diaryModel';
-import { DiaryType } from '../types/diary';
+import { Diary } from '../types/diary';
 import { AppError,CommonError } from "../types/AppError";
 
 
 export const createDiary = async (
-  diary: DiaryType, 
+  diary: Diary, 
   username: string, 
   plan_id: number
   ) => {
@@ -19,16 +19,16 @@ export const createDiary = async (
     
 };
 
-export const getAllDiaries = async (): Promise<DiaryType[]> => {
+export const getAllDiaries = async (): Promise<Diary[]> => {
   try {
-    const diary = await diaryModel.getAllDiariesByUserId();
-    return diary;
+    const diaries = await diaryModel.getAllDiariesByUserId();
+    return diaries;
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '전체 여행기 조회에 실패했습니다.', 500);
   }
 };
-export const getMyDiaries = async (username: string): Promise<DiaryType[]> => {
+export const getMyDiaries = async (username: string): Promise<Diary[]> => {
   try {
     const diary = await diaryModel.getMyDiariesByUserId(username);
     return diary;
@@ -37,7 +37,7 @@ export const getMyDiaries = async (username: string): Promise<DiaryType[]> => {
     throw new AppError(CommonError.UNEXPECTED_ERROR, '내 다이어리 조회에 실패했습니다.', 500);
   }
 };
-export const getOneDiary = async (diary_id: number): Promise<DiaryType | null> => {
+export const getOneDiary = async (diary_id: number): Promise<Diary | null> => {
   try {
     const diary = await diaryModel.getOneDiaryById(diary_id);
     return diary;
@@ -48,7 +48,7 @@ export const getOneDiary = async (diary_id: number): Promise<DiaryType | null> =
 };
 
 export const updateDiary = async (
-  newDiary: DiaryType,
+  newDiary: Diary,
   diary_id: number,
   username: string
 ) => {
@@ -72,9 +72,9 @@ export const deleteDiary = async (diary_id: number, username: string) => {
     if (diary.username !== username) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
-
+    const deletedDiary = { ...diary };
     await diaryModel.deleteDiaryById(diary_id);
-
+    return deletedDiary
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);

@@ -6,7 +6,7 @@ import { JwtPayload } from 'jsonwebtoken';
 interface CustomRequest extends Request {
   user?: JwtPayload & { user_id: string };
 }
-export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { title, content, image, plan_id, ...extraFields } = req.body;
     const username = req.user?.username;
@@ -30,7 +30,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
   }
 };
 
-export const getAllDiariesController = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllDiaries = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // 다이어리 조회
     const diary = await diaryService.getAllDiaries();
@@ -43,7 +43,7 @@ export const getAllDiariesController = async (req: Request, res: Response, next:
     next(error);
   }
 };
-export const getMyDiariesController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getMyDiaries = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const username = req.user?.username;
     if (!username) {
@@ -56,7 +56,7 @@ export const getMyDiariesController = async (req: CustomRequest, res: Response, 
     next(error);
   }
 };
-export const getOneDiaryController = async (req: Request, res: Response, next: NextFunction) => {
+export const getOneDiary = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const diary = await diaryService.getOneDiary(diary_id);
@@ -71,7 +71,7 @@ export const getOneDiaryController = async (req: Request, res: Response, next: N
   }
 };
 
-export const updateDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const { title, content, image, ...extraFields } = req.body;
@@ -94,16 +94,16 @@ export const updateDiaryController = async (req: CustomRequest, res: Response, n
   }
 };
 
-export const deleteDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const username = req.user?.username;
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    await diaryService.deleteDiary(diary_id, username);
+    const deletedDiary = await diaryService.deleteDiary(diary_id, username);
 
-    res.status(200).json({ message: '여행기 삭제 완료되었습니다.' });
+    res.status(200).json(deletedDiary);
   } catch (error) {
     console.error(error);
     next(error);

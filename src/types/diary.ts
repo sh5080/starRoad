@@ -1,4 +1,4 @@
-export interface DiaryType {
+export interface Diary {
     username?: string;
     plan_id?: number;
     title?: string;

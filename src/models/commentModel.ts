@@ -1,5 +1,5 @@
 import { db } from '../loaders/dbLoader';
-import { CommentType } from '../types/comment';
+import { Comment } from '../types/comment';
 import { RowDataPacket, FieldPacket } from 'mysql2';
 
 interface QueryResult extends RowDataPacket {
@@ -9,7 +9,7 @@ interface QueryResult extends RowDataPacket {
   comment: string;
 }
 
-export const createCommentModel = async (comment: CommentType): Promise<void> => {
+export const createCommentModel = async (comment: Comment): Promise<void> => {
   try {
     await db.execute('INSERT INTO comment (username, diary_id, comment) VALUES (?, ?, ?)', [
       comment.username,
@@ -26,7 +26,7 @@ export const getCommentsByDiaryModel = async (
   diary_id: number,
   page: number,
   limit: number
-): Promise<CommentType[]> => {
+): Promise<Comment[]> => {
   try {
     const offset = Math.floor(page - 1) * limit;
 
@@ -35,7 +35,7 @@ export const getCommentsByDiaryModel = async (
       [diary_id, limit, offset]
     );
 
-    const comments: CommentType[] = rows.map(
+    const comments: Comment[] = rows.map(
       (row) =>
         ({
           id: row['id'],
@@ -52,17 +52,17 @@ export const getCommentsByDiaryModel = async (
   }
 };
 
-export const getAllCommentsModel = async (): Promise<CommentType[]> => {
+export const getAllCommentsModel = async (): Promise<Comment[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment');
-    return rows as CommentType[];
+    return rows as Comment[];
   } catch (error) {
     console.error(error);
     throw new Error('모든 댓글 조회에 실패했습니다.');
   }
 };
 
-export const updateCommentModel = async (id: number, comment: CommentType): Promise<void> => {
+export const updateCommentModel = async (id: number, comment: Comment): Promise<void> => {
   try {
     await db.execute('UPDATE comment SET comment = ? WHERE id = ?', [comment.comment, id]);
   } catch (error) {
@@ -71,11 +71,11 @@ export const updateCommentModel = async (id: number, comment: CommentType): Prom
   }
 };
 
-export const getCommentModel = async (id: number): Promise<CommentType | null> => {
+export const getCommentModel = async (id: number): Promise<Comment | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
     if (Array.isArray(rows) && rows.length > 0) {
-      return rows[0] as CommentType;
+      return rows[0] as Comment;
     }
     return null;
   } catch (error) {

@@ -1,9 +1,9 @@
 import { db } from '../loaders/dbLoader';
-import { DiaryType } from '../types/diary';
+import { Diary } from '../types/diary';
 import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
 
-export const createDiaryById = async (diary: DiaryType): Promise<void> => {
+export const createDiaryById = async (diary: Diary): Promise<void> => {
   try {
     await db.execute(
       'INSERT INTO travel_diary (username, plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?, ?)',
@@ -35,10 +35,10 @@ export const getPlan = async (plan_id: number, username: string): Promise<Travel
   }
 };
 
-export const getAllDiariesByUserId = async (): Promise<DiaryType[]> => {
+export const getAllDiariesByUserId = async (): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary');
-    const diary = rows as DiaryType[];
+    const diary = rows as Diary[];
     return diary;
   } catch (error) {
     console.error(error);
@@ -46,21 +46,21 @@ export const getAllDiariesByUserId = async (): Promise<DiaryType[]> => {
   }
 };
 
-export const getMyDiariesByUserId = async (username: string): Promise<DiaryType[]> => {
+export const getMyDiariesByUserId = async (username: string): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
-    return rows as DiaryType[];
+    return rows as Diary[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR,'내 여행기를 가져오는 중에 오류가 발생했습니다.',404);
   }
 };
 
-export const getOneDiaryById = async (diary_id: number): Promise<DiaryType | null> => {
+export const getOneDiaryById = async (diary_id: number): Promise<Diary | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diary_id]);
     if (Array.isArray(rows) && rows.length > 0) {
-      const diary = rows[0] as DiaryType;
+      const diary = rows[0] as Diary;
       return diary;
     }
     return null;
@@ -70,7 +70,7 @@ export const getOneDiaryById = async (diary_id: number): Promise<DiaryType | nul
   }
 };
 
-export const updateDiaryById = async (diary: DiaryType, diary_id: number): Promise<void> => {
+export const updateDiaryById = async (diary: Diary, diary_id: number): Promise<void> => {
   try {
     await db.execute(
       'UPDATE travel_diary SET title = ?, content = ?, image = ? WHERE id = ?',

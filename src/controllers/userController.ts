@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as userService from '../services/userService';
-import { UserType } from '../types/user';
+import { User } from '../types/user';
 import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 
@@ -40,7 +40,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 // 로그인
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { username, password, ...extraFields }: UserType = req.body;
+    const { username, password, ...extraFields }: User = req.body;
 
     if (!username || !password) {
       throw new AppError(CommonError.INVALID_INPUT, '로그인에 필요한 정보가 제공되지 않았습니다.', 400);
@@ -64,7 +64,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
     res.status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (error) {
@@ -82,7 +82,7 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
   try {
     // req.user가 없는 경우 에러 처리
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
     const { username } = req.user;
     const userData = await userService.getUser(username);
@@ -100,7 +100,7 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
 export const updateUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
 
     const { username } = req.user;
@@ -119,7 +119,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response, next: Ne
     }
     const updatedUserData = await userService.updateUser(username, { email, password });
 
-    res.status(200).json({ updatedUserData });
+    res.status(200).json(updatedUserData);
   } catch (error) {
     console.error(error);
     next(error);
@@ -130,12 +130,14 @@ export const updateUserInfo = async (req: CustomRequest, res: Response, next: Ne
 export const deleteUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
     const { username } = req.user;
-    const message = await userService.deleteUser(username);
-
-    res.status(200).json({ message });
+const deletedUserData = await userService.deleteUser(username);
+if(!deletedUserData){
+  throw new AppError(CommonError.RESOURCE_NOT_FOUND, '탈퇴한 회원입니다.', 401);
+}
+    res.status(200).json(deletedUserData);
   } catch (err) {
     console.error(err);
     next(err);
