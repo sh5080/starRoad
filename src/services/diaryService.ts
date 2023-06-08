@@ -3,20 +3,20 @@ import { DiaryType } from '../types/diary';
 import { AppError,CommonError } from "../types/AppError";
 
 
-export const createDiary = async (diary: DiaryType, username: string, plan_id: number) => {
-  try {
+export const createDiary = async (
+  diary: DiaryType, 
+  username: string, 
+  plan_id: number
+  ) => {
     const plan = await diaryModel.getPlan(plan_id, username);
     if (!plan) {
-      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '해당 일정에 대한 여행기를 작성할 권한이 없습니다.', 404);
+      throw new AppError(CommonError.INVALID_INPUT, '나의 일정만 여행기를 등록할 수 있습니다.', 404);
     }
     const { destination } = plan; // 일정의 destination 값
     diary.destination = destination;
     await diaryModel.createDiaryById(diary);
-    return '여행기 생성이 완료되었습니다.';
-  } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 생성에 실패했습니다.', 500);
-  }
+    return diary
+    
 };
 
 export const getAllDiaries = async (): Promise<DiaryType[]> => {
@@ -47,8 +47,11 @@ export const getOneDiary = async (diary_id: number): Promise<DiaryType | null> =
   }
 };
 
-export const updateDiary = async (newDiary: DiaryType, diary_id: number, username: string) => {
-  try {
+export const updateDiary = async (
+  newDiary: DiaryType,
+  diary_id: number,
+  username: string
+) => {
     const diary = await diaryModel.getOneDiaryById(diary_id);
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
@@ -56,14 +59,10 @@ export const updateDiary = async (newDiary: DiaryType, diary_id: number, usernam
     if (diary.username !== username) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
+    
 
     await diaryModel.updateDiaryById(newDiary, diary_id);
-
-    return '여행기 업데이트가 완료되었습니다.';
-  } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 업데이트에 실패했습니다.', 500);
-  }
+    return diary;
 };
 
 export const deleteDiary = async (diary_id: number, username: string) => {

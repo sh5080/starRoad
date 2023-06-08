@@ -1,6 +1,7 @@
 import { db } from '../loaders/dbLoader';
 import { DiaryType } from '../types/diary';
 import { TravelPlan } from '../types/travel';
+import { AppError, CommonError } from '../types/AppError';
 
 export const createDiaryById = async (diary: DiaryType): Promise<void> => {
   try {
@@ -9,9 +10,10 @@ export const createDiaryById = async (diary: DiaryType): Promise<void> => {
       [diary.username, diary.plan_id, diary.title, 
         diary.content, diary.image, diary.destination]
     );
+    
   } catch (error) {
     console.error(error);
-    throw new Error('여행기 생성에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행기 생성에 실패했습니다.',500);
   }
 };
 
@@ -25,10 +27,11 @@ export const getPlan = async (plan_id: number, username: string): Promise<Travel
       const plan = rows[0] as TravelPlan;
       return plan;
     }
+    
     return null;
   } catch (error) {
     console.error(error);
-    throw new Error('여행 일정을 가져오는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정을 가져오는 중에 오류가 발생했습니다.',500);
   }
 };
 
@@ -39,7 +42,7 @@ export const getAllDiariesByUserId = async (): Promise<DiaryType[]> => {
     return diary;
   } catch (error) {
     console.error(error);
-    throw new Error('모든 여행기를 가져오는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'모든 여행기를 가져오는 중에 오류가 발생했습니다.',500);
   }
 };
 
@@ -49,7 +52,7 @@ export const getMyDiariesByUserId = async (username: string): Promise<DiaryType[
     return rows as DiaryType[];
   } catch (error) {
     console.error(error);
-    throw new Error('내 여행기를 가져오는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'내 여행기를 가져오는 중에 오류가 발생했습니다.',404);
   }
 };
 
@@ -63,7 +66,7 @@ export const getOneDiaryById = async (diary_id: number): Promise<DiaryType | nul
     return null;
   } catch (error) {
     console.error(error);
-    throw new Error('여행기를 가져오는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행기를 가져오는 중에 오류가 발생했습니다.',404);
   }
 };
 
@@ -75,7 +78,7 @@ export const updateDiaryById = async (diary: DiaryType, diary_id: number): Promi
     );
   } catch (error) {
     console.error(error);
-    throw new Error('여행기 업데이트에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행기 업데이트에 실패했습니다.',500);
   }
 };
 
@@ -84,6 +87,6 @@ export const deleteDiaryById = async (diary_id: number): Promise<void> => {
     await db.execute('DELETE FROM travel_diary WHERE id = ?', [diary_id]);
   } catch (error) {
     console.error(error);
-    throw new Error('여행기 삭제에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행기 삭제에 실패했습니다.',500);
   }
 };

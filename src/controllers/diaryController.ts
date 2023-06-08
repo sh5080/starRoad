@@ -1,35 +1,36 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import * as diaryService from '../services/diaryService';
 
 import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
-import { NextFunction } from 'connect';
 interface CustomRequest extends Request {
   user?: JwtPayload & { username: string };
 }
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { title, content, image, plan_id } = req.body;
+    const { title, content, image, plan_id, ...extraFields } = req.body;
     const username = req.user?.username;
 
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    await diaryService.createDiary({ username, plan_id, title, content, image }, username, plan_id);
-    res.status(201).json({ message: '여행기가 생성되었습니다.' });
-  } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-        next(error);
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '여행기 생성 실패했습니다.' });
+    if (!title || !content) {
+      throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
     }
+
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+    }
+
+    const diary = await diaryService.createDiary({ username, plan_id, title, content, image }, username, plan_id);
+    res.status(201).json(diary);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
-export const getAllDiariesController = async (req: Request, res: Response) => {
+export const getAllDiariesController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // 다이어리 조회
     const diary = await diaryService.getAllDiaries();
@@ -38,36 +39,24 @@ export const getAllDiariesController = async (req: Request, res: Response) => {
     }
     res.status(200).json(diary);
   } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-      case CommonError.UNAUTHORIZED_ACCESS:
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '전체 여행기 조회에 실패했습니다.' });
+    console.error(error);
+    next(error)
     }
-  }
 };
-export const getMyDiariesController = async (req: CustomRequest, res: Response) => {
+export const getMyDiariesController = async (req: CustomRequest, res: Response, next:NextFunction) => {
   try {
     const username = req.user?.username;
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
     const diaries = await diaryService.getMyDiaries(username);
-
     res.status(200).json(diaries);
   } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '내 여행기 조회에 실패했습니다.' });
-    }
+    console.error(error);
+    next(error)
   }
 };
-export const getOneDiaryController = async (req: Request, res: Response) => {
+export const getOneDiaryController = async (req: Request, res: Response,next:NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const diary = await diaryService.getOneDiary(diary_id);
@@ -77,41 +66,35 @@ export const getOneDiaryController = async (req: Request, res: Response) => {
     }
     res.status(200).json(diary);
   } catch (error) {
-    switch (error) {
-      case CommonError.RESOURCE_NOT_FOUND:
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '여행기 조회에 실패했습니다.' });
-    }
+        console.error(error);
+        next(error)
   }
 };
 
-export const updateDiaryController = async (req: CustomRequest, res: Response) => {
+export const updateDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
-    const { diary } = req.body;
+    const { title,content,image, ...extraFields } = req.body;
     const username = req.user?.username;
-
+    const diaryData = { title,content,image }
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
-
-    await diaryService.updateDiary(diary, diary_id, username);
-
-    res.status(200).json({ message: '여행기 수정이 완료되었습니다.' });
-  } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '여행기 수정에 실패했습니다.' });
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
-  }
+    if (!title || !content) {
+      throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
+    }
+    await diaryService.updateDiary(diaryData, diary_id, username);
+    res.status(200).json(diaryData);
+  }catch (error) {
+        console.error(error);
+        next(error)
+    }
 };
 
-export const deleteDiaryController = async (req: CustomRequest, res: Response) => {
+export const deleteDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const username = req.user?.username;
@@ -120,14 +103,9 @@ export const deleteDiaryController = async (req: CustomRequest, res: Response) =
     }
     await diaryService.deleteDiary(diary_id, username);
 
-    res.status(200).json({ message: '여행기 삭제가 완료되었습니다.' });
+    res.status(200).json({ message: '여행기 삭제 완료되었습니다.' });
   } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '여행기 삭제에 실패했습니다.' });
-    }
+        console.error(error);
+       next(error)
   }
 };
