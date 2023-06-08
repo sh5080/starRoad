@@ -1,39 +1,52 @@
 import { NextFunction, Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserType } from '../types/user';
-import { AppError, CommonError } from "../types/AppError";
+import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 
 // 회원가입
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user: UserType = req.body;
-    console.log(user);
-    
-    if (!user.username || !user.password || !user.email || !user.name) {
+    const { name, username, password, email, ...extraFields } = req.body;
+    const userData = { name, username, email, password };
+    const exceptPassword = { name, username, email };
+    console.log(req.body);
+    if (!username || !password || !email || !name) {
       throw new AppError(CommonError.INVALID_INPUT, '회원가입에 필요한 정보가 제공되지 않았습니다.', 400);
     }
-    const message = await userService.signupUser(user);
-
-    res.status(201).json({ message });
-  } catch (error) {
-    switch (error) {
-      case CommonError.INVALID_INPUT:
-        break;
-      default:
-        console.error(error);
-        res.status(500).json({ error: '회원가입에 실패했습니다.' });
+    //유효성 검증
+    if (username.length < 6 || username.length > 20) {
+      throw new AppError(CommonError.INVALID_INPUT, '아이디는 6자 이상 20자 이내로 설정해야 합니다.', 400);
     }
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{10,20}$/;
+    if (!passwordRegex.test(password)) {
+      throw new AppError(
+        CommonError.INVALID_INPUT,
+        '비밀번호는 영문, 숫자, 특수문자를 포함하여 10자 이상 20자 이내여야 합니다.',
+        400
+      );
+    }
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+    }
+    await userService.signupUser(userData);
+    res.status(201).json(exceptPassword);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 // 로그인
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { username, password }: UserType = req.body;
+    const { username, password, ...extraFields }: UserType = req.body;
 
     if (!username || !password) {
       throw new AppError(CommonError.INVALID_INPUT, '로그인에 필요한 정보가 제공되지 않았습니다.', 400);
+    }
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
     const userData = await userService.getUser(username);
     console.log(userData);
@@ -44,31 +57,19 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const token = await userService.loginUser(username, password);
     res.json({ token });
   } catch (error) {
-    switch (error) {
-      case CommonError.INVALID_INPUT:
-      case CommonError.UNAUTHORIZED_ACCESS:
-        next(error);
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '회원가입에 실패했습니다.' });
-    }
+    console.error(error);
+    next(error);
   }
 };
-export const logout = async (req: CustomRequest, res: Response) => {
+export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
     res.status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '로그아웃에 실패했습니다.' });
-    }
+    console.error(error);
+    next(error);
   }
 };
 
@@ -77,14 +78,12 @@ interface CustomRequest extends Request {
 }
 
 // 내 정보 조회
-export const getUserInfo = async (req: CustomRequest, res: Response) => {
-  // req는 언제든 조회
+export const getUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     // req.user가 없는 경우 에러 처리
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
-
     const { username } = req.user;
     const userData = await userService.getUser(username);
 
@@ -93,18 +92,12 @@ export const getUserInfo = async (req: CustomRequest, res: Response) => {
     }
     res.status(200).json({ userData });
   } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-      case CommonError.RESOURCE_NOT_FOUND:
-        break;
-      default:
-        //console.error(error);
-        res.status(500).json({ error: '사용자 조회에 실패했습니다.' });
-    }
+    console.error(error);
+    next(error);
   }
 };
 // 회원 정보 수정
-export const updateUserInfo = async (req: CustomRequest, res: Response) => {
+export const updateUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
@@ -116,39 +109,35 @@ export const updateUserInfo = async (req: CustomRequest, res: Response) => {
     if (!email || !password) {
       throw new AppError(CommonError.INVALID_INPUT, '올바른 이메일과 비밀번호를 입력해주세요.', 400);
     }
-
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{10,20}$/;
+    if (!passwordRegex.test(password)) {
+      throw new AppError(
+        CommonError.INVALID_INPUT,
+        '비밀번호는 영문, 숫자, 특수문자를 포함하여 10자 이상 20자 이내여야 합니다.',
+        400
+      );
+    }
     const updatedUserData = await userService.updateUser(username, { email, password });
 
     res.status(200).json({ updatedUserData });
   } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-      case CommonError.INVALID_INPUT:
-        break;
-      default:
-        console.error(error);
-        res.status(500).json({ error: '사용자 정보 업데이트에 실패했습니다.' });
-    }
+    console.error(error);
+    next(error);
   }
 };
 
 // 회원 탈퇴
-export const deleteUserInfo = async (req: CustomRequest, res: Response) => {
+export const deleteUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
-
     const { username } = req.user;
     const message = await userService.deleteUser(username);
 
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '사용자 정보 삭제에 실패했습니다.' });
-    }
+    next(err);
   }
 };

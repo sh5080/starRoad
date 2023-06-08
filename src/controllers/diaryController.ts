@@ -40,10 +40,10 @@ export const getAllDiariesController = async (req: Request, res: Response, next:
     res.status(200).json(diary);
   } catch (error) {
     console.error(error);
-    next(error)
-    }
+    next(error);
+  }
 };
-export const getMyDiariesController = async (req: CustomRequest, res: Response, next:NextFunction) => {
+export const getMyDiariesController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const username = req.user?.username;
     if (!username) {
@@ -53,10 +53,10 @@ export const getMyDiariesController = async (req: CustomRequest, res: Response, 
     res.status(200).json(diaries);
   } catch (error) {
     console.error(error);
-    next(error)
+    next(error);
   }
 };
-export const getOneDiaryController = async (req: Request, res: Response,next:NextFunction) => {
+export const getOneDiaryController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
     const diary = await diaryService.getOneDiary(diary_id);
@@ -66,17 +66,17 @@ export const getOneDiaryController = async (req: Request, res: Response,next:Nex
     }
     res.status(200).json(diary);
   } catch (error) {
-        console.error(error);
-        next(error)
+    console.error(error);
+    next(error);
   }
 };
 
 export const updateDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
-    const { title,content,image, ...extraFields } = req.body;
+    const { title, content, image, ...extraFields } = req.body;
     const username = req.user?.username;
-    const diaryData = { title,content,image }
+    const diaryData = { title, content, image };
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
@@ -88,10 +88,10 @@ export const updateDiaryController = async (req: CustomRequest, res: Response, n
     }
     await diaryService.updateDiary(diaryData, diary_id, username);
     res.status(200).json(diaryData);
-  }catch (error) {
-        console.error(error);
-        next(error)
-    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
 };
 
 export const deleteDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -105,7 +105,7 @@ export const deleteDiaryController = async (req: CustomRequest, res: Response, n
 
     res.status(200).json({ message: '여행기 삭제 완료되었습니다.' });
   } catch (error) {
-        console.error(error);
-       next(error)
+    console.error(error);
+    next(error);
   }
 };

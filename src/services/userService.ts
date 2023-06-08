@@ -11,17 +11,14 @@ const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 
-export const signupUser = async (user: UserType): Promise<string> => {
+export const signupUser = async (user: UserType) => {
   const hashedPassword = await bcrypt.hash(String(user.password), saltRounds);
 
   const findUserId = await userModel.getUserById(String(user.username));
   if (findUserId) {
     throw new AppError(CommonError.DUPLICATE_ENTRY, '이미 존재하는 아이디입니다.', 409);
   }
-
   await userModel.createUser({ ...user, password: hashedPassword });
-
-  return '회원가입이 정상적으로 완료되었습니다.';
 };
 
 export const loginUser = async (username: string, password: string): Promise<object> => {
@@ -91,8 +88,6 @@ export const updateUser = async (username: string, updateData: Partial<UserType>
   if (!updatedUser) {
     throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 업데이트에 실패했습니다.', 500);
   }
-
-  return '회원정보 수정이 정상적으로 완료되었습니다.';
 };
 
 export const deleteUser = async (username: string) => {
@@ -101,6 +96,4 @@ export const deleteUser = async (username: string) => {
   if (!deletedUser) {
     throw new Error('사용자 정보 삭제에 실패했습니다.');
   }
-
-  return '회원정보가 성공적으로 삭제되었습니다.';
 };

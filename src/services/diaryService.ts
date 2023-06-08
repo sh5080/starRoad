@@ -59,8 +59,6 @@ export const updateDiary = async (
     if (diary.username !== username) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
-    
-
     await diaryModel.updateDiaryById(newDiary, diary_id);
     return diary;
 };
@@ -77,7 +75,6 @@ export const deleteDiary = async (diary_id: number, username: string) => {
 
     await diaryModel.deleteDiaryById(diary_id);
 
-    return '여행기 삭제가 완료되었습니다.';
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);
