@@ -132,14 +132,21 @@ export const deleteUserInfo = async (req: CustomRequest, res: Response, next: Ne
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
-    const { username } = req.user;
-const deletedUserData = await userService.deleteUser(username);
-if(!deletedUserData){
-  throw new AppError(CommonError.RESOURCE_NOT_FOUND, '탈퇴한 회원입니다.', 401);
-}
-    res.status(200).json(deletedUserData);
+
+    const { username: currentUser } = req.user;
+    const deletedUserData = await userService.deleteUser(currentUser);
+
+    if (!deletedUserData) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '탈퇴한 회원입니다.', 401);
+    }
+
+    const { name, username, email } = deletedUserData;
+    const responseData = { name, username, email };
+
+    res.status(200).json(responseData);
   } catch (err) {
     console.error(err);
     next(err);
   }
 };
+
