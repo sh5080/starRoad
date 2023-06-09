@@ -1,14 +1,14 @@
-import { User } from '../types/user';
+import { UserType } from '../types/user';
 import { db } from '../loaders/dbLoader';
 import { TravelPlan } from '../types/travel';
 import { Diary } from '../types/diary';
 import { Comment } from '../types/comment';
 
 // [관리자] 모든 회원 정보 불러오기
-export const getAllUsersModel = async (): Promise<User[]> => {
+export const getAllUsersModel = async (): Promise<UserType[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM user');
-    return rows as User[];
+    return rows as UserType[];
   } catch (error) {
     console.error(error);
     throw new Error('모든 회원 정보를 불러오는 중에 오류가 발생했습니다.');
@@ -16,11 +16,11 @@ export const getAllUsersModel = async (): Promise<User[]> => {
 };
 
 // [관리자] 회원 정보 업데이트
-export const updateUserByIdModel = async (id: number, user: Partial<User>): Promise<User> => {
+export const updateUserByIdModel = async (id: number, user: Partial<UserType>): Promise<UserType> => {
   try {
     await db.query('UPDATE user SET ? WHERE id = ?', [user, id]);
     const [rows] = await db.execute('SELECT * FROM user WHERE id = ?', [id]);
-    const [updatedUser] = rows as User[];
+    const [updatedUser] = rows as UserType[];
     return updatedUser;
   } catch (error) {
     console.error(error);
@@ -131,9 +131,35 @@ export const deleteCommentByAdminModel = async (
   comment_id: number
 ): Promise<void> => {
   try {
-    await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND comment_id = ?', [username, diary_id, comment_id]);
+    await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND comment_id = ?', [
+      username,
+      diary_id,
+      comment_id,
+    ]);
   } catch (error) {
     console.error(error);
     throw new Error('댓글을 삭제하는 중에 오류가 발생했습니다.');
+  }
+};
+
+// ----------------------------------------------------------------------------
+
+// [관리자] 관광지 추가
+export const addTouristDestinationModel = async (
+  name_en: string,
+  name_ko: string,
+  image: string,
+  introduction: string
+): Promise<void> => {
+  try {
+    await db.execute('INSERT INTO travel_destination (name_en, name_ko, image, introduction) VALUES (?, ?, ?, ?)', [
+      name_en,
+      name_ko,
+      image,
+      introduction,
+    ]);
+  } catch (error) {
+    console.error(error);
+    throw new Error('관광지를 추가하는 중에 오류가 발생했습니다');
   }
 };
