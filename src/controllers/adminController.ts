@@ -2,7 +2,6 @@ import { Response, NextFunction } from 'express';
 import { AppError, CommonError } from '../types/AppError';
 import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
-import { UserType } from '../types/user';
 
 // [관리자] 모든 회원 조회하기
 export const getAllUsersController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -42,10 +41,6 @@ export const deleteUserController = async (req: CustomRequest, res: Response, ne
     const { id } = req.params;
     console.log(`${id} 회원 삭제중...`);
 
-    // const user = await getUser(String(username));
-    // if (!user.activated) {
-    //   return res.status(400).json({ message: '탈퇴한 회원입니다' });
-    // }
     const message = await adminService.deleteUserService(Number(id));
     console.log(message);
 
@@ -75,8 +70,9 @@ export const getAllUserInfoTravelController = async (req: CustomRequest, res: Re
     );
   }
 };
+
 // [관리자] 회원이 작성한 날짜 장소 조회하기
-export const getUserInfoAllLocationController = async (req: CustomRequest, res: Response) => {
+export const getUserInfoAllLocationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { plan_id } = req.params;
 
@@ -85,12 +81,12 @@ export const getUserInfoAllLocationController = async (req: CustomRequest, res: 
     res.status(200).json({ data: userTravelLocationInfos, message: '회원이 작성한 날짜별 장소를 조회했습니다.' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '회원이 작성한 날짜별 장소 조회에 실패했습니다.' });
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '회원이 작성한 날짜별 장소 조회에 실패했습니다.', 500));
   }
 };
 
 // [관리자] 회원이 작성한 다이어리 모두 조회하기
-export const getUserInfoAllDiaryController = async (req: CustomRequest, res: Response) => {
+export const getUserInfoAllDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
 
@@ -99,25 +95,24 @@ export const getUserInfoAllDiaryController = async (req: CustomRequest, res: Res
     res.status(200).json({ data: userTravelDiaryInfos, message: '회원이 작성한 다이어리를 조회했습니다.' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '회원이 작성한 다이어리 조회에 실패했습니다.' });
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '회원이 작성한 다이어리 조회에 실패했습니다.', 500));
   }
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByAdminController = async (req: CustomRequest, res: Response) => {
+export const deleteDiaryByAdminController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, plan_id } = req.params;
     const message = await adminService.deleteDiaryByAdminService(String(username), Number(plan_id));
     res.status(200).json({ data: message });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '회원이 작성한 다이어리 삭제에 실패했습니다.' });
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '회원이 작성한 다이어리 삭제에 실패했습니다.', 500));
   }
 };
 
-// 회원이 작성한 다이어리의 댓글들은 관리자뿐만 아니라 원래 볼 수 있음.(아마 필요없을수도있음 밑에 코드는)
-// [관리자] 회원이 작성한 댓글 모두 조회하기
-export const getUserInfoAllCommentController = async (req: CustomRequest, res: Response) => {
+// [관리자] 회원이 작성한 다이어리의 댓글 모두 조회하기
+export const getUserInfoAllCommentController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diary_id } = req.params;
 
@@ -131,12 +126,10 @@ export const getUserInfoAllCommentController = async (req: CustomRequest, res: R
       .json({ data: userTravelDiaryCommentInfos, message: '회원이 작성한 다이어리의 댓글을 조회했습니다.' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '회원이 작성한 다이어리의 댓글 조회에 실패했습니다.' });
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '회원이 작성한 다이어리의 댓글 조회에 실패했습니다.', 500));
   }
 };
-
-// [관리자] 특정 회원이 작성한 모든 댓글 조회하기
-export const getUserAllCommentsController = async (req: CustomRequest, res: Response) => {
+export const getUserAllCommentsController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
 
@@ -145,12 +138,12 @@ export const getUserAllCommentsController = async (req: CustomRequest, res: Resp
     res.status(200).json({ data: userAllComments, message: '회원이 작성한 모든 댓글을 조회했습니다.' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '회원이 작성한 모든 댓글 조회에 실패했습니다.' });
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '회원이 작성한 모든 댓글 조회에 실패했습니다.', 500));
   }
 };
 
 // [관리자] 특정 회원이 작성한 댓글 삭제하기
-export const deleteCommentByAdminController = async (req: CustomRequest, res: Response) => {
+export const deleteCommentByAdminController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diary_id, comment_id } = req.params;
     const message = await adminService.deleteCommentByAdminService(
@@ -161,12 +154,12 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
     res.status(200).json({ data: message });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '회원이 작성한 댓글 삭제에 실패했습니다.' });
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '회원이 작성한 댓글 삭제에 실패했습니다.', 500));
   }
 };
 
 // [관리자] 관광지 추가하기
-export const addTouristDestinationController = async (req: CustomRequest, res: Response) => {
+export const addTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { name_en, name_ko, image, introduction } = req.body;
     const message = await adminService.addTouristDestinationService(
@@ -178,6 +171,35 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '관광지 추가에 실패했습니다.' });
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '관광지 추가에 실패했습니다.', 500));
+  }
+};
+
+// [관리자] 관광지 수정하기
+export const updateTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { name_en, name_ko, image, introduction } = req.body;
+    const product = {
+      name_en,
+      name_ko,
+      image,
+      introduction,
+    };
+    const data = await adminService.updateTouristDestinationService(String(id), product);
+    res.status(200).json({ data });
+  } catch (err) {
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '관광지 수정에 실패했습니다.', 500));
+  }
+};
+
+// [관리자] 관광지 삭제하기
+export const deleteTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const message = await adminService.deleteTouristDestinationService(String(id));
+    res.status(200).json({ message });
+  } catch (err) {
+    next(new AppError(CommonError.UNEXPECTED_ERROR, '관광지 삭제에 실패했습니다.', 500));
   }
 };
