@@ -1,7 +1,8 @@
 import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
+import { RowDataPacket, FieldPacket } from 'mysql2';
 
-export const createTravelPlan = async (travelPlan: TravelPlan)=> {
+export const createTravelPlan = async (travelPlan: TravelPlan) => {
   try {
     const [rows] = await db.execute(
       'INSERT INTO travel_plan (username, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
@@ -82,10 +83,28 @@ export const updateTravelLocation = async (travelLocation: TravelLocation): Prom
   }
 };
 
-export const deleteTravelPlan = async (username: string, plan_id: number): Promise<void> => {
+export const deleteTravelPlan = async (
+  username: string,
+  plan_id: number
+): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
   try {
+    const [planData] = (await db.execute('SELECT * FROM travel_plan WHERE username = ? AND plan_id = ?', [
+      username,
+      plan_id,
+    ])) as [RowDataPacket[], FieldPacket[]];
+
+    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id])) as [
+      RowDataPacket[],
+      FieldPacket[]
+    ];
+
     await db.execute('DELETE FROM travel_location WHERE plan_id = ?', [plan_id]);
     await db.execute('DELETE FROM travel_plan WHERE username = ? AND plan_id = ?', [username, plan_id]);
+
+    return {
+      deletedPlan: planData,
+      deletedLocations: locationData,
+    };
   } catch (error) {
     console.error(error);
     throw new Error('여행 일정 삭제에 실패했습니다.');

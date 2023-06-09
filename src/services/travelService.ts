@@ -1,6 +1,7 @@
 import { TravelPlan, TravelLocation } from '../types/travel';
 import * as travelModel from '../models/travelModel';
 import { AppError, CommonError } from '../types/AppError';
+import { RowDataPacket } from 'mysql2';
 
 // 여행 일정 등록
 export const createPlan = async (travelPlan: TravelPlan) => {
@@ -71,7 +72,6 @@ export const updateLocation = async (travelLocation: TravelLocation): Promise<vo
     !travelLocation.location?.trim() ||
     !travelLocation.newDate ||
     !travelLocation.order?.toString().trim()
- 
   ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
@@ -80,11 +80,17 @@ export const updateLocation = async (travelLocation: TravelLocation): Promise<vo
 };
 
 // 여행 일정 삭제
-export const deletePlan = async (username: string, plan_id: number): Promise<void> => {
-
+export const deletePlan = async (
+  username: string,
+  plan_id: number
+): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
+  console.log('서비스로직 들어옴');
+  console.log(username, plan_id);
 
   const deletedPlan = await travelModel.deleteTravelPlan(username, plan_id);
-  return deletedPlan
+  console.log('서비스로직 나가는중...');
+
+  return deletedPlan;
 };
 
 // 여행 날짜별 장소 삭제
