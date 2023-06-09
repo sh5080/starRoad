@@ -3,6 +3,8 @@ import { db } from '../loaders/dbLoader';
 import { TravelPlan } from '../types/travel';
 import { Diary } from '../types/diary';
 import { Comment } from '../types/comment';
+import { TouristDestinationType } from '../types/destination';
+import { AppError, CommonError } from '../types/AppError';
 
 // [관리자] 모든 회원 정보 불러오기
 export const getAllUsersModel = async (): Promise<UserType[]> => {
@@ -11,7 +13,7 @@ export const getAllUsersModel = async (): Promise<UserType[]> => {
     return rows as UserType[];
   } catch (error) {
     console.error(error);
-    throw new Error('모든 회원 정보를 불러오는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch all user information', 500);
   }
 };
 
@@ -24,7 +26,7 @@ export const updateUserByIdModel = async (id: number, user: Partial<UserType>): 
     return updatedUser;
   } catch (error) {
     console.error(error);
-    throw new Error('회원 정보 업데이트 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to update user information', 500);
   }
 };
 
@@ -34,7 +36,7 @@ export const deleteUserByIdModel = async (id: number): Promise<void> => {
     await db.execute('UPDATE user SET activated = 0 WHERE id = ?', [id]);
   } catch (error) {
     console.error(error);
-    throw new Error('회원 정보 삭제 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user information', 500);
   }
 };
 
@@ -48,7 +50,7 @@ export const getUserInfoTravelModel = async (username: string): Promise<TravelPl
     return travelPlans;
   } catch (error) {
     console.error(error);
-    throw new Error('회원이 작성한 일정을 불러오는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel plans', 500);
   }
 };
 
@@ -62,7 +64,7 @@ export const getUserInfoLocationModel = async (plan_id: number): Promise<TravelP
     return travelPlans;
   } catch (error) {
     console.error(error);
-    throw new Error('회원이 작성한 여행 장소 날짜를 조회하는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel locations', 500);
   }
 };
 
@@ -76,7 +78,7 @@ export const getUserInfoDiaryModel = async (username: string): Promise<Diary[]> 
     return travelDiaries;
   } catch (error) {
     console.error(error);
-    throw new Error('회원이 작성한 다이어리를 조회하는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel diaries', 500);
   }
 };
 
@@ -100,7 +102,7 @@ export const getUserInfoDiaryCommentModel = async (username: string, diary_id: n
     return diaryComments;
   } catch (error) {
     console.error(error);
-    throw new Error('회원이 작성한 다이어리 댓글을 조회하는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user diary comments', 500);
   }
 };
 
@@ -120,7 +122,7 @@ export const getUserAllCommentModel = async (username: string): Promise<Comment[
     return userComments;
   } catch (error) {
     console.error(error);
-    throw new Error('특정 회원이 작성한 모든 댓글을 조회하는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user comments', 500);
   }
 };
 
@@ -138,7 +140,7 @@ export const deleteCommentByAdminModel = async (
     ]);
   } catch (error) {
     console.error(error);
-    throw new Error('댓글을 삭제하는 중에 오류가 발생했습니다.');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete comment', 500);
   }
 };
 
@@ -160,6 +162,32 @@ export const addTouristDestinationModel = async (
     ]);
   } catch (error) {
     console.error(error);
-    throw new Error('관광지를 추가하는 중에 오류가 발생했습니다');
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to add tourist destination', 500);
+  }
+};
+
+// [관리자] 관광지 수정하기
+export const updateTouristDestinationModel = async (
+  id: string,
+  product: Partial<TouristDestinationType>
+): Promise<void> => {
+  try {
+    await db.execute(
+      'UPDATE travel_destination SET name_en = ?, name_ko = ?, image = ?, introduction = ? WHERE id = ?',
+      [product.name_en, product.name_ko, product.image, product.introduction, id]
+    );
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to update tourist destination', 500);
+  }
+};
+
+// [관리자] 관광지 삭제하기
+export const deleteTouristDestinationModel = async (id: string): Promise<void> => {
+  try {
+    await db.execute('DELETE FROM travel_destination WHERE id = ?', [id]);
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete tourist destination', 500);
   }
 };
