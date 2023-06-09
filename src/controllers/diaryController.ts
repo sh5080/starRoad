@@ -102,7 +102,9 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
     const deletedDiary = await diaryService.deleteDiary(diary_id, username);
-
+    if (!deletedDiary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
+    }
     res.status(200).json(deletedDiary);
   } catch (error) {
     console.error(error);

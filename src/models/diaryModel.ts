@@ -3,11 +3,11 @@ import { Diary } from '../types/diary';
 import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
 
-export const createDiaryById = async (diary: Diary): Promise<void> => {
+export const createDiaryByUsername = async (diary: Diary): Promise<void> => {
   try {
     await db.execute(
-      'INSERT INTO travel_diary (username, plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?, ?)',
-      [diary.username, diary.plan_id, diary.title, 
+      'INSERT INTO travel_diary (plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?)',
+      [diary.plan_id, diary.title, 
         diary.content, diary.image, diary.destination]
     );
     
@@ -35,7 +35,7 @@ export const getPlan = async (plan_id: number, username: string): Promise<Travel
   }
 };
 
-export const getAllDiariesByUserId = async (): Promise<Diary[]> => {
+export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary');
     const diary = rows as Diary[];
@@ -46,7 +46,7 @@ export const getAllDiariesByUserId = async (): Promise<Diary[]> => {
   }
 };
 
-export const getMyDiariesByUserId = async (username: string): Promise<Diary[]> => {
+export const getMyDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
     return rows as Diary[];
@@ -56,7 +56,7 @@ export const getMyDiariesByUserId = async (username: string): Promise<Diary[]> =
   }
 };
 
-export const getOneDiaryById = async (diary_id: number): Promise<Diary | null> => {
+export const getOneDiaryByUsername = async (diary_id: number): Promise<Diary | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diary_id]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -70,7 +70,7 @@ export const getOneDiaryById = async (diary_id: number): Promise<Diary | null> =
   }
 };
 
-export const updateDiaryById = async (diary: Diary, diary_id: number): Promise<void> => {
+export const updateDiaryByUsername = async (diary: Diary, diary_id: number): Promise<void> => {
   try {
     await db.execute(
       'UPDATE travel_diary SET title = ?, content = ?, image = ? WHERE id = ?',
@@ -82,11 +82,10 @@ export const updateDiaryById = async (diary: Diary, diary_id: number): Promise<v
   }
 };
 
-export const deleteDiaryById = async (diary_id: number): Promise<void> => {
+export const deleteDiaryByUsername = async (diary_id: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM travel_diary WHERE id = ?', [diary_id]);
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행기 삭제에 실패했습니다.',500);
   }
 };

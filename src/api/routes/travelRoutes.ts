@@ -11,10 +11,10 @@ router.post('/', validateToken, travelController.createTravelPlanController);
 router.get('/', validateToken, travelController.getTravelPlanController);
 
 // 여행 일정 수정
-router.put('/:plan_id', validateToken, travelController.updateTravelPlanController);
+router.patch('/:plan_id', validateToken, travelController.updateTravelPlanController);
 
 // 특정 날짜 장소 수정
-router.put('/location/:plan_id/:location_id', validateToken, travelController.updateTravelLocationController);
+router.patch('/location/:plan_id/:location_id', validateToken, travelController.updateTravelLocationController);
 
 // 여행 일정 삭제
 router.delete('/:plan_id', validateToken, travelController.deleteTravelPlanController);

@@ -1,7 +1,7 @@
 import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
 
-export const createTravelPlan = async (travelPlan: TravelPlan): Promise<number> => {
+export const createTravelPlan = async (travelPlan: TravelPlan)=> {
   try {
     const [rows] = await db.execute(
       'INSERT INTO travel_plan (username, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
@@ -11,7 +11,6 @@ export const createTravelPlan = async (travelPlan: TravelPlan): Promise<number> 
     return insertId;
   } catch (error) {
     console.error(error);
-    throw new Error('여행 일정 등록에 실패했습니다.');
   }
 };
 
@@ -30,7 +29,6 @@ export const createTravelLocation = async (travelLocation: TravelLocation, plan_
     );
   } catch (error) {
     console.error(error);
-    throw new Error('날짜별 장소 등록에 실패했습니다.');
   }
 };
 
@@ -80,7 +78,7 @@ export const updateTravelLocation = async (travelLocation: TravelLocation): Prom
     );
   } catch (error) {
     console.error(error);
-    throw new Error('날짜별 장소 수정에 실패했습니다.');
+    //throw new Error('날짜별 장소 수정에 실패했습니다.');
   }
 };
 

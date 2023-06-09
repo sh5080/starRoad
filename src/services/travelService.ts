@@ -4,7 +4,12 @@ import { AppError, CommonError } from '../types/AppError';
 
 // 여행 일정 등록
 export const createPlan = async (travelPlan: TravelPlan) => {
-  if (!travelPlan.username || !travelPlan.start_date || !travelPlan.end_date || !travelPlan.destination) {
+  if (
+    !travelPlan.username?.trim() ||
+    !travelPlan.start_date ||
+    !travelPlan.end_date ||
+    !travelPlan.destination?.trim()
+  ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
   const plan_id = await travelModel.createTravelPlan(travelPlan);
@@ -24,9 +29,11 @@ export const createLocation = async (travelLocation: TravelLocation, plan_id: nu
     !travelLocation.longitude ||
     !plan_id
   ) {
-    throw new AppError(CommonError.TOKEN_EXPIRED_ERROR, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+    throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
+
   console.log('여행 장소 등록');
+
   await travelModel.createTravelLocation(travelLocation, plan_id);
 };
 
@@ -45,10 +52,10 @@ export const getLocations = async (plan_id: number): Promise<TravelLocation[]> =
 export const updatePlan = async (travelPlan: TravelPlan): Promise<void> => {
   if (
     !travelPlan.plan_id ||
-    !travelPlan.username ||
+    !travelPlan.username?.trim() ||
     !travelPlan.start_date ||
     !travelPlan.end_date ||
-    !travelPlan.destination
+    !travelPlan.destination?.trim()
   ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
@@ -61,9 +68,10 @@ export const updateLocation = async (travelLocation: TravelLocation): Promise<vo
   if (
     !travelLocation.location_id ||
     !travelLocation.plan_id ||
-    !travelLocation.location ||
+    !travelLocation.location?.trim() ||
     !travelLocation.newDate ||
-    !travelLocation.order
+    !travelLocation.order?.toString().trim()
+ 
   ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
@@ -73,7 +81,10 @@ export const updateLocation = async (travelLocation: TravelLocation): Promise<vo
 
 // 여행 일정 삭제
 export const deletePlan = async (username: string, plan_id: number): Promise<void> => {
-  await travelModel.deleteTravelPlan(username, plan_id);
+
+
+  const deletedPlan = await travelModel.deleteTravelPlan(username, plan_id);
+  return deletedPlan
 };
 
 // 여행 날짜별 장소 삭제
