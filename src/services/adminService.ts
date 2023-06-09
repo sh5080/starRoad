@@ -1,16 +1,16 @@
 import * as adminModel from '../models/adminModel';
 import { TravelPlan } from '../types/travel';
-import { User } from '../types/user';
+import { UserType } from '../types/user';
 import { Diary } from '../types/diary';
 import { Comment } from '../types/comment';
 
 // [관리자] 모든 회원 정보 불러오기
-export const getAllUsersService = async (): Promise<User[]> => {
+export const getAllUsersService = async (): Promise<UserType[]> => {
   return adminModel.getAllUsersModel();
 };
 
 // [관리자] 회원 정보 업데이트
-export const updateUserService = async (id: number, user: Partial<User>): Promise<User> => {
+export const updateUserService = async (id: number, user: Partial<UserType>): Promise<UserType> => {
   const updatedUser = await adminModel.updateUserByIdModel(id, user);
   return updatedUser;
 };
@@ -65,4 +65,15 @@ export const deleteCommentByAdminService = async (
 ): Promise<string> => {
   await adminModel.deleteCommentByAdminModel(username, diary_id, comment_id);
   return '댓글이 정상적으로 삭제되었습니다.';
+};
+
+// [관리자] 관광지 추가하기
+export const addTouristDestinationService = async (
+  name_en: string,
+  name_ko: string,
+  image: string,
+  introduction: string
+): Promise<string> => {
+  await adminModel.addTouristDestinationModel(name_en, name_ko, image, introduction);
+  return '관광지 추가에 성공하였습니다.';
 };
