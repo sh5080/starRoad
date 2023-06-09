@@ -55,6 +55,8 @@ export const getTravelLocationsByPlanId = async (plan_id: number): Promise<Trave
 
 export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
   try {
+
+
     await db.execute(
       'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ? AND username = ?',
       [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id, travelPlan.username]
@@ -65,8 +67,17 @@ export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> =>
   }
 };
 
-export const updateTravelLocation = async (travelLocation: TravelLocation): Promise<void> => {
+export const updateTravelLocation = async (username: string, travelLocation: TravelLocation): Promise<{myLocation:RowDataPacket[],myPlan:RowDataPacket[]}> => {
   try {
+    const [myPlan] = await db.execute(
+      'SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?',
+      [travelLocation.plan_id, username]
+    )as [RowDataPacket[],FieldPacket[]];
+    const [myLocation] = await db.execute(
+      'SELECT * FROM travel_location WHERE location_id = ?',
+      [travelLocation.location_id]
+    )as [RowDataPacket[],FieldPacket[]];
+
     await db.execute(
       'UPDATE travel_location SET location = ?, date = ?, `order` = ? WHERE plan_id = ? AND location_id = ?',
       [
@@ -77,9 +88,10 @@ export const updateTravelLocation = async (travelLocation: TravelLocation): Prom
         travelLocation.location_id,
       ]
     );
+    return {myLocation,myPlan}
   } catch (error) {
     console.error(error);
-    //throw new Error('날짜별 장소 수정에 실패했습니다.');
+    throw new Error('날짜별 장소 수정에 실패했습니다.');
   }
 };
 
@@ -111,12 +123,25 @@ export const deleteTravelPlan = async (
   }
 };
 
-export const deleteTravelLocation = async (travelLocation: TravelLocation): Promise<void> => {
+export const deleteTravelLocation = async (
+  location_id:number,
+  travelLocation: TravelLocation
+  ): Promise<{deletedLocations:RowDataPacket[]}> => {
   try {
+    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [location_id])) as [
+      RowDataPacket[],
+      FieldPacket[]
+    ];
+    
     await db.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND location_id = ?', [
       travelLocation.plan_id,
       travelLocation.location_id,
-    ]);
+    ])
+return {
+  deletedLocations: locationData
+}
+
+
   } catch (error) {
     console.error(error);
     throw new Error('날짜별 장소 삭제에 실패했습니다.');

@@ -50,7 +50,7 @@ export const getLocations = async (plan_id: number): Promise<TravelLocation[]> =
 };
 
 // 여행 일정 수정
-export const updatePlan = async (travelPlan: TravelPlan): Promise<void> => {
+export const updatePlan = async (username: string, travelPlan: TravelPlan) => {
   if (
     !travelPlan.plan_id ||
     !travelPlan.username?.trim() ||
@@ -60,12 +60,19 @@ export const updatePlan = async (travelPlan: TravelPlan): Promise<void> => {
   ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
+  const existingTravelPlans = await travelModel.getTravelPlansByUserId(username);
+  const existingTravelPlan = existingTravelPlans.find((plan) => plan.plan_id === travelPlan.plan_id);
+
+  if (!existingTravelPlan || existingTravelPlan.username !== username) {
+    throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
+  }
 
   await travelModel.updateTravelPlan(travelPlan);
+  return travelPlan;
 };
 
 // 여행 날짜별 장소 수정
-export const updateLocation = async (travelLocation: TravelLocation): Promise<void> => {
+export const updateLocation = async (travelLocation: TravelLocation, username: string): Promise<{ myPlan: RowDataPacket[], myLocation: RowDataPacket[] }> => {
   if (
     !travelLocation.location_id ||
     !travelLocation.plan_id ||
@@ -75,8 +82,8 @@ export const updateLocation = async (travelLocation: TravelLocation): Promise<vo
   ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
-
-  await travelModel.updateTravelLocation(travelLocation);
+  const {myPlan, myLocation} = await travelModel.updateTravelLocation(username, travelLocation);
+  return { myPlan, myLocation };
 };
 
 // 여행 일정 삭제
@@ -84,16 +91,17 @@ export const deletePlan = async (
   username: string,
   plan_id: number
 ): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
-  console.log('서비스로직 들어옴');
-  console.log(username, plan_id);
-
   const deletedPlan = await travelModel.deleteTravelPlan(username, plan_id);
-  console.log('서비스로직 나가는중...');
-
   return deletedPlan;
 };
 
 // 여행 날짜별 장소 삭제
-export const deleteLocation = async (travelLocation: TravelLocation): Promise<void> => {
-  await travelModel.deleteTravelLocation(travelLocation);
+
+export const deleteLocation = async (
+  location_id: number,
+  travelLocation: TravelLocation
+): Promise<{ deletedLocations: RowDataPacket[] }> => {
+  const deletedLocations = await travelModel.deleteTravelLocation(location_id, travelLocation);
+
+  return deletedLocations;
 };

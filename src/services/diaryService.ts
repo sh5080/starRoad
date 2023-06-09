@@ -63,23 +63,6 @@ export const updateDiary = async (
     return diary;
 };
 
-// export const deleteDiary = async (diary_id: number, username: string) => {
-//   try {
-//     const diary = await diaryModel.getOneDiaryByUsername(diary_id);
-//     if (!diary) {
-//       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
-//     }
-//     if (diary.username !== username) {
-//       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
-//     }
-//     const deletedDiary = { ...diary };
-//     await diaryModel.deleteDiaryByUsername(diary_id);
-//     return deletedDiary
-//   } catch (error) {
-//     console.error(error);
-//     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);
-//   }
-// };
 export const deleteDiary = async (diary_id: number, username: string) => {
   try {
     const diary = await diaryModel.getOneDiaryByUsername(diary_id);
