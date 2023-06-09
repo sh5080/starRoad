@@ -1,7 +1,8 @@
 import { Response, NextFunction } from 'express';
-import { AppError,CommonError } from "../types/AppError";
+import { AppError, CommonError } from '../types/AppError';
 import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
+import { UserType } from '../types/user';
 
 // [관리자] 모든 회원 조회하기
 export const getAllUsersController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -22,8 +23,8 @@ export const updateUserController = async (req: CustomRequest, res: Response, ne
   try {
     console.log('회원 정보 수정 중...');
     const { id } = req.params;
-    const user = req.body;
-    const data = await adminService.updateUserService(Number(id), user);
+    const userInfo = req.body;
+    const data = await adminService.updateUserService(Number(id), userInfo);
     console.log('updatedUser = ', data);
     console.log('회원 정보 수정 완료');
     res.status(200).json({ data, message: '회원 정보 수정을 완료했습니다.' });
@@ -120,7 +121,10 @@ export const getUserInfoAllCommentController = async (req: CustomRequest, res: R
   try {
     const { username, diary_id } = req.params;
 
-    const userTravelDiaryCommentInfos = await adminService.getUserInfoCommentService(String(username), Number(diary_id));
+    const userTravelDiaryCommentInfos = await adminService.getUserInfoCommentService(
+      String(username),
+      Number(diary_id)
+    );
 
     res
       .status(200)
@@ -158,5 +162,22 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: '회원이 작성한 댓글 삭제에 실패했습니다.' });
+  }
+};
+
+// [관리자] 관광지 추가하기
+export const addTouristDestinationController = async (req: CustomRequest, res: Response) => {
+  try {
+    const { name_en, name_ko, image, introduction } = req.body;
+    const message = await adminService.addTouristDestinationService(
+      String(name_en),
+      String(name_ko),
+      String(image),
+      String(introduction)
+    );
+    res.status(200).json({ message });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: '관광지 추가에 실패했습니다.' });
   }
 };
