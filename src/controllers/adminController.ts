@@ -176,18 +176,21 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
 };
 
 // [관리자] 관광지 수정하기
+// 현재 4가지 모두가 와야 수정되는 상황임.
+// 안오는 프로퍼티가 있다면 undefined로 정의되고 데이터에 undefined로 들어가게 됨.
 export const updateTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
+    const { location_id } = req.params;
     const { name_en, name_ko, image, introduction } = req.body;
+
     const product = {
-      name_en,
-      name_ko,
-      image,
-      introduction,
+      name_en: String(name_en),
+      name_ko: String(name_ko),
+      image: String(image),
+      introduction: String(introduction),
     };
-    const data = await adminService.updateTouristDestinationService(String(id), product);
-    res.status(200).json({ data });
+    const message = await adminService.updateTouristDestinationService(String(location_id), product);
+    res.status(200).json({ message: message });
   } catch (err) {
     next(new AppError(CommonError.UNEXPECTED_ERROR, '관광지 수정에 실패했습니다.', 500));
   }
@@ -196,8 +199,8 @@ export const updateTouristDestinationController = async (req: CustomRequest, res
 // [관리자] 관광지 삭제하기
 export const deleteTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
-    const message = await adminService.deleteTouristDestinationService(String(id));
+    const { location_id } = req.params;
+    const message = await adminService.deleteTouristDestinationService(String(location_id));
     res.status(200).json({ message });
   } catch (err) {
     next(new AppError(CommonError.UNEXPECTED_ERROR, '관광지 삭제에 실패했습니다.', 500));
