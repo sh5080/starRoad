@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import * as userModel from '../models/userModel';
 import jwt from 'jsonwebtoken';
 import config from '../config';
-import { User } from '../types/user';
+import { UserType } from '../types/user';
 import { AppError, CommonError } from '../types/AppError';
 
 const { saltRounds } = config.bcrypt;
@@ -11,7 +11,7 @@ const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 
-export const signupUser = async (user: User): Promise<string> => {
+export const signupUser = async (user: UserType): Promise<string> => {
   const hashedPassword = await bcrypt.hash(String(user.password), saltRounds);
 
   const foundUserId = await userModel.getUserByUsername(String(user.username));
@@ -62,7 +62,7 @@ export const getUser = async (username: string) => {
   return userData;
 };
 
-export const updateUser = async (username: string, updateData: Partial<User>) => {
+export const updateUser = async (username: string, updateData: Partial<UserType>) => {
   // 기존 유저 정보 가져오기
   const existingUser = await userModel.getUserByUsername(username);
 
