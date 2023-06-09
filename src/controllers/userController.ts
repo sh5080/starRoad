@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import * as userService from '../services/userService';
-import { User } from '../types/user';
 import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
+import { UserType } from '../types/user';
 
 // 회원가입
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +40,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 // 로그인
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { username, password, ...extraFields }: User = req.body;
+    const { username, password, ...extraFields }: UserType = req.body;
 
     if (!username || !password) {
       throw new AppError(CommonError.INVALID_INPUT, '로그인에 필요한 정보가 제공되지 않았습니다.', 400);
