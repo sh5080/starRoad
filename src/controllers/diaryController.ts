@@ -1,12 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import * as diaryService from '../services/diaryService';
-
 import { AppError, CommonError } from '../types/AppError';
-import { JwtPayload } from 'jsonwebtoken';
-interface CustomRequest extends Request {
-  user?: JwtPayload & { user_id: string };
-}
-export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
+import { CustomRequest } from '../types/customRequest';
+
+export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { title, content, image, plan_id, ...extraFields } = req.body;
     const username = req.user?.username;
@@ -22,7 +19,11 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
 
-    const diary = await diaryService.createDiary({ username, plan_id, title, content, image }, username, plan_id);
+    const diary = await diaryService.createDiary(
+      { username, plan_id, title, content, image },
+      username,
+      Number(plan_id)
+    );
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);
@@ -73,7 +74,7 @@ export const getOneDiary = async (req: Request, res: Response, next: NextFunctio
 
 export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const diary_id = parseInt(req.params.diary_id, 10);
+    const diary_id = parseInt(String(req.params.diary_id), 10);
     const { title, content, image, ...extraFields } = req.body;
     const username = req.user?.username;
     const diaryData = { title, content, image };
@@ -96,7 +97,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
 
 export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const diary_id = parseInt(req.params.diary_id, 10);
+    const diary_id = parseInt(String(req.params.diary_id), 10);
     const username = req.user?.username;
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);

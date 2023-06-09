@@ -1,9 +1,9 @@
 import { OkPacket } from 'mysql2';
 import { db } from '../loaders/dbLoader';
-import { User } from '../types/user';
+import { UserType } from '../types/user';
 import { RowDataPacket } from 'mysql2';
 
-export const createUser = async (user: User): Promise<void> => {
+export const createUser = async (user: UserType): Promise<void> => {
   await db.execute('INSERT INTO user (name, username, password, email) VALUES (?, ?, ?, ?)', [
     user.name,
     user.username,
@@ -12,10 +12,10 @@ export const createUser = async (user: User): Promise<void> => {
   ]);
 };
 
-export const getUserByUsername = async (username: string): Promise<User | null> => {
+export const getUserByUsername = async (username: string): Promise<UserType | null> => {
   const [rows] = await db.execute('SELECT * FROM user WHERE username = ?', [username]);
   if (Array.isArray(rows) && rows.length > 0) {
-    const userData = rows[0] as User;
+    const userData = rows[0] as UserType;
     return userData;
   }
   return null;
@@ -23,8 +23,8 @@ export const getUserByUsername = async (username: string): Promise<User | null> 
 
 export const updateUserByUsername = async (
   userId: string,
-  updateData: Partial<Pick<User, 'email' | 'password'>>
-): Promise<User | null> => {
+  updateData: Partial<Pick<UserType, 'email' | 'password'>>
+): Promise<UserType | null> => {
   const { email, password } = updateData;
 
 await db.execute(
@@ -37,7 +37,7 @@ await db.execute(
   return updatedUser;
 };
 
-export const deleteUserByUsername = async (username: string): Promise<User | null> => {
+export const deleteUserByUsername = async (username: string): Promise<UserType | null> => {
   const [result] = await db.execute<RowDataPacket[]>('SELECT * FROM user WHERE username = ?', [username]);
   
   if (result.length === 0) {
@@ -47,5 +47,5 @@ export const deleteUserByUsername = async (username: string): Promise<User | nul
   const [deletedUser] = result;
   await db.execute<OkPacket>('DELETE FROM user WHERE username = ?', [username]);
 
-  return deletedUser as User;
+  return deletedUser as UserType;
 };

@@ -13,6 +13,7 @@ export interface CustomRequest extends Request {
     comment_id?: string;
   };
   body: {
+    id?: number;
     username: string;
     diary_id?: number; // Add this if diary_id comes from body
     comment?: string;
@@ -30,5 +31,11 @@ export interface CustomRequest extends Request {
     locations?: TravelLocation[];
     createdAt?: Date;
     updatedAt?: Date;
+    name_ko?: string;
+    name_en?: string;
+    image?: string;
+    introduction?: string;
+    role?: string;
+    plan_id?: number;
   };
 }

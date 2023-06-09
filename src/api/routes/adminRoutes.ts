@@ -3,7 +3,6 @@ import { validateToken } from '../middlewares/jwt';
 import { ensureAdmin } from '../middlewares/admin';
 import * as adminController from '../../controllers/adminController';
 const router = Router();
-// 관리자 페이지 구현
 
 // [관리자] 모든 회원 조회하기
 router.get('/users', validateToken, ensureAdmin, adminController.getAllUsersController);
@@ -49,5 +48,14 @@ router.delete(
 
 // [관리자] 회원이 작성한 모든 댓글 조회하기
 router.get('/users/:username/comments', validateToken, ensureAdmin, adminController.getUserAllCommentsController);
+
+// [관리자] 관광지 추가하기
+router.post('/locations', validateToken, ensureAdmin, adminController.addTouristDestinationController);
+
+// [관리자] 관광지 수정하기
+router.patch('/locations/:location_id', validateToken, ensureAdmin, adminController.updateTouristDestinationController);
+
+// [관리자] 관광지 삭제하기
+router.delete('/locations/:location_id', validateToken, ensureAdmin, adminController.deleteTouristDestinationController);
 
 export default router;
