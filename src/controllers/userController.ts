@@ -56,6 +56,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
     const token = await userService.loginUser(username, password);
     // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
+    console.log('token= ', token);
+
     res.cookie('token', token, {
       httpOnly: true,
       // secure: true, // Uncomment this line if you're serving over HTTPS
