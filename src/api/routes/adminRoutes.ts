@@ -52,4 +52,10 @@ router.get('/users/:username/comments', validateToken, ensureAdmin, adminControl
 // [관리자] 관광지 추가하기
 router.post('/locations', validateToken, ensureAdmin, adminController.addTouristDestinationController);
 
+// [관리자] 관광지 수정하기
+router.patch('/locations/:location_id', validateToken, ensureAdmin, adminController.updateTouristDestinationController);
+
+// [관리자] 관광지 삭제하기
+router.delete('/locations/:location_id', validateToken, ensureAdmin, adminController.deleteTouristDestinationController);
+
 export default router;
