@@ -3,6 +3,7 @@ import { AppError, CommonError } from '../types/AppError';
 import { NextFunction, Request, Response } from 'express';
 import * as travelService from '../services/travelService';
 import { CustomRequest } from '../types/customRequest';
+import { RowDataPacket } from 'mysql2';
 
 // 여행 일정 등록 + 날짜별 장소 등록
 export const createTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -135,7 +136,7 @@ export const updateTravelPlanController = async (req: CustomRequest, res: Respon
     });
 
     // 여행 일정 수정
-    await travelService.updatePlan({
+    await travelService.updatePlan(username, {
       plan_id: Number(plan_id),
       username,
       start_date,
@@ -159,19 +160,32 @@ export const updateTravelLocationController = async (req: CustomRequest, res: Re
     }
     const { plan_id, location_id } = req.params;
     const { location, newDate, order, ...extraFields } = req.body;
+    const username = req.user?.username;
 
     if (Object.keys(extraFields).length > 0) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
     // 각 날짜별 장소 수정
-    await travelService.updateLocation({
-      plan_id: Number(plan_id),
-      location_id: Number(location_id),
-      newDate,
-      location,
-      order,
-    });
+    const result = await travelService.updateLocation(
+      {
+        username,
+        plan_id: Number(plan_id),
+        location_id: Number(location_id),
+        newDate,
+        location,
+        order,
+      },
+      username
+    );
+    const myPlan = result.myPlan;
+    const myLocation = result.myLocation;
 
+    if (myPlan[0] === undefined || !myLocation || myLocation.length === 0 || !myLocation[0].plan_id) {
+      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
+    }
+    if (myLocation[0].plan_id !== Number(plan_id)) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 장소입니다.', 400);
+    }
     res.status(200).json(req.body);
   } catch (error) {
     console.error(error);
@@ -187,19 +201,15 @@ export const deleteTravelPlanController = async (req: CustomRequest, res: Respon
       return res.status(401).json({ error: '인증이 필요합니다.' });
     }
     const { username } = req.user;
-    console.log('username = ', username);
-
     const { plan_id } = req.params;
-    console.log('plan_id = ', plan_id);
 
     const deletedPlan = await travelService.deletePlan(username, Number(plan_id));
-    // if (Object.keys(extraFields).length > 0) {
-    //   return res.status(400).json({ error: '잘못된 요청입니다. 추가 필드는 허용되지 않습니다.' });
-    // }
-    console.log(deletedPlan);
-    
+
+    if (!deletedPlan.deletedPlan[0] || !deletedPlan.deletedLocations[0]) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 일정입니다.', 400);
+    }
+
     res.status(200).json(deletedPlan);
-    //res.status(200).json({ message: '여행 일정이 성공적으로 삭제되었습니다.' });
   } catch (error) {
     console.error(error);
     next(error);
@@ -213,18 +223,37 @@ export const deleteTravelLocationController = async (req: CustomRequest, res: Re
     if (!req.user) {
       return res.status(401).json({ error: '인증이 필요합니다.' });
     }
-
+    const { username } = req.user;
     const { plan_id, location_id } = req.params;
-    console.log(plan_id, location_id);
+const planByUsername = await travelService.getPlans(username)
+const plan = planByUsername.find((plan) => plan.plan_id === Number(plan_id));
 
+if (!plan) {
+  throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 일정만 삭제할 수 있습니다.', 400);
+}
     const travelLocation = {
       plan_id: Number(plan_id),
       location_id: Number(location_id),
     };
+
     // 특정 날짜의 장소 삭제
-    await travelService.deleteLocation(travelLocation);
-    res.status(200).json(req.user);
-    //res.status(200).json({ message: '해당 날짜의 여행 장소가 성공적으로 삭제되었습니다.' });
+    const deletedLocations = await travelService.deleteLocation(Number(location_id), travelLocation);
+    if (!deletedLocations.deletedLocations || deletedLocations.deletedLocations.length === 0) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '일치하는 장소가 없습니다.', 400);
+    }
+
+    const deletedPlanId = deletedLocations.deletedLocations[0].plan_id;
+    const deletedLocation = deletedLocations.deletedLocations[0].location;
+
+    if (deletedLocation === null || !deletedLocations.deletedLocations[0]) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 장소입니다.', 400);
+    }
+
+    if (Number(plan_id) !== deletedPlanId) {
+      throw new AppError(CommonError.INVALID_INPUT, '일정에 해당 장소가 존재하지 않습니다.', 400);
+    }
+
+    res.status(200).json(deletedLocations);
   } catch (error) {
     console.error(error);
     next(error);
