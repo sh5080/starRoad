@@ -1,17 +1,23 @@
-import { Application } from 'express';
-import bodyParser from 'body-parser';
+import express, { Application } from 'express';
+
 import cors from 'cors';
 import { dbLoader } from '../loaders/dbLoader';
 import routeLoader from './routeLoader';
 import { errorHandler } from '../api/middlewares/errorHandler';
+import cookieParser from 'cookie-parser';
 
 export default async function expressLoader(app: Application): Promise<Application> {
   try {
     const db = await dbLoader();
+    const corsOptions = {
+      origin: ['http://localhost:5173', 'http://localhost:5174'],
+      credentials: true,
+    };
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
 
-    app.use(bodyParser.json());
-
-    app.use(cors());
+    app.use(cors(corsOptions));
 
     app.set('db', db);
 
