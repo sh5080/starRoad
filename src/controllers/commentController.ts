@@ -6,92 +6,69 @@ import { CustomRequest } from '../types/customRequest';
 
 export const createCommentController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { diary_id, comment } = req.body;
+    const { diary_id, comment, ...extraFields } = req.body;
 
-    const loggedInUserId = req.user?.username;
-    if (!loggedInUserId) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증되지 않은 사용자입니다.', 401);
+    const loggedInUsername = req.user?.username;
+    if (!loggedInUsername) {
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
 
     const diary = await getOneDiary(Number(diary_id));
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '유효하지 않은 여행기입니다.', 404);
     }
-
-    const createdCommentId = await commentService.createComment({
-      username: loggedInUserId,
+    await commentService.createComment({
+      username: loggedInUsername,
       diary_id,
       comment,
     });
-
-    res.status(201).json({ id: createdCommentId, message: '댓글이 생성되었습니다.' });
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+    }
+    res.status(201).json({ diary_id, comment });
   } catch (error) {
-      switch (error) {
-        case CommonError.AUTHENTICATION_ERROR:
-          next(new AppError(CommonError.AUTHENTICATION_ERROR, '인증되지 않은 사용자입니다.', 401));
-          break;
-        case CommonError.RESOURCE_NOT_FOUND:
-          next(new AppError(CommonError.RESOURCE_NOT_FOUND, '유효하지 않은 여행기입니다.', 404));
-          break;
-        default:
-          console.error(error)
-          next(error);
-      }
-    };
-}
+    console.error(error);
+    next(error);
+  }
+};
 export const getCommentsByDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diary_id } = req.params;
-    const { page, limit } = req.query;
+    const { page } = req.query;
+    const limit = 10;
     const comments = await commentService.getCommentsByDiary(Number(diary_id), Number(page), Number(limit));
+    if (comments[0] === undefined) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '댓글을 찾을 수 없습니다.', 404);
+    }
+    console.log(comments[0]);
     res.status(200).json({ comments });
   } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-        break;
-      default:
-        console.error(error);
-        next(error);
-    }
+    console.error(error);
+    next(error);
   }
 };
-export const getAllCommentsController = async (req: CustomRequest, res: Response, next: NextFunction) => {
-  try {
-    const comments = await commentService.getAllComments();
-    res.status(200).json(comments);
-  } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-        break;
-      default:
-        console.error(error);
-        next(new AppError(CommonError.UNEXPECTED_ERROR, '댓글 조회 실패했습니다.', 500));
-    }
-  }
-};
+
 export const updateCommentController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { comment_id } = req.params;
-    const { comment } = req.body;
+    const { comment, ...extraFields } = req.body;
     const username = req.user?.username;
     if (!comment) {
       throw new AppError(CommonError.INVALID_INPUT, '댓글을 입력해 주세요.', 400);
     }
-    await commentService.updateComment({ comment }, Number(comment_id), username as string);
-    res.status(200).json({ message: '댓글이 성공적으로 수정되었습니다.' });
-  } catch (error) {
-    switch (error) {
-      case CommonError.INVALID_INPUT:
-      next(error);
-      break;
-      default:
-        console.error(error);
-        next(new AppError(CommonError.UNEXPECTED_ERROR, '댓글 수정에 실패했습니다.', 500));
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
+
+    await commentService.updateComment({ comment }, Number(comment_id), username as string);
+    res.status(200).json({message : comment});
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
-export const deleteCommentController = async (req: CustomRequest, res: Response) => {
+export const deleteCommentController = async (req: CustomRequest, res: Response, next:NextFunction) => {
   try {
     const { comment_id } = req.params;
     const username = req.user?.username;
@@ -102,12 +79,7 @@ export const deleteCommentController = async (req: CustomRequest, res: Response)
     await commentService.deleteComment(Number(comment_id), username);
     res.status(200).json({ message: '댓글 삭제가 완료되었습니다.' });
   } catch (error) {
-    switch (error) {
-      case CommonError.AUTHENTICATION_ERROR:
-        break;
-      default:
-        console.error(error);
-        new AppError(CommonError.UNEXPECTED_ERROR, '댓글 삭제에 실패했습니다.', 500);
-    }
+    console.error(error);
+    next(error)
   }
 };

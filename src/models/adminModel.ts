@@ -84,11 +84,13 @@ export const getUserInfoDiaryModel = async (username: string): Promise<Diary[]> 
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
 export const deleteDiaryByAdminModel = async (username: string, diary_id: number): Promise<void> => {
-  const connection = await db.getConnection();
   try {
-    await connection.execute('DELETE FROM travel_diary WHERE username = ? AND diary_id = ?', [username, diary_id]);
-  } finally {
-    connection.release();
+    await db.execute('DELETE FROM travel_diary WHERE username = ? AND diary_id = ?', [username, diary_id]);
+  } catch (error) {
+    console.error(error);
+    {
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 삭제 실패했습니다.', 500);
+    }
   }
 };
 

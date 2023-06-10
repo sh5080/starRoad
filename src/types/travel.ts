@@ -10,7 +10,7 @@ export interface TravelPlan {
 }
 
 export interface TravelLocation {
-  username?: string;
+  //username?: string;
   plan_id?: number;
   date?: string;
   newDate?: string;

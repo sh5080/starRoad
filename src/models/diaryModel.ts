@@ -31,7 +31,7 @@ export const getPlan = async (plan_id: number, username: string): Promise<Travel
     return null;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정을 가져오는 중에 오류가 발생했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정을 가져오는 중에 오류가 발생했습니다.',404);
   }
 };
 
@@ -42,7 +42,7 @@ export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
     return diary;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'모든 여행기를 가져오는 중에 오류가 발생했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'모든 여행기를 가져오는 중에 오류가 발생했습니다.',404);
   }
 };
 
@@ -57,6 +57,7 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
 };
 
 export const getOneDiaryByUsername = async (diary_id: number): Promise<Diary | null> => {
+  
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diary_id]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -70,7 +71,7 @@ export const getOneDiaryByUsername = async (diary_id: number): Promise<Diary | n
   }
 };
 
-export const updateDiaryByUsername = async (diary: Diary, diary_id: number): Promise<void> => {
+export const updateDiaryByUsername = async (diary: Omit<Diary, 'id'>, diary_id: number): Promise<void> => {
   try {
     await db.execute(
       'UPDATE travel_diary SET title = ?, content = ?, image = ? WHERE id = ?',
@@ -87,5 +88,6 @@ export const deleteDiaryByUsername = async (diary_id: number): Promise<void> => 
     await db.execute('DELETE FROM travel_diary WHERE id = ?', [diary_id]);
   } catch (error) {
     console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행기 삭제에 실패했습니다.',500)
   }
 };

@@ -1,6 +1,7 @@
 import { db } from '../loaders/dbLoader';
 import { Comment } from '../types/comment';
-import { RowDataPacket, FieldPacket } from 'mysql2';
+import { RowDataPacket } from 'mysql2';
+import { AppError, CommonError } from '../types/AppError';
 
 interface QueryResult extends RowDataPacket {
   id: number;
@@ -48,26 +49,17 @@ export const getCommentsByDiaryModel = async (
     return comments;
   } catch (error) {
     console.error(error);
-    throw new Error('댓글 조회에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 조회에 실패했습니다.',500);
   }
 };
 
-export const getAllCommentsModel = async (): Promise<Comment[]> => {
-  try {
-    const [rows] = await db.execute('SELECT * FROM comment');
-    return rows as Comment[];
-  } catch (error) {
-    console.error(error);
-    throw new Error('모든 댓글 조회에 실패했습니다.');
-  }
-};
-
-export const updateCommentModel = async (id: number, comment: Comment): Promise<void> => {
+export const updateCommentModel = async (id: number, comment: Comment) => {
   try {
     await db.execute('UPDATE comment SET comment = ? WHERE id = ?', [comment.comment, id]);
+
   } catch (error) {
     console.error(error);
-    throw new Error('댓글 업데이트에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 업데이트에 실패했습니다.',500);
   }
 };
 
@@ -80,7 +72,7 @@ export const getCommentModel = async (id: number): Promise<Comment | null> => {
     return null;
   } catch (error) {
     console.error(error);
-    throw new Error('댓글 조회에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 조회에 실패했습니다.',500);
   }
 };
 
@@ -89,6 +81,6 @@ export const deleteCommentModel = async (id: number): Promise<void> => {
     await db.execute('DELETE FROM comment WHERE id = ?', [id]);
   } catch (error) {
     console.error(error);
-    throw new Error('댓글 삭제에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 삭제에 실패했습니다.',500);
   }
 };

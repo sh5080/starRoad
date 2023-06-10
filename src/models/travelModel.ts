@@ -1,6 +1,7 @@
 import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
 import { RowDataPacket, FieldPacket } from 'mysql2';
+import { AppError,CommonError } from '../types/AppError';
 
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
   try {
@@ -12,6 +13,7 @@ export const createTravelPlan = async (travelPlan: TravelPlan) => {
     return insertId;
   } catch (error) {
     console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'일정 생성에 실패했습니다.',500)
   }
 };
 
@@ -30,6 +32,7 @@ export const createTravelLocation = async (travelLocation: TravelLocation, plan_
     );
   } catch (error) {
     console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜 및 장소 생성에 실패했습니다.',500)
   }
 };
 
@@ -39,7 +42,7 @@ export const getTravelPlansByUserId = async (username: string): Promise<TravelPl
     return rows as TravelPlan[];
   } catch (error) {
     console.error(error);
-    throw new Error('여행 일정 조회에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 조회에 실패했습니다.',500);
   }
 };
 
@@ -49,7 +52,7 @@ export const getTravelLocationsByPlanId = async (plan_id: number): Promise<Trave
     return rows as TravelLocation[];
   } catch (error) {
     console.error(error);
-    throw new Error('날짜별 장소 조회에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 조회에 실패했습니다.',500);
   }
 };
 
@@ -63,7 +66,7 @@ export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> =>
     );
   } catch (error) {
     console.error(error);
-    throw new Error('여행 일정 수정에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 수정에 실패했습니다.',500);
   }
 };
 
@@ -91,7 +94,7 @@ export const updateTravelLocation = async (username: string, travelLocation: Tra
     return {myLocation,myPlan}
   } catch (error) {
     console.error(error);
-    throw new Error('날짜별 장소 수정에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 수정에 실패했습니다.',500);
   }
 };
 
@@ -119,7 +122,7 @@ export const deleteTravelPlan = async (
     };
   } catch (error) {
     console.error(error);
-    throw new Error('여행 일정 삭제에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 삭제에 실패했습니다.',500);
   }
 };
 
@@ -145,6 +148,6 @@ return {
 
   } catch (error) {
     console.error(error);
-    throw new Error('날짜별 장소 삭제에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 삭제에 실패했습니다.',500);
   }
 };

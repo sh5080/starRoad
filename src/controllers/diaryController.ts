@@ -77,6 +77,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
     const diary_id = parseInt(String(req.params.diary_id), 10);
     const { title, content, image, ...extraFields } = req.body;
     const username = req.user?.username;
+
     const diaryData = { title, content, image };
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
@@ -87,7 +88,9 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
     if (!title || !content) {
       throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
     }
+
     await diaryService.updateDiary(diaryData, diary_id, username);
+
     res.status(200).json(diaryData);
   } catch (error) {
     console.error(error);
@@ -104,7 +107,7 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
     }
     const deletedDiary = await diaryService.deleteDiary(diary_id, username);
     if (!deletedDiary) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 여행기가 아닙니다.', 404);
     }
     res.status(200).json(deletedDiary);
   } catch (error) {

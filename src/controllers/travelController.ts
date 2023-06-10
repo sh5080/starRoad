@@ -3,7 +3,6 @@ import { AppError, CommonError } from '../types/AppError';
 import { NextFunction, Request, Response } from 'express';
 import * as travelService from '../services/travelService';
 import { CustomRequest } from '../types/customRequest';
-import { RowDataPacket } from 'mysql2';
 
 // 여행 일정 등록 + 날짜별 장소 등록
 export const createTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -168,7 +167,7 @@ export const updateTravelLocationController = async (req: CustomRequest, res: Re
     // 각 날짜별 장소 수정
     const result = await travelService.updateLocation(
       {
-        username,
+        //username,
         plan_id: Number(plan_id),
         location_id: Number(location_id),
         newDate,
