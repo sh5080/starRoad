@@ -2,6 +2,8 @@ import { Response, NextFunction } from 'express';
 import { AppError, CommonError } from '../types/AppError';
 import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
+import * as fs from 'node:fs';
+import { compressImage } from '../api/middlewares/sharp';
 
 // [관리자] 모든 회원 조회하기
 export const getAllUsersController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -161,13 +163,22 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
 // [관리자] 관광지 추가하기
 export const addTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
+    const imgName = req.file ? `https://localhost:3000/static/${req.file.filename}` : '';
     const { name_en, name_ko, image, introduction } = req.body;
+
+    if (!name_en || !name_ko || !image || !introduction) {
+      return next(new AppError(CommonError.INVALID_INPUT, '모두 입력해 주세요.', 400));
+    }
+
     const message = await adminService.addTouristDestinationService(
       String(name_en),
       String(name_ko),
-      String(image),
+      String(imgName),
       String(introduction)
     );
+
+    const outputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/${req.file?.filename}`;
+    await compressImage(outputPath, outputPath, 800, 800);
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);
@@ -200,8 +211,28 @@ export const updateTouristDestinationController = async (req: CustomRequest, res
 export const deleteTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { location_id } = req.params;
-    const message = await adminService.deleteTouristDestinationService(String(location_id));
-    res.status(200).json({ message });
+    const deletedData = await adminService.deleteTouristDestinationService(String(location_id));
+    console.log('deletedData =', deletedData);
+
+    if (deletedData) {
+      const imgName = deletedData.touristDestination.image.split('/static/')[4];
+      console.log('imgName', imgName);
+
+      // imgName 파일을 찾아서 삭제
+      // 상대경로 오류남 -> 절대경로로 수정
+      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public
+      /${imgName}`;
+      console.log('filePath', filePath);
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(err);
+        }
+        console.log('File deleted successfully');
+      });
+    }
+
+    res.status(200).json({ deletedData });
   } catch (err) {
     next(new AppError(CommonError.UNEXPECTED_ERROR, '관광지 삭제에 실패했습니다.', 500));
   }

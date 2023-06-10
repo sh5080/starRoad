@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { validateToken } from '../middlewares/jwt';
 import { ensureAdmin } from '../middlewares/admin';
 import * as adminController from '../../controllers/adminController';
+import { processImage } from '../middlewares/multer';
 const router = Router();
 
 // [관리자] 모든 회원 조회하기
@@ -50,12 +51,17 @@ router.delete(
 router.get('/users/:username/comments', validateToken, ensureAdmin, adminController.getUserAllCommentsController);
 
 // [관리자] 관광지 추가하기
-router.post('/locations', validateToken, ensureAdmin, adminController.addTouristDestinationController);
+router.post('/locations', validateToken, ensureAdmin, processImage, adminController.addTouristDestinationController);
 
 // [관리자] 관광지 수정하기
 router.patch('/locations/:location_id', validateToken, ensureAdmin, adminController.updateTouristDestinationController);
 
 // [관리자] 관광지 삭제하기
-router.delete('/locations/:location_id', validateToken, ensureAdmin, adminController.deleteTouristDestinationController);
+router.delete(
+  '/locations/:location_id',
+  validateToken,
+  ensureAdmin,
+  adminController.deleteTouristDestinationController
+);
 
 export default router;

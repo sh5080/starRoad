@@ -5,6 +5,7 @@ import { Diary } from '../types/diary';
 import { Comment } from '../types/comment';
 import { TouristDestinationType } from '../types/destination';
 import { AppError, CommonError } from '../types/AppError';
+import { RowDataPacket } from 'mysql2';
 
 // [관리자] 모든 회원 정보 불러오기
 export const getAllUsersModel = async (): Promise<UserType[]> => {
@@ -185,9 +186,17 @@ export const updateTouristDestinationModel = async (
 };
 
 // [관리자] 관광지 삭제하기
-export const deleteTouristDestinationModel = async (id: string): Promise<void> => {
+export const deleteTouristDestinationModel = async (id: string): Promise<object> => {
   try {
+    // First, get the tourist destination data
+    const [rows] = await db.execute('SELECT * FROM travel_destination WHERE id = ?', [id]);
+    const touristDestination = (rows as RowDataPacket[])[0];
+
+    // Then, delete the tourist destination
     await db.execute('DELETE FROM travel_destination WHERE id = ?', [id]);
+
+    // Return the image name
+    return touristDestination;
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete tourist destination', 500);
