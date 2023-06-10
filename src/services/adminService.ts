@@ -137,11 +137,22 @@ export const updateTouristDestinationService = async (
   }
 };
 
+
+interface TouristDestination {
+  [key: string]: any;
+  // add other properties if necessary
+}
+interface DeletedData {
+  touristDestination: TouristDestination;
+  message: string;
+  [key: string]: any; // Optionally allow other string properties
+}
+
 // [관리자] 관광지 삭제하기
-export const deleteTouristDestinationService = async (id: string): Promise<string> => {
+export const deleteTouristDestinationService = async (id: string): Promise<DeletedData> => {
   try {
-    await adminModel.deleteTouristDestinationModel(id);
-    return '관광지 삭제에 성공하였습니다.';
+    const touristDestination = await adminModel.deleteTouristDestinationModel(id);
+    return { message: '관광지 삭제에 성공하였습니다.', touristDestination };
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete tourist destination', 500);
   }
