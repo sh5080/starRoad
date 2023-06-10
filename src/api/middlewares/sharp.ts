@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 import * as fs from 'node:fs';
 
-const compressImage = async (inputPath: string, outputPath: string, width: number, height: number): Promise<void> => {
+export const compressImage = async (inputPath: string, outputPath: string, width: number, height: number): Promise<void> => {
   try {
     await sharp(inputPath)
       .resize(width, height, {
@@ -16,6 +16,3 @@ const compressImage = async (inputPath: string, outputPath: string, width: numbe
     console.error('Error compressing image', error);
   }
 };
-
-// Usage:
-compressImage('./input.jpg', './output.jpg', 800, 800);
