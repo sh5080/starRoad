@@ -91,7 +91,6 @@ export const getUserInfoAllLocationController = async (req: CustomRequest, res: 
 export const getUserInfoAllDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
-
     const userTravelDiaryInfos = await adminService.getUserInfoDiaryService(String(username));
 
     res.status(200).json({ data: userTravelDiaryInfos, message: '회원이 작성한 다이어리를 조회했습니다.' });
@@ -163,10 +162,12 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
 // [관리자] 관광지 추가하기
 export const addTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const imgName = req.file ? `https://localhost:3000/static/${req.file.filename}` : '';
-    const { name_en, name_ko, image, introduction } = req.body;
+    const imgName = req.file ? `http://localhost:3000/static/${req.file.filename}` : '';
+    console.log(imgName);
+    const { name_en, name_ko, introduction } = req.body;
+    console.log(name_en, name_ko, introduction);
 
-    if (!name_en || !name_ko || !image || !introduction) {
+    if (!name_en || !name_ko || !introduction) {
       return next(new AppError(CommonError.INVALID_INPUT, '모두 입력해 주세요.', 400));
     }
 
@@ -215,14 +216,15 @@ export const deleteTouristDestinationController = async (req: CustomRequest, res
     console.log('deletedData =', deletedData);
 
     if (deletedData) {
-      const imgName = deletedData.touristDestination.image.split('/static/')[4];
+      const imgName = deletedData.touristDestination.image.split('/static/')[1];
       console.log('imgName', imgName);
 
       // imgName 파일을 찾아서 삭제
       // 상대경로 오류남 -> 절대경로로 수정
-      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public
+      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/public
       /${imgName}`;
-      console.log('filePath', filePath);
+
+      console.log('filePath = ', filePath);
 
       fs.unlink(filePath, (err) => {
         if (err) {
