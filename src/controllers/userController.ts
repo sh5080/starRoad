@@ -54,16 +54,15 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     if (!userData.activated) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '탈퇴한 회원입니다.', 400);
     }
+
     const token = await userService.loginUser(username, password);
     // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
     console.log('token= ', token);
-
     res.cookie('token', token, {
       httpOnly: true,
       // secure: true, // Uncomment this line if you're serving over HTTPS
-      // maxAge: 7200000, // 쿠키의 유효 시간 설정(예: 2 hours)
-      // domain: 'yourdomain.com', // 쿠키를 설정할 도메인 설정
-      // sameSite: 'strict' // SameSite 옵션 설정
+      maxAge: 7200000, // 쿠키의 유효 시간 설정(예: 2 hours)
+      // sameSite: 'none', // SameSite 옵션 설정
       // 필요에 따라 쿠키 설정을 추가할 수 있습니다.
     });
     res.status(200).json({ message: '로그인 성공' });
