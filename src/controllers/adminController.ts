@@ -210,21 +210,23 @@ export const deleteTouristDestinationController = async (req: CustomRequest, res
     const deletedData = await adminService.deleteTouristDestinationService(String(location_id));
     console.log('deletedData =', deletedData);
 
-    const imgName = deletedData.touristDestination.image.split('/static/')[4];
-    console.log('imgName', imgName);
+    if (deletedData) {
+      const imgName = deletedData.touristDestination.image.split('/static/')[4];
+      console.log('imgName', imgName);
 
-    // imgName 파일을 찾아서 삭제
-    // 상대경로 오류남 -> 절대경로로 수정
-    const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public
-    /${imgName}`;
-    console.log('filePath', filePath);
+      // imgName 파일을 찾아서 삭제
+      // 상대경로 오류남 -> 절대경로로 수정
+      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public
+      /${imgName}`;
+      console.log('filePath', filePath);
 
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error(err);
-      }
-      console.log('File deleted successfully');
-    });
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(err);
+        }
+        console.log('File deleted successfully');
+      });
+    }
 
     res.status(200).json({ deletedData });
   } catch (err) {
