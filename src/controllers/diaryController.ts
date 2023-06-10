@@ -3,6 +3,8 @@ import * as diaryService from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs';
+import {compressImage} from '../api/middlewares/sharp';
+
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const imgName = req.file ? `https://localhost:3000/static/${req.file.filename}` : '';
@@ -19,12 +21,15 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     if (Object.keys(extraFields).length > 0) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
-
+    
     const diary = await diaryService.createDiary(
       { username, plan_id, title, content, image: imgName },
       username,
       Number(plan_id)
     );
+
+    const outputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/${req.file?.filename}`;
+    await compressImage(outputPath, outputPath, 800, 800);
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);

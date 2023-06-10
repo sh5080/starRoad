@@ -3,6 +3,7 @@ import { AppError, CommonError } from '../types/AppError';
 import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs';
+import { compressImage } from '../api/middlewares/sharp';
 
 // [관리자] 모든 회원 조회하기
 export const getAllUsersController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -175,6 +176,9 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
       String(imgName),
       String(introduction)
     );
+
+    const outputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/${req.file?.filename}`;
+    await compressImage(outputPath, outputPath, 800, 800);
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);
