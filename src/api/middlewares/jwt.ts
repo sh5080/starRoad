@@ -7,9 +7,26 @@ import { CustomRequest } from '../../types/customRequest';
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES_IN } = config.jwt;
 
 export const validateToken = async (req: CustomRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers['authorization'];
-  const accessToken = authHeader && authHeader.split(' ')[1];
-
+  let accessToken;
+  let refreshToken;
+  if (req.headers.cookie) {
+    const cookies = req.headers.cookie.split('; ');
+    for (let i = 0; i < cookies.length; i++) {
+      if (cookies[i].startsWith('token=')) {
+        const cookieValue = cookies[i].substring(6);
+        const decodedValue = decodeURIComponent(cookieValue);
+        // 'j:' 접두사 제거
+        const jsonStr = decodedValue.substring(2);
+        const cookieObject = JSON.parse(jsonStr);
+        accessToken = cookieObject.accessToken;
+        refreshToken = cookieObject.refreshToken;
+        break;
+      }
+    }
+    console.log(accessToken);
+    console.log(refreshToken);
+    
+  }
   if (req.method === 'GET' && !accessToken) {
     return next();
   }
@@ -23,8 +40,6 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
     next();
   } catch (err: unknown) {
     if (err instanceof jwt.TokenExpiredError) {
-      const refreshToken = req.cookies?.refreshToken;
-
       if (!refreshToken) {
         console.error(err);
         return next(
