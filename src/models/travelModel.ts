@@ -128,11 +128,12 @@ export const deleteTravelLocation = async (
   travelLocation: TravelLocation
   ): Promise<{deletedLocations:RowDataPacket[]}> => {
   try {
-    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [location_id])) as [
+    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
+      location_id, 
+    ])) as [
       RowDataPacket[],
       FieldPacket[]
     ];
-    
     await db.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND location_id = ?', [
       travelLocation.plan_id,
       travelLocation.location_id,

@@ -101,7 +101,6 @@ export const deleteLocation = async (
   location_id: number,
   travelLocation: TravelLocation
 ): Promise<{ deletedLocations: RowDataPacket[] }> => {
-  const deletedLocations = await travelModel.deleteTravelLocation(location_id, travelLocation);
-
+  const deletedLocations = await travelModel.deleteTravelLocation(location_id,travelLocation);
   return deletedLocations;
 };

@@ -166,17 +166,20 @@ export const updateTravelLocationController = async (req: CustomRequest, res: Re
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
     // 각 날짜별 장소 수정
-    const result = await travelService.updateLocation({
-      username,
-      plan_id: Number(plan_id),
-      location_id: Number(location_id),
-      newDate,
-      location,
-      order,
-    },username);
+    const result = await travelService.updateLocation(
+      {
+        username,
+        plan_id: Number(plan_id),
+        location_id: Number(location_id),
+        newDate,
+        location,
+        order,
+      },
+      username
+    );
     const myPlan = result.myPlan;
     const myLocation = result.myLocation;
-  
+
     if (myPlan[0] === undefined || !myLocation || myLocation.length === 0 || !myLocation[0].plan_id) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
@@ -222,14 +225,33 @@ export const deleteTravelLocationController = async (req: CustomRequest, res: Re
     }
     const { username } = req.user;
     const { plan_id, location_id } = req.params;
-    //console.log(plan_id, location_id);
+const planByUsername = await travelService.getPlans(username)
+const plan = planByUsername.find((plan) => plan.plan_id === Number(plan_id));
 
+if (!plan) {
+  throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 일정만 삭제할 수 있습니다.', 400);
+}
     const travelLocation = {
       plan_id: Number(plan_id),
       location_id: Number(location_id),
     };
+
     // 특정 날짜의 장소 삭제
     const deletedLocations = await travelService.deleteLocation(Number(location_id), travelLocation);
+    if (!deletedLocations.deletedLocations || deletedLocations.deletedLocations.length === 0) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '일치하는 장소가 없습니다.', 400);
+    }
+
+    const deletedPlanId = deletedLocations.deletedLocations[0].plan_id;
+    const deletedLocation = deletedLocations.deletedLocations[0].location;
+
+    if (deletedLocation === null || !deletedLocations.deletedLocations[0]) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 장소입니다.', 400);
+    }
+
+    if (Number(plan_id) !== deletedPlanId) {
+      throw new AppError(CommonError.INVALID_INPUT, '일정에 해당 장소가 존재하지 않습니다.', 400);
+    }
 
     res.status(200).json(deletedLocations);
   } catch (error) {
