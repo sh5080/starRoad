@@ -38,4 +38,5 @@ export interface CustomRequest extends Request {
     role?: string;
     plan_id?: number;
   };
+  file?: Express.Multer.File;
 }
