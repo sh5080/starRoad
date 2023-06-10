@@ -2,9 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import * as diaryService from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
-
+import * as fs from 'node:fs';
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
+    const imgName = req.file ? `https://localhost:3000/static/${req.file.filename}` : '';
     const { title, content, image, plan_id, ...extraFields } = req.body;
     const username = req.user?.username;
 
@@ -20,7 +21,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     }
 
     const diary = await diaryService.createDiary(
-      { username, plan_id, title, content, image },
+      { username, plan_id, title, content, image: imgName },
       username,
       Number(plan_id)
     );
@@ -103,9 +104,27 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
     const deletedDiary = await diaryService.deleteDiary(diary_id, username);
+
     if (!deletedDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
     }
+    if (deletedDiary.image) {
+      const imgName = deletedDiary.image.split('/static')[4];
+      console.log('imgName=', imgName);
+
+      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public
+      /${imgName}`;
+
+      console.log('filePath', filePath);
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(err);
+        }
+        console.log('File deleted successfully');
+      });
+    }
+
     res.status(200).json(deletedDiary);
   } catch (error) {
     console.error(error);
