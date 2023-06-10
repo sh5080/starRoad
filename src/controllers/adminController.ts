@@ -178,7 +178,7 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
     );
 
     const outputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/${req.file?.filename}`;
-    await compressImage(outputPath, outputPath, 800, 800);
+    // await compressImage(outputPath, outputPath, 800, 800);
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);

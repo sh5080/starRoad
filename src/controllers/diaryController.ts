@@ -21,7 +21,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     if (Object.keys(extraFields).length > 0) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
-    
+
     const diary = await diaryService.createDiary(
       { username, plan_id, title, content, image: imgName },
       username,
@@ -29,7 +29,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     );
 
     const outputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/${req.file?.filename}`;
-    await compressImage(outputPath, outputPath, 800, 800);
+    // await compressImage(outputPath, outputPath, 800, 800);
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);
