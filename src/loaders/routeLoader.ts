@@ -8,6 +8,8 @@ import destinationRouter from '../api/routes/destinationRoutes';
 import axios from 'axios';
 import config from '../config/index';
 import path from 'path';
+
+
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = config.google;
 const { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } = config.kakao;
 const routeLoader = (app: Application): Application => {
@@ -19,18 +21,17 @@ const routeLoader = (app: Application): Application => {
 
   app.get('/auth/callback', async (req, res) => {
     const code = req.query.code;
+
     
     // oauth 위임을 위한 절차
     try {
       const response = await axios.post('https://oauth2.googleapis.com/token', {
-        code:code,
+        code: code,
         client_id: GOOGLE_CLIENT_ID,
         client_secret: GOOGLE_CLIENT_SECRET,
         redirect_uri: GOOGLE_REDIRECT_URI,
-        //grant_type:'authorization_code', // 임시 코드
-        
       });
-      console.log(GOOGLE_CLIENT_ID)
+      // console.log(GOOGLE_CLIENT_ID);
       const accessToken = response.data.access_token;
 
       // 구글에서 유저인포 가져오기위한작업
@@ -39,7 +40,7 @@ const routeLoader = (app: Application): Application => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(userInfo.data);
+      // console.log(userInfo.data);
       // 최소한으로 db 에 저장해야 회원가입.
       // email과 가입유형
       // 따로나눠서 저장
@@ -51,15 +52,15 @@ const routeLoader = (app: Application): Application => {
       res.status(500).send('Authentication failed.');
     }
   });
-   app.get('/auth/kakao/callback', async (req, res) => {
+  app.get('/auth/kakao/callback', async (req, res) => {
     const code = req.query.code;
 
     // 카카오 OAuth 토큰 요청
     try {
       const response = await axios.post('https://kauth.kakao.com/oauth/token', {
         grant_type: 'authorization_code',
-        client_id:KAKAO_CLIENT_ID,
-        redirect_uri:KAKAO_REDIRECT_URI,
+        client_id: KAKAO_CLIENT_ID,
+        redirect_uri: KAKAO_REDIRECT_URI,
         code,
       });
 
