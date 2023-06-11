@@ -70,8 +70,8 @@ export const getTravelPlanByPlanId = async (plan_id: string): Promise<TravelPlan
 export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
   try {
     await db.execute(
-      'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ? AND username = ?',
-      [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id, travelPlan.username]
+      'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ?',
+      [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id]
     );
   } catch (error) {
     console.error(error);
