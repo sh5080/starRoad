@@ -3,11 +3,11 @@ import * as diaryService from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs';
-import {compressImage} from '../api/middlewares/sharp';
+import { compressImage } from '../api/middlewares/sharp';
 
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const imgName = req.file ? `https://localhost:3000/static/${req.file.filename}` : '';
+    const imgName = req.file ? `https://localhost:3000/static/compressed/${req.file.filename}` : '';
     const { title, content, image, plan_id, ...extraFields } = req.body;
     const username = req.user?.username;
 
@@ -27,9 +27,10 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
       username,
       Number(plan_id)
     );
-
-    const outputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/${req.file?.filename}`;
-    // await compressImage(outputPath, outputPath, 800, 800);
+    const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`;
+    const compressed = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${req.file?.filename}`;
+    await compressImage(inputPath, compressed, 800, 800);
+    fs.unlinkSync(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`);
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);

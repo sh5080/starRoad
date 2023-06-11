@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import * as fs from 'node:fs';
+
 
 export const compressImage = async (inputPath: string, outputPath: string, width: number, height: number): Promise<void> => {
   try {

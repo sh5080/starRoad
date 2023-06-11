@@ -162,7 +162,8 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
 // [관리자] 관광지 추가하기
 export const addTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const imgName = req.file ? `http://localhost:3000/static/${req.file.filename}` : '';
+    const imgName = req.file ? `http://localhost:3000/static/compressed/${req.file.filename}` : '';
+
     console.log(imgName);
     const { name_en, name_ko, introduction } = req.body;
     console.log(name_en, name_ko, introduction);
@@ -178,8 +179,10 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
       String(introduction)
     );
 
-    const outputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/${req.file?.filename}`;
-    // await compressImage(outputPath, outputPath, 800, 800);
+    const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`;
+    const compressed = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${req.file?.filename}`;
+    await compressImage(inputPath, compressed, 800, 800);
+    fs.unlinkSync(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`);
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);
