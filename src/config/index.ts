@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-dotenv.config();
 import { Config } from '../types/config';
+dotenv.config();
 
 const config: Config = {
   jwt: {
@@ -49,17 +49,17 @@ const config: Config = {
   },
   google: {
     GOOGLE_CLIENT_ID:
-      process.env.CLIENT_ID ||
+      process.env.CLIENT_ID ??
       (() => {
         throw new Error('CLIENT_ID 환경 변수가 필요합니다.');
       })(),
       GOOGLE_CLIENT_SECRET:
-      process.env.CLIENT_SECRET ||
+      process.env.CLIENT_SECRET ??
       (() => {
         throw new Error('CLIENT_SECRET 환경 변수가 필요합니다.');
       })(),
       GOOGLE_REDIRECT_URI:
-      process.env.REDIRECT_URI ||
+      process.env.REDIRECT_URI ??
       (() => {
         throw new Error('REDIRECT_URI 환경 변수가 필요합니다.');
       })(),
