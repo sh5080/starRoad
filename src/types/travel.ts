@@ -7,15 +7,19 @@ export interface TravelPlan {
   locations?: TravelLocation[];
   createdAt?: Date;
   updatedAt?: Date;
+  dates?: TravelDate[];
+}
+
+export interface TravelDate {
+  date?: string;
+  locations?: TravelLocation[];
 }
 
 export interface TravelLocation {
-  //username?: string;
-  plan_id?: number;
-  date?: string;
-  newDate?: string;
-  locations?: [];
   location_id?: number;
+  plan_id?: number;
+  newDate?: string;
+  date?: string;
   location?: string;
   order?: number;
   latitude?: number;
