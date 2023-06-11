@@ -37,6 +37,12 @@ export interface CustomRequest extends Request {
     introduction?: string;
     role?: string;
     plan_id?: number;
+    location_id?: number;
+    comment_id?: number;
+    dates?: {
+      date?: string;
+      locations?: TravelLocation[];
+    }[];
   };
   file?: Express.Multer.File;
 }
