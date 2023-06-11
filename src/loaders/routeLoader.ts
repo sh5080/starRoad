@@ -11,17 +11,13 @@ import path from 'path';
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = config.google;
 const { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } = config.kakao;
 const routeLoader = (app: Application): Application => {
+  // 배포시
+  // app.use(express.static(path.join(__dirname, '../../../frontend/dist')));
+  // app.get('/', (req: Request, res: Response) => {
+  //   res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'));
+  // });
 
-
-
- app.use(express.static(path.join(__dirname, '../../../frontend/dist')));
-
- app.get('*', (req: Request, res: Response) => {
-   res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'));
- });
- 
-
-  app.get('/auth/google/callback', async (req, res) => {
+  app.get('/auth/callback', async (req, res) => {
     const code = req.query.code;
     
     // oauth 위임을 위한 절차

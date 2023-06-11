@@ -23,9 +23,6 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
         break;
       }
     }
-    console.log(accessToken);
-    console.log(refreshToken);
-    
   }
   if (req.method === 'GET' && !accessToken) {
     return next();

@@ -11,12 +11,9 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
     }
 
     const { dates, start_date, end_date, destination, ...extraFields } = req.body;
-    console.log(req.body);
 
     const { username } = req.user;
 
-    console.log('username=', username);
-    console.log('extraFields =', extraFields);
     if (!start_date || !end_date || !destination || !dates) {
       throw new AppError(CommonError.INVALID_INPUT, '필수 입력값이 없습니다.', 400);
     }
@@ -48,7 +45,6 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
     // 각 날짜별 장소 등록
     if (dates) {
       for (const dateInfo of dates) {
-        console.log('dateInfo = ', dateInfo);
         if (!dateInfo.date) {
           throw new AppError(CommonError.INVALID_INPUT, '날짜가 없는 장소입니다.', 400);
         }
@@ -59,7 +55,6 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
         // 각 날짜에 대해 location을 등록
         if (dateInfo.locations) {
           for (const location of dateInfo.locations) {
-            console.log('location = ', location);
             const date = dateInfo.date;
             location.date = date;
             await travelService.createLocation(location, plan_id);
@@ -74,8 +69,6 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
       username,
       dates,
     };
-
-    console.log('응답데이터 = ', responseData);
 
     res.status(201).json(responseData);
   } catch (error) {

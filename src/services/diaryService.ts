@@ -79,7 +79,6 @@ export const deleteDiary = async (diary_id: number, username: string) => {
     }
 
     const plan = await diaryModel.getPlan(diary.plan_id,username);
-    console.log(plan)
     if (!plan) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '일정을 찾을 수 없습니다.', 404);
     }

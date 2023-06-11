@@ -10,7 +10,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     const { name, username, password, email, ...extraFields } = req.body;
     const userData = { name, username, email, password };
     const exceptPassword = { name, username, email };
-    console.log(req.body);
     if (!username || !password || !email || !name) {
       throw new AppError(CommonError.INVALID_INPUT, '회원가입에 필요한 정보가 제공되지 않았습니다.', 400);
     }
@@ -49,7 +48,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
     const userData = await userService.getUser(username);
-    console.log(userData);
 
     if (!userData.activated) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '탈퇴한 회원입니다.', 400);
@@ -65,7 +63,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       // sameSite: 'none', // SameSite 옵션 설정
       // 필요에 따라 쿠키 설정을 추가할 수 있습니다.
     });
-    res.status(200).json({ message: '로그인 성공',user:userData });
+    res.status(200).json({ message: '로그인 성공', user: userData });
   } catch (error) {
     console.error(error);
     next(error);

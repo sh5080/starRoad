@@ -27,10 +27,13 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
       username,
       Number(plan_id)
     );
+
     const inputPath = `../../public/${req.file?.filename}`;
     const compressed = `../../public/compressed/${req.file?.filename}`;
-    await compressImage(inputPath, compressed, 800, 800);
+    await compressImage(inputPath, compressed, 600, 600);
     fs.unlinkSync(`../../public/${req.file?.filename}`);
+
+
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);
@@ -119,12 +122,9 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
     }
     if (deletedDiary.image) {
       const imgName = deletedDiary.image.split('/static')[4];
-      console.log('imgName=', imgName);
 
       const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public
       /${imgName}`;
-
-      console.log('filePath', filePath);
 
       fs.unlink(filePath, (err) => {
         if (err) {

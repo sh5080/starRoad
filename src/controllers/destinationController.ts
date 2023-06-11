@@ -6,7 +6,6 @@ import * as destinationService from '../services/destinationService';
 // 관광지 모두 조회하기
 export const getAllTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    console.log('모든 여행지 불러오는 중...');
     const destinations = await destinationService.getAllTouristDestinationService();
     const destinationCount: number = destinations.length;
 
@@ -20,11 +19,9 @@ export const getAllTouristDestinationController = async (req: CustomRequest, res
 // 관광지 상세 조회하기
 export const getTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    console.log('관광지 상세 조회중...');
     const { location_id } = req.params;
 
     const destination = await destinationService.getTouristDestinationService(Number(location_id));
-    console.log('destination = ', destination);
 
     res.status(200).json({ data: { destination, message: '여행지 상세 조회를 완료했습니다.' } });
   } catch (err) {

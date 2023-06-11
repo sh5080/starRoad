@@ -46,7 +46,6 @@ export const getUserInfoTravelModel = async (username: string): Promise<TravelPl
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
     const travelPlans = rows as TravelPlan[];
-    console.log(travelPlans);
 
     return travelPlans;
   } catch (error) {
@@ -60,7 +59,6 @@ export const getUserInfoLocationModel = async (plan_id: number): Promise<TravelP
   try {
     const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
     const travelPlans = rows as TravelPlan[];
-    console.log(travelPlans);
 
     return travelPlans;
   } catch (error) {
@@ -74,7 +72,6 @@ export const getUserInfoDiaryModel = async (username: string): Promise<Diary[]> 
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
     const travelDiaries = rows as Diary[];
-    console.log(travelDiaries);
 
     return travelDiaries;
   } catch (error) {
@@ -100,7 +97,6 @@ export const getUserInfoDiaryCommentModel = async (username: string, diary_id: n
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE diary_id = ? AND username = ?', [diary_id, username]);
     const diaryComments = rows as Comment[];
-    console.log(diaryComments);
 
     return diaryComments;
   } catch (error) {
@@ -120,7 +116,6 @@ export const getUserAllCommentModel = async (username: string): Promise<Comment[
       [username]
     );
     const userComments = rows as Comment[];
-    console.log(userComments);
 
     return userComments;
   } catch (error) {
@@ -157,10 +152,13 @@ export const addTouristDestinationModel = async (
   introduction: string
 ): Promise<void> => {
   try {
+    const encodedImage = image ? encodeURI(image) : '';
+    
     await db.execute('INSERT INTO travel_destination (name_en, name_ko, image, introduction) VALUES (?, ?, ?, ?)', [
       name_en,
       name_ko,
-      image,
+      encodedImage,
+      // image,
       introduction,
     ]);
   } catch (error) {
