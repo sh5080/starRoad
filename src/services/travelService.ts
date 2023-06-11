@@ -33,7 +33,7 @@ export const createLocation = async (travelLocation: TravelLocation, plan_id: nu
     throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
-  console.log('여행 장소 등록');
+  console.log('여행 장소 등록 완료');
 
   await travelModel.createTravelLocation(travelLocation, plan_id);
 };
@@ -95,12 +95,12 @@ export const deletePlan = async (
   return deletedPlan;
 };
 
-// 여행 날짜별 장소 삭제
+// // 여행 날짜별 장소 삭제
 
-export const deleteLocation = async (
-  location_id: number,
-  travelLocation: TravelLocation
-): Promise<{ deletedLocations: RowDataPacket[] }> => {
-  const deletedLocations = await travelModel.deleteTravelLocation(location_id,travelLocation);
-  return deletedLocations;
-};
+// export const deleteLocation = async (
+//   location_id: number,
+//   travelLocation: TravelLocation
+// ): Promise<{ deletedLocations: RowDataPacket[] }> => {
+//   const deletedLocations = await travelModel.deleteTravelLocation(location_id,travelLocation);
+//   return deletedLocations;
+// };
