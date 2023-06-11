@@ -65,7 +65,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       // sameSite: 'none', // SameSite 옵션 설정
       // 필요에 따라 쿠키 설정을 추가할 수 있습니다.
     });
-    res.status(200).json({ message: '로그인 성공' });
+    res.status(200).json({ message: '로그인 성공',user:userData });
   } catch (error) {
     console.error(error);
     next(error);

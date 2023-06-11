@@ -19,7 +19,7 @@ export const createCommentModel = async (comment: Comment): Promise<void> => {
     ]);
   } catch (error) {
     console.error(error);
-    throw new Error('댓글 생성에 실패했습니다.');
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 생성에 실패했습니다.',500);
   }
 };
 
