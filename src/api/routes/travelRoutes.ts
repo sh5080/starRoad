@@ -10,6 +10,9 @@ router.post('/', validateToken, travelController.createTravelPlanController);
 // 여행 일정 조회
 router.get('/', validateToken, travelController.getTravelPlanController);
 
+// 여행 일정 상세 조회
+router.get('/:plan_id', validateToken, travelController.getTravelPlanDetailController);
+
 // 여행 일정 수정
 router.patch('/:plan_id', validateToken, travelController.updateTravelPlanAndLocationController);
 
