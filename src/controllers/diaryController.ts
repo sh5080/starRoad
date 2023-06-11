@@ -1,133 +1,141 @@
-import { Request, Response } from 'express';
-import { 
-    createDiary, 
-    deleteDiary, 
-    getAllDiary, 
-    getMyDiary, 
-    getOneDiary, 
-    updateDiary 
-} from '../services/diaryService';
+import { Request, Response, NextFunction } from 'express';
+import * as diaryService from '../services/diaryService';
+import { AppError, CommonError } from '../types/AppError';
+import { CustomRequest } from '../types/customRequest';
+import * as fs from 'node:fs';
+import {compressImage} from '../api/middlewares/sharp';
 
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
-import { JwtPayload } from 'jsonwebtoken';
-import { getPlanById } from '../models/diaryModel';
-
-interface CustomRequest extends Request {
-    user?: JwtPayload & { user_id: string };
-  }
-
-  export const createDiaryController = async (req: CustomRequest, res: Response) => {
-    try {
-      const { title, content, image, plan_id } = req.body;
-      const user_id = req.user?.user_id;
-  
-      if (!user_id) {
-        throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
-      }
-  
-      // 해당 유저의 플랜인지 유효성 검사
-      const plan = await getPlanById(plan_id, user_id);
-      if (!plan) {
-        throw new AppError(CommonError.RESOURCE_NOT_FOUND,'플랜을 찾을 수 없습니다.', 404);
-      }
-  
-      const { destination } = plan; // 플랜의 destination 값
-  
-      // diary 생성
-      await createDiary({ user_id, plan_id, title, content, image, destination }, plan);
-  
-      res.status(201).json({ message: '여행기가 생성되었습니다.' });
-    } catch (error) {
-      switch (error) {
-        case CommonError.AUTHENTICATION_ERROR:
-        case CommonError.RESOURCE_NOT_FOUND:
-          break;
-        default:
-          console.error(error);
-          res.status(500).json({ error: '여행기 생성에 실패했습니다.' });
-      }
-    }
-  };
-  
-  export const getAllDiaryController = async (req: Request, res: Response) => {
-    try {
-        // 다이어리 조회
-        const diary = await getAllDiary();
-    
-        if (!diary) {
-          throw new AppError(CommonError.RESOURCE_NOT_FOUND,'전체 여행기를 찾을 수 없습니다.', 404);
-        }
-    
-        res.status(200).json(diary);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: '전체 여행기 조회에 실패했습니다.' });
-      }
-    };
-    export const getMyDiaryController = async (req: CustomRequest, res: Response) => {
-        try {
-          const user_id = req.params.user_id;
-      
-          if (!user_id) {
-            throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
-          }
-          const loggedInUserId = req.user?.user_id; 
-          if (user_id !== loggedInUserId) {
-            throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 아이디가 일치하지 않습니다.', 403);
-          }
-          const diaries = await getMyDiary(user_id);
-      
-          res.status(200).json(diaries);
-        } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: '내 여행기 조회에 실패했습니다.' });
-        }
-      };
-  export const getOneDiaryController = async (req: Request, res: Response) => {
-      try {
-        const diary_id = parseInt(req.params.diary_id, 10);
-        const diary = await getOneDiary(diary_id);
-      
-        if (!diary) {
-          throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행기를 찾을 수 없습니다.', 404);
-        }
-        res.status(200).json(diary);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: '여행기 조회에 실패했습니다.' });
-      }
-    };
-
-export const updateDiaryController = async (req: CustomRequest, res: Response) => {
+export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { diary, diary_id } = req.body;
-    const user_id = req.user?.user_id;
-    if (!user_id) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
+    const imgName = req.file ? `https://localhost:3000/static/${req.file.filename}` : '';
+    const { title, content, image, plan_id, ...extraFields } = req.body;
+    const username = req.user?.username;
+
+    if (!username) {
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
+    }
+    if (!title || !content) {
+      throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
     }
 
-    await updateDiary(diary, diary_id, user_id);
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+    }
 
-    res.status(200).json({ message: '여행기 수정이 완료되었습니다.' });
+    const diary = await diaryService.createDiary(
+      { username, plan_id, title, content, image: imgName },
+      username,
+      Number(plan_id)
+    );
+
+    const outputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/${req.file?.filename}`;
+    // await compressImage(outputPath, outputPath, 800, 800);
+    res.status(201).json(diary);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: '여행기 수정에 실패했습니다.' });
+    next(error);
   }
 };
 
-export const deleteDiaryController = async (req: CustomRequest, res: Response) => {
-    try {
-      const diary_id = parseInt(req.params.diary_id, 10);
-      const user_id = req.user?.user_id;
-  
-      if (!user_id) {
-        throw new AppError(CommonError.AUTHENTICATION_ERROR,'사용자 정보를 찾을 수 없습니다.', 401);
-      }
-      await deleteDiary(diary_id, user_id);
-  
-      res.status(200).json({ message: '여행기 삭제가 완료되었습니다.' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: '여행기 삭제에 실패했습니다.' });
+export const getAllDiaries = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // 다이어리 조회
+    const diary = await diaryService.getAllDiaries();
+    if (!diary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '전체 여행기를 찾을 수 없습니다.', 404);
     }
-  };
+    res.status(200).json(diary);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+export const getMyDiaries = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const username = req.user?.username;
+    if (!username) {
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
+    }
+    const diaries = await diaryService.getMyDiaries(username);
+    res.status(200).json(diaries);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+export const getOneDiary = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const diary_id = parseInt(req.params.diary_id, 10);
+    const diary = await diaryService.getOneDiary(diary_id);
+
+    if (!diary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
+    }
+    res.status(200).json(diary);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const diary_id = parseInt(String(req.params.diary_id), 10);
+    const { title, content, image, ...extraFields } = req.body;
+    const username = req.user?.username;
+
+    const diaryData = { title, content, image };
+    if (!username) {
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
+    }
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+    }
+    if (!title || !content) {
+      throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
+    }
+
+    await diaryService.updateDiary(diaryData, diary_id, username);
+
+    res.status(200).json(diaryData);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const diary_id = parseInt(String(req.params.diary_id), 10);
+    const username = req.user?.username;
+    if (!username) {
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
+    }
+    const deletedDiary = await diaryService.deleteDiary(diary_id, username);
+
+    if (!deletedDiary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 여행기가 아닙니다.', 404);
+    }
+    if (deletedDiary.image) {
+      const imgName = deletedDiary.image.split('/static')[4];
+      console.log('imgName=', imgName);
+
+      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public
+      /${imgName}`;
+
+      console.log('filePath', filePath);
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(err);
+        }
+        console.log('File deleted successfully');
+      });
+    }
+
+    res.status(200).json(deletedDiary);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};

@@ -1,118 +1,153 @@
 import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
+import { RowDataPacket, FieldPacket } from 'mysql2';
+import { AppError,CommonError } from '../types/AppError';
 
-// DB 여행일정 등록
-/**
- * 예시
- *
- */
-export const createTravelPlanModel = async (travelPlan: TravelPlan): Promise<number> => {
-  const connection = await db.getConnection();
+export const createTravelPlan = async (travelPlan: TravelPlan) => {
   try {
-    const [rows] = await connection.execute(
-      'INSERT INTO travel_plan (user_id, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
-      [travelPlan.user_id, travelPlan.start_date, travelPlan.end_date, travelPlan.destination]
+    const [rows] = await db.execute(
+      'INSERT INTO travel_plan (username, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
+      [travelPlan.username, travelPlan.start_date, travelPlan.end_date, travelPlan.destination]
     );
     const insertId = (rows as any).insertId;
     return insertId;
-  } finally {
-    connection.release(); // connection release
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'일정 생성에 실패했습니다.',500)
   }
 };
 
-// DB에 날짜별 장소 등록
-export const createTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
-  const connection = await db.getConnection();
+export const createTravelLocation = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
   try {
-    await connection.execute(
-      'INSERT INTO travel_location (user_id, plan_id, date, location, `order`) VALUES (?, ?, ?, ?, ?)', 
+    await db.execute(
+      'INSERT INTO travel_location (plan_id, date, location, `order`, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
       [
-        travelLocation.user_id,
-        travelLocation.plan_id,
+        plan_id,
         travelLocation.date,
         travelLocation.location,
-        travelLocation.order
+        travelLocation.order,
+        travelLocation.latitude,
+        travelLocation.longitude,
       ]
     );
-  } finally {
-    connection.release();
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜 및 장소 생성에 실패했습니다.',500)
   }
 };
 
-// DB에서 여행일정 조회
-export const getTravelPlansModel = async (user_id: string): Promise<TravelPlan[]> => {
-  const connection = await db.getConnection();
+export const getTravelPlansByUserId = async (username: string): Promise<TravelPlan[]> => {
   try {
-    const [rows] = await connection.query('SELECT * FROM travel_plan WHERE user_id = ?', [user_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
     return rows as TravelPlan[];
-  } finally {
-    connection.release();
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 조회에 실패했습니다.',500);
   }
 };
 
-// DB에서 여행일정에 해당하는 날짜별 장소 조회
-export const getTravelLocationsModel = async (plan_id: number): Promise<TravelLocation[]> => {
-  const connection = await db.getConnection();
+export const getTravelLocationsByPlanId = async (plan_id: number): Promise<TravelLocation[]> => {
   try {
-    const [rows] = await connection.query('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
     return rows as TravelLocation[];
-  } finally {
-    connection.release();
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 조회에 실패했습니다.',500);
   }
 };
 
-// DB에 여행 일정 수정
-export const updateTravelPlanModel = async (travelPlan: TravelPlan): Promise<void> => {
-  const connection = await db.getConnection();
+export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
   try {
-    await connection.execute(
-      'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ? AND user_id = ?',
-      [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id, travelPlan.user_id]
+
+
+    await db.execute(
+      'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ? AND username = ?',
+      [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id, travelPlan.username]
     );
-  } finally {
-    connection.release();
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 수정에 실패했습니다.',500);
   }
 };
 
-// 날짜별 장소 수정
-export const updateTravelLocationModel = async (travelLocation: TravelLocation): Promise<void> => {
-  const connection = await db.getConnection();
+export const updateTravelLocation = async (username: string, travelLocation: TravelLocation): Promise<{myLocation:RowDataPacket[],myPlan:RowDataPacket[]}> => {
   try {
-    await connection.execute(
-      'UPDATE travel_location SET location = ?, date = ? WHERE plan_id = ? AND date = ? AND user_id = ?',
+    const [myPlan] = await db.execute(
+      'SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?',
+      [travelLocation.plan_id, username]
+    )as [RowDataPacket[],FieldPacket[]];
+    const [myLocation] = await db.execute(
+      'SELECT * FROM travel_location WHERE location_id = ?',
+      [travelLocation.location_id]
+    )as [RowDataPacket[],FieldPacket[]];
+
+    await db.execute(
+      'UPDATE travel_location SET location = ?, date = ?, `order` = ? WHERE plan_id = ? AND location_id = ?',
       [
         travelLocation.location,
         travelLocation.newDate,
+        travelLocation.order,
         travelLocation.plan_id,
-        travelLocation.date,
-        travelLocation.user_id,
+        travelLocation.location_id,
       ]
     );
-  } finally {
-    connection.release();
+    return {myLocation,myPlan}
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 수정에 실패했습니다.',500);
   }
 };
 
-// 여행 일정 삭제
-export const deleteTravelPlanModel = async (user_id: string, plan_id: number): Promise<void> => {
-  const connection = await db.getConnection();
+export const deleteTravelPlan = async (
+  username: string,
+  plan_id: number
+): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
   try {
-    await connection.execute('DELETE FROM travel_location WHERE plan_id = ?', [plan_id]);
-    await connection.execute('DELETE FROM travel_plan WHERE user_id = ? AND plan_id = ?', [user_id, plan_id]);
-  } finally {
-    connection.release();
-  }
-};
-
-// 특정일정 특정날짜별 장소 삭제 (사실상 장소를 null로 설정)
-export const deleteTravelLocationModel = async (plan_id: number, date: string): Promise<void> => {
-  const connection = await db.getConnection();
-  try {
-    await connection.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND date = ?', [
+    const [planData] = (await db.execute('SELECT * FROM travel_plan WHERE username = ? AND plan_id = ?', [
+      username,
       plan_id,
-      date,
-    ]);
-  } finally {
-    connection.release();
+    ])) as [RowDataPacket[], FieldPacket[]];
+
+    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id])) as [
+      RowDataPacket[],
+      FieldPacket[]
+    ];
+
+    await db.execute('DELETE FROM travel_location WHERE plan_id = ?', [plan_id]);
+    await db.execute('DELETE FROM travel_plan WHERE username = ? AND plan_id = ?', [username, plan_id]);
+
+    return {
+      deletedPlan: planData,
+      deletedLocations: locationData,
+    };
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 삭제에 실패했습니다.',500);
+  }
+};
+
+export const deleteTravelLocation = async (
+  location_id:number,
+  travelLocation: TravelLocation
+  ): Promise<{deletedLocations:RowDataPacket[]}> => {
+  try {
+    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
+      location_id, 
+    ])) as [
+      RowDataPacket[],
+      FieldPacket[]
+    ];
+    await db.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND location_id = ?', [
+      travelLocation.plan_id,
+      travelLocation.location_id,
+    ])
+return {
+  deletedLocations: locationData
+}
+
+
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 삭제에 실패했습니다.',500);
   }
 };

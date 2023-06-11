@@ -1,7 +1,7 @@
 export interface UserType {
-  id?: string;
+  id?: number;
   name?: string;
-  user_id?: string;
+  username?: string;
   password?: string;
   email?: string;
   role?: string;

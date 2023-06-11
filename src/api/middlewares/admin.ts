@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../middlewares/errorHandler';
+import { AppError, CommonError } from '../../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { user_id: string; role: string };
+  user?: JwtPayload & { username: string; role: string };
 }
 export const ensureAdmin = (req: CustomRequest, res: Response, next: NextFunction) => {
   if (req.user?.role !== 'ADMIN') {
