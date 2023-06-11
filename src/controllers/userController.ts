@@ -1,143 +1,164 @@
 import { NextFunction, Request, Response } from 'express';
-import { signupUser, loginUser, getUser, updateUser, deleteUser } from '../services/userService';
-import { UserType } from '../types/user';
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import * as userService from '../services/userService';
+import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
+import { UserType } from '../types/user';
+
 // 회원가입
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user: UserType = req.body;
-
-    if (!user.user_id || !user.password || !user.email || !user.name) {
-      return res.status(400).json({ error: '회원가입에 필요한 정보가 제공되지 않았습니다.' });
+    const { name, username, password, email, ...extraFields } = req.body;
+    const userData = { name, username, email, password };
+    const exceptPassword = { name, username, email };
+    console.log(req.body);
+    if (!username || !password || !email || !name) {
+      throw new AppError(CommonError.INVALID_INPUT, '회원가입에 필요한 정보가 제공되지 않았습니다.', 400);
     }
-
-    const message = await signupUser(user);
-
-    res.status(201).json({ message });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '회원가입에 실패했습니다.' });
+    //유효성 검증
+    if (username.length < 6 || username.length > 20) {
+      throw new AppError(CommonError.INVALID_INPUT, '아이디는 6자 이상 20자 이내로 설정해야 합니다.', 400);
     }
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{10,20}$/;
+    if (!passwordRegex.test(password)) {
+      throw new AppError(
+        CommonError.INVALID_INPUT,
+        '비밀번호는 영문, 숫자, 특수문자를 포함하여 10자 이상 20자 이내여야 합니다.',
+        400
+      );
+    }
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+    }
+    await userService.signupUser(userData);
+    res.status(201).json(exceptPassword);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 // 로그인
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { user_id, password }: UserType = req.body;
+    const { username, password, ...extraFields }: UserType = req.body;
 
-    if (!user_id || !password) {
-      return res.status(400).json({ error: '로그인에 필요한 정보가 제공되지 않았습니다.' });
+    if (!username || !password) {
+      throw new AppError(CommonError.INVALID_INPUT, '로그인에 필요한 정보가 제공되지 않았습니다.', 400);
     }
-
-    const userData = await getUser(user_id);
-
+    if (Object.keys(extraFields).length > 0) {
+      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+    }
+    const userData = await userService.getUser(username);
     console.log(userData);
+
     if (!userData.activated) {
-      return res.status(400).json({ error: '탈퇴한 회원입니다.' });
+      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '탈퇴한 회원입니다.', 400);
     }
 
-    const token = await loginUser(user_id, password);
-
-    res.json({ token });
-  } catch (err) {
-    console.error(err);
-    next(err); // 에러를 next 함수를 통해 errorHandler 미들웨어로 전달합니다.
+    const token = await userService.loginUser(username, password);
+    // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
+    console.log('token= ', token);
+    res.cookie('token', token, {
+      httpOnly: true,
+      // secure: true, // Uncomment this line if you're serving over HTTPS
+      maxAge: 7200000, // 쿠키의 유효 시간 설정(예: 2 hours)
+      // sameSite: 'none', // SameSite 옵션 설정
+      // 필요에 따라 쿠키 설정을 추가할 수 있습니다.
+    });
+    res.status(200).json({ message: '로그인 성공' });
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
-export const logout = async (req: CustomRequest, res: Response) => {
+export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
+    res.cookie('token', null, {
+      maxAge: 0,
+    });
     res.status(200).json({ message: '로그아웃 되었습니다.' });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '로그아웃 실패했습니다.' });
-    }
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 interface CustomRequest extends Request {
-  user?: JwtPayload & { user_id: string };
+  user?: JwtPayload & { username: string };
 }
 
 // 내 정보 조회
-export const getUserInfo = async (req: CustomRequest, res: Response) => {
-  // req는 언제든 조회
+export const getUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     // req.user가 없는 경우 에러 처리
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
-
-    const { user_id } = req.user;
-    const userData = await getUser(user_id);
+    const { username } = req.user;
+    const userData = await userService.getUser(username);
 
     if (!userData) {
-      return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '사용자를 찾을 수 없습니다.', 404);
     }
     res.status(200).json({ userData });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '사용자 조회에 실패했습니다.' });
-    }
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 // 회원 정보 수정
-export const updateUserInfo = async (req: CustomRequest, res: Response) => {
+export const updateUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    // req.user가 없는 경우 에러 처리
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
 
-    const { user_id } = req.user;
-    const updateData = req.body;
+    const { username } = req.user;
+    const { email, password } = req.body;
 
-    const updatedUserData = await updateUser(user_id, updateData);
+    if (!email || !password) {
+      throw new AppError(CommonError.INVALID_INPUT, '올바른 이메일과 비밀번호를 입력해주세요.', 400);
+    }
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{10,20}$/;
+    if (!passwordRegex.test(password)) {
+      throw new AppError(
+        CommonError.INVALID_INPUT,
+        '비밀번호는 영문, 숫자, 특수문자를 포함하여 10자 이상 20자 이내여야 합니다.',
+        400
+      );
+    }
+    const updatedUserData = await userService.updateUser(username, { email, password });
 
-    if (!updatedUserData) {
-      return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
-    }
-    res.status(200).json({ updatedUserData });
-  } catch (err) {
-    console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '사용자 정보 업데이트에 실패했습니다.' });
-    }
+    res.status(200).json(updatedUserData);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
 // 회원 탈퇴
-export const deleteUserInfo = async (req: CustomRequest, res: Response) => {
+export const deleteUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR,'인증이 필요합니다.', 401);
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
 
-    const { user_id } = req.user;
-    const message = await deleteUser(user_id);
+    const { username: currentUser } = req.user;
+    const deletedUserData = await userService.deleteUser(currentUser);
 
-    res.status(200).json({ message });
+    if (!deletedUserData) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '탈퇴한 회원입니다.', 401);
+    }
+
+    const { name, username, email } = deletedUserData;
+    const responseData = { name, username, email };
+
+    res.status(200).json(responseData);
   } catch (err) {
     console.error(err);
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: '사용자 정보 삭제에 실패했습니다.' });
-    }
+    next(err);
   }
 };

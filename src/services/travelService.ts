@@ -1,88 +1,106 @@
 import { TravelPlan, TravelLocation } from '../types/travel';
-import {
-  createTravelPlanModel,
-  createTravelLocationModel,
-  getTravelPlansModel,
-  getTravelLocationsModel,
-  updateTravelPlanModel,
-  updateTravelLocationModel,
-  deleteTravelPlanModel,
-  deleteTravelLocationModel,
-} from '../models/travelModel';
-import { AppError, CommonError } from '../api/middlewares/errorHandler';
+import * as travelModel from '../models/travelModel';
+import { AppError, CommonError } from '../types/AppError';
+import { RowDataPacket } from 'mysql2';
 
 // 여행 일정 등록
-export const createTravelPlan = async (travelPlan: TravelPlan) => {
-  if (!travelPlan.user_id || !travelPlan.start_date || !travelPlan.end_date || !travelPlan.destination) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
+export const createPlan = async (travelPlan: TravelPlan) => {
+  if (
+    !travelPlan.username?.trim() ||
+    !travelPlan.start_date ||
+    !travelPlan.end_date ||
+    !travelPlan.destination?.trim()
+  ) {
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
-
-  const plan_id = await createTravelPlanModel(travelPlan);
+  const plan_id = await travelModel.createTravelPlan(travelPlan);
+  console.log('plan_id', plan_id);
   return plan_id;
 };
 
 // 여행 날짜별 장소 등록
-export const createTravelLocation = async (travelLocation: TravelLocation): Promise<void> => {
+export const createLocation = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
+  console.log(travelLocation, plan_id);
+
   if (
-    !travelLocation.user_id ||
-    !travelLocation.plan_id ||
     !travelLocation.date ||
     !travelLocation.location ||
-    !travelLocation.order
+    !travelLocation.order ||
+    !travelLocation.latitude ||
+    !travelLocation.longitude ||
+    !plan_id
   ) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+    throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
-  await createTravelLocationModel(travelLocation);
+  console.log('여행 장소 등록');
+
+  await travelModel.createTravelLocation(travelLocation, plan_id);
 };
 
 // 여행 일정 조회
-export const getTravelPlans = async (user_id: string): Promise<TravelPlan[]> => {
-  const travelPlans = await getTravelPlansModel(user_id);
+export const getPlans = async (username: string): Promise<TravelPlan[]> => {
+  const travelPlans = await travelModel.getTravelPlansByUserId(username);
   return travelPlans;
 };
 // 여행 날짜별 장소 조회.
-export const getTravelLocations = async (plan_id: number): Promise<TravelLocation[]> => {
-  const travelLocations = await getTravelLocationsModel(plan_id);
+export const getLocations = async (plan_id: number): Promise<TravelLocation[]> => {
+  const travelLocations = await travelModel.getTravelLocationsByPlanId(plan_id);
   return travelLocations;
 };
 
 // 여행 일정 수정
-export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
+export const updatePlan = async (username: string, travelPlan: TravelPlan) => {
   if (
     !travelPlan.plan_id ||
-    !travelPlan.user_id ||
+    !travelPlan.username?.trim() ||
     !travelPlan.start_date ||
     !travelPlan.end_date ||
-    !travelPlan.destination
+    !travelPlan.destination?.trim()
   ) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
+  }
+  const existingTravelPlans = await travelModel.getTravelPlansByUserId(username);
+  const existingTravelPlan = existingTravelPlans.find((plan) => plan.plan_id === travelPlan.plan_id);
+
+  if (!existingTravelPlan || existingTravelPlan.username !== username) {
+    throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
   }
 
-  await updateTravelPlanModel(travelPlan);
+  await travelModel.updateTravelPlan(travelPlan);
+  return travelPlan;
 };
 
 // 여행 날짜별 장소 수정
-export const updateTravelLocation = async (
-  user_id: string,
-  plan_id: number,
-  date: string,
-  newDate: string,
-  location: string
-): Promise<void> => {
-  if (!user_id || !plan_id || !date || !location || !newDate) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND,'여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+export const updateLocation = async (travelLocation: TravelLocation, username: string): Promise<{ myPlan: RowDataPacket[], myLocation: RowDataPacket[] }> => {
+  if (
+    !travelLocation.location_id ||
+    !travelLocation.plan_id ||
+    !travelLocation.location?.trim() ||
+    !travelLocation.newDate ||
+    !travelLocation.order?.toString().trim()
+  ) {
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
-
-  await updateTravelLocationModel({ user_id, plan_id, date, newDate, location });
+  const {myPlan, myLocation} = await travelModel.updateTravelLocation(username, travelLocation);
+  return { myPlan, myLocation };
 };
 
 // 여행 일정 삭제
-export const deleteTravelPlan = async (user_id: string, plan_id: number): Promise<void> => {
-  await deleteTravelPlanModel(user_id, plan_id);
+export const deletePlan = async (
+  username: string,
+  plan_id: number
+): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
+  const deletedPlan = await travelModel.deleteTravelPlan(username, plan_id);
+  return deletedPlan;
 };
 
 // 여행 날짜별 장소 삭제
-export const deleteTravelLocation = async (plan_id: number, date: string): Promise<void> => {
-  await deleteTravelLocationModel(plan_id, date);
+
+export const deleteLocation = async (
+  location_id: number,
+  travelLocation: TravelLocation
+): Promise<{ deletedLocations: RowDataPacket[] }> => {
+  const deletedLocations = await travelModel.deleteTravelLocation(location_id,travelLocation);
+  return deletedLocations;
 };

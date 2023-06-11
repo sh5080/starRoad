@@ -1,5 +1,6 @@
-export interface CommentType {
-    user_id?: string;
-    diary_id?: number;
-    comment?: string;
-  }
+export interface Comment {
+  username?: string;
+  diary_id?: number;
+  comment?: string;
+  title?: string;
+}

@@ -1,76 +1,71 @@
-import { OkPacket } from 'mysql2';
+import { OkPacket, RowDataPacket } from 'mysql2';
 import { db } from '../loaders/dbLoader';
+import { AppError, CommonError } from '../types/AppError';
 import { UserType } from '../types/user';
 
 export const createUser = async (user: UserType): Promise<void> => {
-  // const pool = db;
-  const connection = await db.getConnection();
   try {
-    await connection.execute('INSERT INTO user (name, user_id, password, email) VALUES (?, ?, ?, ?)', [
+    await db.execute('INSERT INTO user (name, username, password, email) VALUES (?, ?, ?, ?)', [
       user.name,
-      user.user_id,
+      user.username,
       user.password,
       user.email,
     ]);
-  } finally {
-    connection.release(); // 연결 해제
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '회원가입에 실패했습니다.', 500);
   }
 };
 
-// 로그인,정보 조회시 사용
-export const getUserById = async (user_id: string): Promise<UserType | null> => {
-  // const pool = await db;
-  const connection = await db.getConnection();
+export const getUserByUsername = async (username: string): Promise<UserType | null> => {
   try {
-    const [rows] = await connection.execute('SELECT * FROM user WHERE user_id = ?', [user_id]);
+    const [rows] = await db.execute('SELECT * FROM user WHERE username = ?', [username]);
     if (Array.isArray(rows) && rows.length > 0) {
       const userData = rows[0] as UserType;
       return userData;
     }
     return null;
-  } finally {
-    connection.release(); // 연결 해제
+  } catch (error) {
+    console.error(error);
+    {
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
+    }
   }
 };
 
-export const updateUserById = async (
-  user_id: string,
+export const updateUserByUsername = async (
+  userId: string,
   updateData: Partial<Pick<UserType, 'email' | 'password'>>
 ): Promise<UserType | null> => {
-  const pool = await db;
-  const connection = await pool.getConnection();
-  try {
-    //사용자 데이터 업데이트
-    const [result] = await connection.query<OkPacket>('UPDATE user SET ? WHERE user_id = ?', [updateData, user_id]);
+  try{const { email, password } = updateData;
 
-    if (!result.affectedRows) {
-      return null;
-    }
-    //업데이트된 사용자 데이터 가져옴
-    const [updatedUserRows] = await connection.execute('SELECT * FROM user WHERE user_id = ?', [user_id]);
-    if (Array.isArray(updatedUserRows) && updatedUserRows.length > 0) {
-      const updatedUser = updatedUserRows[0] as UserType;
-      return updatedUser;
-    }
-    return null;
-  } finally {
-    connection.release(); // 연결 해제
+  await db.execute('UPDATE user SET email = ?, password = ? WHERE username = ?', [email, password, userId]);
+
+  const updatedUser = await getUserByUsername(userId);
+  return updatedUser;
+}catch (error) {
+  console.error(error);
+  {
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 수정에 실패했습니다.', 500);
   }
+}
 };
 
-export const deleteUserById = async (user_id: string): Promise<boolean> => {
-  const pool = await db;
-  const connection = await pool.getConnection();
+export const deleteUserByUsername = async (username: string): Promise<UserType | null> => {
+try{  const [result] = await db.execute<RowDataPacket[]>('SELECT * FROM user WHERE username = ?', [username]);
 
-  try {
-    const [result] = await connection.query<OkPacket>('UPDATE user SET activated = 0 WHERE user_id = ?', [user_id]);
-
-    if (result.affectedRows > 0) {
-      return true; // 삭제 성공
-    }
-
-    return false; // 삭제 실패
-  } finally {
-    connection.release();
+  if (result.length === 0) {
+    return null; // 사용자가 존재하지 않음
   }
+
+  const [deletedUser] = result;
+  await db.execute<OkPacket>('DELETE FROM user WHERE username = ?', [username]);
+
+  return deletedUser as UserType;
+}catch (error) {
+  console.error(error);
+  {
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 탈퇴에 실패했습니다.', 500);
+  }
+}
 };

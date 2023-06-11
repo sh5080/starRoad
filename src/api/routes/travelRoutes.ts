@@ -1,33 +1,26 @@
 import { Router } from 'express';
-import {
-  createTravelPlanController,
-  getTravelPlanController,
-  updateTravelPlanController,
-  deleteTravelPlanController,
-  deleteTravelLocationController,
-  updateTravelLocationController,
-} from '../../controllers/travelController';
+import * as travelController from '../../controllers/travelController';
 import { validateToken } from '../middlewares/jwt';
 
 const router = Router();
 
 // 여행 일정 등록
-router.post('/', validateToken, createTravelPlanController);
+router.post('/', validateToken, travelController.createTravelPlanController);
 
 // 여행 일정 조회
-router.get('/', validateToken, getTravelPlanController);
+router.get('/', validateToken, travelController.getTravelPlanController);
 
 // 여행 일정 수정
-router.put('/:plan_id', validateToken, updateTravelPlanController);
+router.patch('/:plan_id', validateToken, travelController.updateTravelPlanController);
 
 // 특정 날짜 장소 수정
-router.put('/location/:plan_id/:date', validateToken, updateTravelLocationController);
+router.patch('/location/:plan_id/:location_id', validateToken, travelController.updateTravelLocationController);
 
 // 여행 일정 삭제
-router.delete('/:plan_id', validateToken, deleteTravelPlanController);
+router.delete('/:plan_id', validateToken, travelController.deleteTravelPlanController);
 
 // 특정 날짜 장소 삭제
-router.delete('/location/:plan_id/:date', validateToken, deleteTravelLocationController);
+router.delete('/location/:plan_id/:location_id', validateToken, travelController.deleteTravelLocationController);
 
 export default router;
 
