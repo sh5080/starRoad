@@ -27,10 +27,10 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
       username,
       Number(plan_id)
     );
-    const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`;
-    const compressed = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${req.file?.filename}`;
+    const inputPath = `../../public/${req.file?.filename}`;
+    const compressed = `../../public/compressed/${req.file?.filename}`;
     await compressImage(inputPath, compressed, 800, 800);
-    fs.unlinkSync(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`);
+    fs.unlinkSync(`../../public/${req.file?.filename}`);
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);
