@@ -126,28 +126,30 @@ export const deleteTravelPlan = async (
   }
 };
 
-export const deleteTravelLocation = async (
-  location_id:number,
-  travelLocation: TravelLocation
-  ): Promise<{deletedLocations:RowDataPacket[]}> => {
-  try {
-    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
-      location_id, 
-    ])) as [
-      RowDataPacket[],
-      FieldPacket[]
-    ];
-    await db.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND location_id = ?', [
-      travelLocation.plan_id,
-      travelLocation.location_id,
-    ])
-return {
-  deletedLocations: locationData
-}
+
+// 특정 날짜별 장소 삭제는 일정 수정에서 처리(null값으로)
+// export const deleteTravelLocation = async (
+//   location_id:number,
+//   travelLocation: TravelLocation
+//   ): Promise<{deletedLocations:RowDataPacket[]}> => {
+//   try {
+//     const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
+//       location_id, 
+//     ])) as [
+//       RowDataPacket[],
+//       FieldPacket[]
+//     ];
+//     await db.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND location_id = ?', [
+//       travelLocation.plan_id,
+//       travelLocation.location_id,
+//     ])
+// return {
+//   deletedLocations: locationData
+// }
 
 
-  } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 삭제에 실패했습니다.',500);
-  }
-};
+//   } catch (error) {
+//     console.error(error);
+//     throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 삭제에 실패했습니다.',500);
+//   }
+// };
