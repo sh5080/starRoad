@@ -40,7 +40,6 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
     if (comments[0] === undefined) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '댓글을 찾을 수 없습니다.', 404);
     }
-    console.log(comments[0]);
     res.status(200).json({ comments });
   } catch (error) {
     console.error(error);

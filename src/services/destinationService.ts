@@ -6,7 +6,6 @@ import * as destinationModel from '../models/destinationModel';
 
 export const getAllTouristDestinationService = async (): Promise<TouristDestinationType[]> => {
   try {
-    console.log('모든 여행지 정보를 가져오는 중...');
     const destinations = await destinationModel.getAllTouristDestinationModel();
     return destinations;
   } catch (error) {
@@ -18,7 +17,6 @@ export const getAllTouristDestinationService = async (): Promise<TouristDestinat
 // 관광지 상세 조회하기
 export const getTouristDestinationService = async (id: number): Promise<TouristDestinationType> => {
   try {
-    console.log('특정 관광지 정보를 가져오는 중...');
     const destination = await destinationModel.getTouristDestinationModel(id);
     return destination;
   } catch (error) {

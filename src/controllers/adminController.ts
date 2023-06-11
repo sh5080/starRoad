@@ -8,7 +8,6 @@ import { compressImage } from '../api/middlewares/sharp';
 // [관리자] 모든 회원 조회하기
 export const getAllUsersController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    console.log('모든 회원 불러오는 중...');
     const users = await adminService.getAllUsersService();
     const userCount: number = users.length;
 
@@ -22,12 +21,9 @@ export const getAllUsersController = async (req: CustomRequest, res: Response, n
 // [관리자] 회원 정보 수정하기
 export const updateUserController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    console.log('회원 정보 수정 중...');
     const { id } = req.params;
     const userInfo = req.body;
     const data = await adminService.updateUserService(Number(id), userInfo);
-    console.log('updatedUser = ', data);
-    console.log('회원 정보 수정 완료');
     res.status(200).json({ data, message: '회원 정보 수정을 완료했습니다.' });
   } catch (err) {
     console.error(err);
@@ -41,11 +37,8 @@ export const updateUserController = async (req: CustomRequest, res: Response, ne
 export const deleteUserController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    console.log(`${id} 회원 삭제중...`);
 
     const message = await adminService.deleteUserService(Number(id));
-    console.log(message);
-
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);
@@ -61,7 +54,6 @@ export const getAllUserInfoTravelController = async (req: CustomRequest, res: Re
     const { username } = req.params;
 
     const userTravelInfos = await adminService.getUserInfoTravelService(String(username));
-    console.log('userInfo = ', userTravelInfos);
     res.status(200).json({ data: userTravelInfos, message: '회원이 작성한 여행 일정을 조회했습니다.' });
   } catch (err) {
     console.error(err);
@@ -164,9 +156,7 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
   try {
     const imgName = req.file ? `http://localhost:3000/static/compressed/${req.file.filename}` : '';
 
-    console.log(imgName);
     const { name_en, name_ko, introduction } = req.body;
-    console.log(name_en, name_ko, introduction);
 
     if (!name_en || !name_ko || !introduction) {
       return next(new AppError(CommonError.INVALID_INPUT, '모두 입력해 주세요.', 400));
@@ -181,7 +171,7 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
 
     const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`;
     const compressed = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${req.file?.filename}`;
-    await compressImage(inputPath, compressed, 800, 800);
+    await compressImage(inputPath, compressed, 600, 600);
     fs.unlinkSync(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`);
     res.status(200).json({ message });
   } catch (err) {
@@ -216,18 +206,13 @@ export const deleteTouristDestinationController = async (req: CustomRequest, res
   try {
     const { location_id } = req.params;
     const deletedData = await adminService.deleteTouristDestinationService(String(location_id));
-    console.log('deletedData =', deletedData);
 
     if (deletedData) {
-      const imgName = deletedData.touristDestination.image.split('/static/')[1];
-      console.log('imgName', imgName);
+      const imgName = deletedData.touristDestination.image.split('/compressed')[1];
 
       // imgName 파일을 찾아서 삭제
       // 상대경로 오류남 -> 절대경로로 수정
-      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/public
-      /${imgName}`;
-
-      console.log('filePath = ', filePath);
+      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed${imgName}`;
 
       fs.unlink(filePath, (err) => {
         if (err) {

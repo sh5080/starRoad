@@ -14,14 +14,11 @@ export const createPlan = async (travelPlan: TravelPlan) => {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
   const plan_id = await travelModel.createTravelPlan(travelPlan);
-  console.log('plan_id', plan_id);
   return plan_id;
 };
 
 // 여행 날짜별 장소 등록
 export const createLocation = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
-  console.log(travelLocation, plan_id);
-
   if (
     !travelLocation.date ||
     !travelLocation.location ||
@@ -32,8 +29,6 @@ export const createLocation = async (travelLocation: TravelLocation, plan_id: nu
   ) {
     throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
-
-  console.log('여행 장소 등록 완료');
 
   await travelModel.createTravelLocation(travelLocation, plan_id);
 };
@@ -49,7 +44,6 @@ export const getPlan = async (plan_id: string): Promise<TravelPlan> => {
   const travelPlans = await travelModel.getTravelPlanByPlanId(plan_id);
   return travelPlans;
 };
-
 
 // 여행 날짜별 장소 조회.
 export const getLocations = async (plan_id: number): Promise<TravelLocation[]> => {

@@ -8,7 +8,6 @@ export const getAllTouristDestinationModel = async (): Promise<TouristDestinatio
   try {
     const [rows] = await db.execute('SELECT * FROM travel_destination');
     const touristDestinations = rows as TouristDestinationType[];
-    console.log(touristDestinations);
 
     return touristDestinations;
   } catch (error) {
@@ -22,7 +21,6 @@ export const getTouristDestinationModel = async (id: number): Promise<TouristDes
   try {
     const [rows] = await db.execute('SELECT * FROM travel_destination WHERE id = ?', [id]);
     const touristDestination = (rows as RowDataPacket[])[0] as TouristDestinationType;
-    console.log(touristDestination);
 
     return touristDestination;
   } catch (error) {

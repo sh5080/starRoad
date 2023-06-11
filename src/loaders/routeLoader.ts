@@ -10,15 +10,11 @@ import config from '../config/index';
 import path from 'path';
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = config.google;
 const routeLoader = (app: Application): Application => {
-
-
- // app.use('/static', express.static('../../../frontend/dist')); // 정적파일 관리 경로
- app.use(express.static(path.join(__dirname, '../../../frontend/dist')));
-
- app.get('/', (req: Request, res: Response) => {
-   res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'));
- });
- 
+  // 배포시
+  // app.use(express.static(path.join(__dirname, '../../../frontend/dist')));
+  // app.get('/', (req: Request, res: Response) => {
+  //   res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'));
+  // });
 
   app.get('/auth/callback', async (req, res) => {
     const code = req.query.code;
@@ -51,6 +47,7 @@ const routeLoader = (app: Application): Application => {
       res.status(500).send('Authentication failed.');
     }
   });
+  app.use('/static', express.static('public')); // 정적파일 관리 경로
   app.use('/destinations', destinationRouter);
   app.use('/users', userRouter);
   app.use('/travels', travelRouter);

@@ -1,7 +1,11 @@
 import sharp from 'sharp';
 
-
-export const compressImage = async (inputPath: string, outputPath: string, width: number, height: number): Promise<void> => {
+export const compressImage = async (
+  inputPath: string,
+  outputPath: string,
+  width: number,
+  height: number
+): Promise<void> => {
   try {
     await sharp(inputPath)
       .resize(width, height, {
@@ -11,7 +15,7 @@ export const compressImage = async (inputPath: string, outputPath: string, width
       .jpeg({ quality: 80 }) // you can adjust the compression quality here
       .toFile(outputPath);
 
-    console.log(`Image compressed and saved to ${outputPath}`);
+    console.log(`이미지 압축 완료`);
   } catch (error) {
     console.error('Error compressing image', error);
   }
