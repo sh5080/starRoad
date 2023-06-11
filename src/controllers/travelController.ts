@@ -114,6 +114,33 @@ export const getTravelPlanController = async (req: CustomRequest, res: Response,
   }
 };
 
+// 여행 일정 상세 조회
+export const getTravelPlanDetailController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
+    }
+    const { plan_id } = req.params;
+
+    // 내 여행 일정 조회 해서 여행 일정 데이터에 있는 plan_id 를 통해서 장소 데이터 조회
+
+    const travelPlanData = await travelService.getPlan(String(plan_id)); // 여행 일정 데이터
+    if (!travelPlanData) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
+    }
+
+    // plan_id가 정의되어 있으면 해당 장소 정보를 조회합니다.
+    if (travelPlanData.plan_id !== undefined) {
+      travelPlanData.locations = await travelService.getLocations(travelPlanData.plan_id);
+    }
+
+    res.status(200).json({ travelPlanData });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 // 여행 일정 및 날짜별 장소 수정
 export const updateTravelPlanAndLocationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {

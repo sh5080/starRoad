@@ -43,6 +43,14 @@ export const getPlans = async (username: string): Promise<TravelPlan[]> => {
   const travelPlans = await travelModel.getTravelPlansByUserId(username);
   return travelPlans;
 };
+
+// 여행 일정 상세 조회
+export const getPlan = async (plan_id: string): Promise<TravelPlan> => {
+  const travelPlans = await travelModel.getTravelPlanByPlanId(plan_id);
+  return travelPlans;
+};
+
+
 // 여행 날짜별 장소 조회.
 export const getLocations = async (plan_id: number): Promise<TravelLocation[]> => {
   const travelLocations = await travelModel.getTravelLocationsByPlanId(plan_id);
@@ -72,7 +80,10 @@ export const updatePlan = async (username: string, travelPlan: TravelPlan) => {
 };
 
 // 여행 날짜별 장소 수정
-export const updateLocation = async (travelLocation: TravelLocation, username: string): Promise<{ myPlan: RowDataPacket[], myLocation: RowDataPacket[] }> => {
+export const updateLocation = async (
+  travelLocation: TravelLocation,
+  username: string
+): Promise<{ myPlan: RowDataPacket[]; myLocation: RowDataPacket[] }> => {
   if (
     !travelLocation.location_id ||
     !travelLocation.plan_id ||
@@ -82,7 +93,7 @@ export const updateLocation = async (travelLocation: TravelLocation, username: s
   ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
-  const {myPlan, myLocation} = await travelModel.updateTravelLocation(username, travelLocation);
+  const { myPlan, myLocation } = await travelModel.updateTravelLocation(username, travelLocation);
   return { myPlan, myLocation };
 };
 
