@@ -48,15 +48,32 @@ export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
   }
 };
 
+// export const getMyDiariesByUsername = async (username: string): Promise<Diary[]> => {
+//   try {
+//     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
+//     return rows as Diary[];
+//   } catch (error) {
+//     console.error(error);
+//     throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
+//   }
+// };
+//diaryModel
 export const getMyDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
+    const query = `
+      SELECT td.*
+      FROM travel_diary td
+      JOIN travel_plan p ON td.plan_id = p.plan_id
+      WHERE p.username = ?;
+    `;
+    const [rows] = await db.execute(query, [username]);
     return rows as Diary[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
   }
 };
+
 
 export const getOneDiaryByUsername = async (diary_id: number): Promise<Diary | null> => {
   try {

@@ -49,17 +49,17 @@ const config: Config = {
   },
   google: {
     GOOGLE_CLIENT_ID:
-      process.env.CLIENT_ID ??
+      process.env.GOOGLE_CLIENT_ID ||
       (() => {
         throw new Error('CLIENT_ID 환경 변수가 필요합니다.');
       })(),
-      GOOGLE_CLIENT_SECRET:
-      process.env.CLIENT_SECRET ??
+    GOOGLE_CLIENT_SECRET:
+      process.env.GOOGLE_CLIENT_SECRET ||
       (() => {
         throw new Error('CLIENT_SECRET 환경 변수가 필요합니다.');
       })(),
-      GOOGLE_REDIRECT_URI:
-      process.env.REDIRECT_URI ??
+    GOOGLE_REDIRECT_URI:
+      process.env.GOOGLE_REDIRECT_URI ||
       (() => {
         throw new Error('REDIRECT_URI 환경 변수가 필요합니다.');
       })(),

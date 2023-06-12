@@ -89,10 +89,11 @@ interface CustomRequest extends Request {
 export const getUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     // req.user가 없는 경우 에러 처리
-    if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
-    }
-    const { username } = req.user;
+    // if (!req.user) {
+    //   throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
+    // }
+    const username = req.user?.username;
+    console.log(username)
     const userData = await userService.getUser(username);
 
     if (!userData) {
