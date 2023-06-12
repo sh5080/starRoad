@@ -74,9 +74,10 @@ export const logout = async (req: CustomRequest, res: Response, next: NextFuncti
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     }
-    res.cookie('token', null, {
-      maxAge: 0,
-    });
+    res.clearCookie('token')
+    // , null, {
+    //   maxAge: 0,
+    // });
     res.status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (error) {
     console.error(error);
