@@ -9,7 +9,6 @@ import axios from 'axios';
 import config from '../config/index';
 import path from 'path';
 
-
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = config.google;
 const { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } = config.kakao;
 const routeLoader = (app: Application): Application => {
@@ -18,11 +17,15 @@ const routeLoader = (app: Application): Application => {
   // app.get('/', (req: Request, res: Response) => {
   //   res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'));
   // });
+  
+
+  app.get('/', (req: Request, res: Response) => {
+    res.send('hello world');
+  });
 
   app.get('/auth/callback', async (req, res) => {
     const code = req.query.code;
 
-    
     // oauth 위임을 위한 절차
     try {
       const response = await axios.post('https://oauth2.googleapis.com/token', {
@@ -84,6 +87,7 @@ const routeLoader = (app: Application): Application => {
     }
   });
 
+  app.use('/static',express.static('public'))
   app.use('/destinations', destinationRouter);
   app.use('/users', userRouter);
   app.use('/travels', travelRouter);
