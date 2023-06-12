@@ -157,9 +157,9 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
     const imgName = req.file ? `http://localhost:3000/images/compressed/${req.file.filename}` : '';
     // 로컬에서 테스트 시 images => static으로 변경
 
-    const { name_en, name_ko, introduction } = req.body;
+    const { name_en, name_ko, introduction, latitude, longitude } = req.body;
 
-    if (!name_en || !name_ko || !introduction) {
+    if (!name_en || !name_ko || !introduction || !latitude || !longitude) {
       return next(new AppError(CommonError.INVALID_INPUT, '모두 입력해 주세요.', 400));
     }
 
@@ -167,7 +167,9 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
       String(name_en),
       String(name_ko),
       String(imgName),
-      String(introduction)
+      String(introduction),
+      Number(latitude),
+      Number(longitude)
     );
 
     const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`;

@@ -114,10 +114,12 @@ export const addTouristDestinationService = async (
   name_en: string,
   name_ko: string,
   image: string,
-  introduction: string
+  introduction: string,
+  latitude: number,
+  longitude: number
 ): Promise<string> => {
   try {
-    await adminModel.addTouristDestinationModel(name_en, name_ko, image, introduction);
+    await adminModel.addTouristDestinationModel(name_en, name_ko, image, introduction, latitude, longitude);
     return '관광지 추가에 성공하였습니다.';
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to add tourist destination', 500);
@@ -136,7 +138,6 @@ export const updateTouristDestinationService = async (
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update tourist destination', 500);
   }
 };
-
 
 interface TouristDestination {
   [key: string]: any;
