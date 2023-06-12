@@ -51,7 +51,7 @@ export const loginUser = async (username: string, password: string): Promise<obj
   return { accessToken, refreshToken };
 };
 
-export const getUser = async (username: string) => {
+export const getUser = async (username?: string) => {
   const user = await userModel.getUserByUsername(username);
 
   if (!user) {

@@ -17,7 +17,7 @@ export const createUser = async (user: UserType): Promise<void> => {
   }
 };
 
-export const getUserByUsername = async (username: string): Promise<UserType | null> => {
+export const getUserByUsername = async (username?: string): Promise<UserType | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM user WHERE username = ?', [username]);
     if (Array.isArray(rows) && rows.length > 0) {
