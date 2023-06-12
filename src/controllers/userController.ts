@@ -70,9 +70,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 };
 export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
-    }
+    // if (!req.user) {
+    //   throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
+    // }
     res.clearCookie('token');
     res.status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (error) {
@@ -93,7 +93,7 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
     //   throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     // }
     const username = req.user?.username;
-    console.log(username)
+    console.log(username);
     const userData = await userService.getUser(username);
 
     if (!userData) {
