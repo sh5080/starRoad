@@ -154,7 +154,7 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
 // [관리자] 관광지 추가하기
 export const addTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const imgName = req.file ? `http://localhost:3000/static/compressed/${req.file.filename}` : '';
+    const imgName = req.file ? `http://localhost:3000/images/compressed/${req.file.filename}` : '';
 
     const { name_en, name_ko, introduction } = req.body;
 
