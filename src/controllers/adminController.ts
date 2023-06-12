@@ -155,6 +155,7 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
 export const addTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const imgName = req.file ? `http://localhost:3000/images/compressed/${req.file.filename}` : '';
+    // 로컬에서 테스트 시 images => static으로 변경
 
     const { name_en, name_ko, introduction } = req.body;
 
