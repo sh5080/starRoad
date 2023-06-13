@@ -67,42 +67,54 @@ export const getTravelPlanByPlanId = async (plan_id: string): Promise<TravelPlan
   }
 };
 
-export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
-  try {
-    await db.execute(
-      'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ?',
-      [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id]
-    );
-  } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 수정에 실패했습니다.', 500);
-  }
-};
+// 여행 일정 수정 ( -> 삭제만 하는 걸로 하기로 함 )
+// export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
+//   try {
+//     await db.execute(
+//       'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ?',
+//       [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id]
+//     );
+//   } catch (error) {
+//     console.error(error);
+//     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 수정에 실패했습니다.', 500);
+//   }
+// };
 
 export const updateTravelLocation = async (
   username: string,
   travelLocation: TravelLocation
-): Promise<{ myLocation: RowDataPacket[]; myPlan: RowDataPacket[] }> => {
+): Promise<TravelLocation> => {
   try {
-    const [myPlan] = (await db.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?', [
-      travelLocation.plan_id,
-      username,
-    ])) as [RowDataPacket[], FieldPacket[]];
-    const [myLocation] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
-      travelLocation.location_id,
-    ])) as [RowDataPacket[], FieldPacket[]];
-
+    // Perform the update query
     await db.execute(
-      'UPDATE travel_location SET location = ?, date = ?, `order` = ? WHERE plan_id = ? AND location_id = ?',
+      'UPDATE travel_location SET location = ?, date = ?, `order` = ?, latitude = ?, longitude = ? WHERE plan_id = ? AND location_id = ?',
       [
         travelLocation.location,
         travelLocation.newDate,
         travelLocation.order,
+        travelLocation.latitude,
+        travelLocation.longitude,
         travelLocation.plan_id,
         travelLocation.location_id,
       ]
     );
-    return { myLocation, myPlan };
+
+    const [rawLocation] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
+      travelLocation.location_id,
+    ])) as [RowDataPacket[], FieldPacket[]];
+
+    // Convert rawLocation (a RowDataPacket) to TravelLocation type
+    let updatedLocation: TravelLocation = {
+      location_id: rawLocation[0].location_id,
+      plan_id: rawLocation[0].plan_id,
+      location: rawLocation[0].location,
+      newDate: rawLocation[0].date,
+      order: rawLocation[0].order,
+      latitude: rawLocation[0].latitude,
+      longitude: rawLocation[0].longitude,
+    };
+
+    return updatedLocation;
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜별 장소 수정에 실패했습니다.', 500);

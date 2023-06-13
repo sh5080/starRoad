@@ -134,7 +134,7 @@ export const getTravelPlanDetailController = async (req: CustomRequest, res: Res
   }
 };
 
-// 여행 일정 및 날짜별 장소 수정
+// 여행 일정의 날짜별 장소 수정
 export const updateTravelPlanAndLocationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
@@ -142,30 +142,33 @@ export const updateTravelPlanAndLocationController = async (req: CustomRequest, 
     }
 
     const { plan_id } = req.params;
-    const { dates, start_date, end_date, destination, ...extraFields } = req.body;
+    // const { dates, start_date, end_date, destination, ...extraFields } = req.body;
+    const { dates, ...extraFields } = req.body;
+    console.log(dates);
+    
     const { username } = req.user;
 
     if (Object.keys(extraFields).length > 0) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
 
-    const startDate: Date | string | undefined = start_date ? new Date(start_date) : undefined;
-    const endDate: Date | string | undefined = end_date ? new Date(end_date) : undefined;
-    if ((startDate && startDate.toString() === 'Invalid Date') || (endDate && endDate.toString() === 'Invalid Date')) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
-    }
-    if (startDate && endDate && startDate > endDate) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜 범위입니다.', 400);
-    }
+    // const startDate: Date | string | undefined = start_date ? new Date(start_date) : undefined;
+    // // const endDate: Date | string | undefined = end_date ? new Date(end_date) : undefined;
+    // if ((startDate && startDate.toString() === 'Invalid Date') || (endDate && endDate.toString() === 'Invalid Date')) {
+    //   throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
+    // }
+    // if (startDate && endDate && startDate > endDate) {
+    //   throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜 범위입니다.', 400);
+    // }
 
-    // 여행 일정 수정
-    await travelService.updatePlan(username, {
-      plan_id: Number(plan_id),
-      username,
-      start_date,
-      end_date,
-      destination,
-    });
+    // // 여행 일정 수정
+    // await travelService.updatePlan(username, {
+    //   plan_id: Number(plan_id),
+    //   username,
+    //   start_date,
+    //   end_date,
+    //   destination,
+    // });
 
     // 각 날짜별 장소 수정
     if (dates) {
@@ -176,14 +179,16 @@ export const updateTravelPlanAndLocationController = async (req: CustomRequest, 
 
         // 각 날짜에 대해 location을 수정
         if (dateInfo.locations) {
-          for (const location of dateInfo.locations) {
-            await travelService.updateLocation(
+          for (let i = 0; i < dateInfo.locations.length; i++) {
+            dateInfo.locations[i] = await travelService.updateLocation(
               {
                 plan_id: Number(plan_id),
-                location_id: location.location_id, // assuming location_id is a property of the location object
+                location_id: dateInfo.locations[i].location_id,
                 newDate: dateInfo.date,
-                location: location.location,
-                order: location.order,
+                location: dateInfo.locations[i].location,
+                order: dateInfo.locations[i].order,
+                latitude: dateInfo.locations[i].latitude,
+                longitude: dateInfo.locations[i].longitude,
               },
               username
             );
@@ -192,7 +197,7 @@ export const updateTravelPlanAndLocationController = async (req: CustomRequest, 
       }
     }
 
-    res.status(200).json(req.body);
+    res.status(200).json({ dates });
   } catch (error) {
     console.error(error);
     next(error);
