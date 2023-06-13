@@ -17,7 +17,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     const { title, content, image, ...extraFields } = req.body;
     const { plan_id } = req.params;
     const username = req.user?.username;
-    console.log(image);
+    //console.log(image);
     
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
@@ -38,12 +38,14 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
 
     if (req.files && 'image' in req.files) {
       for (let file of req.files['image']) {
-        const inputPath = `../../public/${file.filename}`;
-        const compressed = `../../public/compressed/${file.filename}`;
+        const inputPath = `/Users/seunghwankim/myproject/intro-me/intro-me/back-end/public/${req.file?.filename}`;
+        const compressed = `/Users/seunghwankim/myproject/intro-me/intro-me/back-end/public/compressed/${req.file?.filename}`;
         await compressImage(inputPath, compressed, 600, 600);
-        fs.unlinkSync(`../../public/${file.filename}`);
+        fs.unlinkSync(`/Users/seunghwankim/myproject/intro-me/intro-me/back-end/public/${req.file?.filename}`);
       }
     }
+
+
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);

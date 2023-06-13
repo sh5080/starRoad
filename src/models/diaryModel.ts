@@ -13,9 +13,6 @@ export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<
       diary.content,
       image,
       diary.destination,
-
-     // console.log(plan.plan_id)
-      console.log(diary.destination)
     ]);
   } catch (error) {
     console.error(error);
