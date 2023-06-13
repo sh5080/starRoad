@@ -34,7 +34,6 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     await compressImage(inputPath, compressed, 600, 600);
     fs.unlinkSync(`../../public/${req.file?.filename}`);
 
-
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);
