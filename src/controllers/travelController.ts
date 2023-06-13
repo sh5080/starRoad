@@ -144,7 +144,6 @@ export const updateTravelPlanAndLocationController = async (req: CustomRequest, 
     const { plan_id } = req.params;
     // const { dates, start_date, end_date, destination, ...extraFields } = req.body;
     const { dates, ...extraFields } = req.body;
-    console.log(dates);
     
     const { username } = req.user;
 

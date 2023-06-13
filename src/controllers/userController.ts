@@ -54,10 +54,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     const token = await userService.loginUser(username, password);
     // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
-    console.log('token= ', token);
     res.cookie('token', token, {
       httpOnly: true,
-      // secure: true, // Uncomment this line if you're serving over HTTPS
+      // secure: true, // HTTPS시에
       maxAge: 7200000, // 쿠키의 유효 시간 설정(예: 2 hours)
       // sameSite: 'none', // SameSite 옵션 설정
       // 필요에 따라 쿠키 설정을 추가할 수 있습니다.
@@ -70,9 +69,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 };
 export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    // if (!req.user) {
-    //   throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
-    // }
     res.clearCookie('token');
     res.status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (error) {

@@ -48,7 +48,6 @@ export const kakaoLogin = async (req: CustomRequest, res: Response, next: NextFu
       const token = await authService.OauthLoginUser(existingUser.username || '');
 
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
-      console.log('token= ', token);
       res.cookie('token', token, {
         httpOnly: true,
         // secure: true, // Uncomment this line if you're serving over HTTPS
@@ -103,7 +102,6 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
       },
     });
     const googleEmail = googleInfo.data.email;
-    //console.log(googleEmail); //구글 데이터
     // 기존 사용자 여부 이메일로 확인
     const existingInfo = await authService.getUserForOauth(googleEmail);
     // 회원가입 및 로그인 처리 등 필요한 로직 수행
@@ -112,7 +110,6 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
       const token = await authService.OauthLoginUser(existingInfo.username || '');
     
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
-      console.log('token= ', token);
       res.cookie('token', token, {
         httpOnly: true,
         maxAge: 7200000, 

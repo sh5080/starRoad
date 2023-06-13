@@ -4,9 +4,7 @@ import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
 
 export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<void> => {
-  //console.log(plan)
   try {
-    // const image = diary.image ? encodeURI(diary.image) : '';
     await db.execute('INSERT INTO travel_diary (plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?)', [
       plan.plan_id,
       diary.title,

@@ -1,12 +1,12 @@
-import mysql,{ Pool } from 'mysql2/promise';
+import mysql, { Pool } from 'mysql2/promise';
 import config from '../config';
 
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = config.database;
-export let db:Pool; 
+export let db: Pool;
 
 export const dbLoader = async () => {
   try {
-      db = await mysql.createPool({
+    db = await mysql.createPool({
       host: DB_HOST,
       user: DB_USER,
       password: DB_PASSWORD,
@@ -21,4 +21,3 @@ export const dbLoader = async () => {
     throw error;
   }
 };
-

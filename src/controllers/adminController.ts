@@ -4,6 +4,10 @@ import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
+import config from '../config';
+const IMG_PATH = config.server.IMG_PATH;
+const DELETE_INPUT_PATH = config.paths.DELETE_INPUT_PATH;
+const DELETE_COMPRESSED_PATH = config.paths.DELETE_COMPRESSED_PATH;
 
 // [관리자] 모든 회원 조회하기
 export const getAllUsersController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -154,8 +158,16 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
 // [관리자] 관광지 추가하기
 export const addTouristDestinationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const imgName = req.file ? `http://localhost:3000/images/compressed/${req.file.filename}` : '';
-    // 로컬에서 테스트 시 images => static으로 변경
+    let imgName = '';
+    let inputPath = '';
+    let compressed = '';
+
+    if (req.files && Array.isArray(req.files)) {
+      const files = req.files as Express.Multer.File[];
+      imgName = files.length > 0 ? `${IMG_PATH}/${files[0].filename}` : '';
+      inputPath = files.length > 0 ? `/${DELETE_INPUT_PATH}/${files[0].filename}` : '';
+      compressed = files.length > 0 ? `/${DELETE_COMPRESSED_PATH}/${files[0].filename}` : '';
+    }
 
     const { name_en, name_ko, introduction, latitude, longitude } = req.body;
 
@@ -172,10 +184,11 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
       Number(longitude)
     );
 
-    const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`;
-    const compressed = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${req.file?.filename}`;
-    await compressImage(inputPath, compressed, 600, 600);
-    fs.unlink(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`);
+    if (inputPath && compressed) {
+      await compressImage(inputPath, compressed, 600, 600);
+      fs.unlink(inputPath);
+    }
+
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);
@@ -215,7 +228,7 @@ export const deleteTouristDestinationController = async (req: CustomRequest, res
 
       // imgName 파일을 찾아서 삭제
       // 상대경로 오류남 -> 절대경로로 수정
-      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed${imgName}`;
+      const filePath = `/${DELETE_COMPRESSED_PATH}/${imgName}`;
 
       fs.unlink(filePath);
     }

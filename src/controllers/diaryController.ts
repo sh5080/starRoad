@@ -4,21 +4,21 @@ import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
+import config from '../config';
+const IMG_PATH = config.server.IMG_PATH;
+const DELETE_INPUT_PATH = config.paths.DELETE_INPUT_PATH;
+const DELETE_COMPRESSED_PATH = config.paths.DELETE_COMPRESSED_PATH;
 
 // 다이어리 작성(이미지 포함)
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    console.log('컨트롤러들어옴');
-    console.log(req.files); // 배열
-
     let imgNames: string[] = [];
 
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
-      imgNames = files.map((file) => `http://localhost:3000/static/compressed/${file.filename}`);
+      imgNames = files.map((file) => `${IMG_PATH}/${file.filename}`);
     }
 
-    console.log('imgNames = ', imgNames);
     const { title, content, ...extraFields } = req.body;
 
     const { plan_id } = req.params;
@@ -44,10 +44,10 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
       const promises = files.map(async (file) => {
-        const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${file.filename}`;
-        const compressed = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${file.filename}`;
+        const inputPath = `/${DELETE_INPUT_PATH}/${file.filename}`;
+        const compressed = `/${DELETE_COMPRESSED_PATH}/${file.filename}`;
         await compressImage(inputPath, compressed, 600, 600);
-        fs.unlink(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${file.filename}`);
+        fs.unlink(`${DELETE_INPUT_PATH}/${file.filename}`);
       });
 
       await Promise.all(promises);
@@ -142,7 +142,7 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
     if (deletedDiary.image) {
       const imgName = String(deletedDiary.image).split('/compressed')[1];
 
-      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/compressed
+      const filePath = `/${DELETE_COMPRESSED_PATH}
       /${imgName}`;
       fs.unlink(filePath);
     }

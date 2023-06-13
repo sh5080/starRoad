@@ -9,13 +9,28 @@ const router = Router();
 router.get('/users/:plan_id/locations', validateToken, ensureAdmin, adminController.getUserInfoAllLocationController);
 
 // [관리자] 회원이 작성한 댓글 삭제하기
-router.delete('/users/:username/:diary_id/:comment_id/comments', validateToken, ensureAdmin, adminController.deleteCommentByAdminController);
+router.delete(
+  '/users/:username/:diary_id/:comment_id/comments',
+  validateToken,
+  ensureAdmin,
+  adminController.deleteCommentByAdminController
+);
 
 // [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기
-router.get('/users/:username/diary/:diary_id/comments', validateToken, ensureAdmin, adminController.getUserInfoAllCommentController);
+router.get(
+  '/users/:username/diary/:diary_id/comments',
+  validateToken,
+  ensureAdmin,
+  adminController.getUserInfoAllCommentController
+);
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-router.delete('/users/:username/:diary_id/diary', validateToken, ensureAdmin, adminController.deleteDiaryByAdminController);
+router.delete(
+  '/users/:username/:diary_id/diary',
+  validateToken,
+  ensureAdmin,
+  adminController.deleteDiaryByAdminController
+);
 
 // [관리자] 회원이 작성한 여행 일정 조회하기
 router.get('/users/:username/plans', validateToken, ensureAdmin, adminController.getAllUserInfoTravelController);
@@ -42,6 +57,11 @@ router.post('/locations', validateToken, ensureAdmin, processImage, adminControl
 router.patch('/locations/:location_id', validateToken, ensureAdmin, adminController.updateTouristDestinationController);
 
 // [관리자] 관광지 삭제하기
-router.delete('/locations/:location_id', validateToken, ensureAdmin, adminController.deleteTouristDestinationController);
+router.delete(
+  '/locations/:location_id',
+  validateToken,
+  ensureAdmin,
+  adminController.deleteTouristDestinationController
+);
 
 export default router;

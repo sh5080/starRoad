@@ -3,6 +3,20 @@ import { Config } from '../types/config';
 dotenv.config();
 
 const config: Config = {
+  port: process.env.SERVER_MODE === 'PRO' ? Number(process.env.PRO_PORT) : Number(process.env.DEV_PORT),
+
+  paths: {
+    DELETE_INPUT_PATH: String(process.env.DELETE_INPUT_PATH),
+    DELETE_COMPRESSED_PATH: String(process.env.DELETE_COMPRESSED_PATH),
+  },
+
+  server: {
+    SERVER_MODE: process.env.SERVER_MODE || 'DEV',
+    SERVER_URL:
+      process.env.SERVER_MODE === 'PRO' ? String(process.env.PRO_SERVER_URL) : String(process.env.DEV_SERVER_URL),
+    IMG_PATH: process.env.SERVER_MODE === 'PRO' ? String(process.env.PRO_IMG_PATH) : String(process.env.DEV_IMG_PATH),
+  },
+
   jwt: {
     ACCESS_TOKEN_SECRET:
       process.env.ACCESS_TOKEN_SECRET ||
@@ -17,11 +31,7 @@ const config: Config = {
     REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
     ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN || '12h',
   },
-  port:
-    process.env.PORT ||
-    (() => {
-      throw new Error('PORT 환경 변수가 필요합니다.');
-    })(),
+
   database: {
     DB_HOST:
       process.env.DB_HOST ||
