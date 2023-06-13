@@ -10,29 +10,33 @@ import destinationRouter from '../api/routes/destinationRoutes';
 import axios from 'axios';
 import config from '../config/index';
 import path from 'path';
+
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = config.google;
 const { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } = config.kakao;
 const routeLoader = (app: Application): Application => {
+  
   // 배포시
-  app.use(express.static(path.join(__dirname, '../../../frontend/dist')));
+  // app.use(express.static(path.join(__dirname, '../../../frontend/dist')));
+
+
   app.get('/', (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, '../../../frontend/dist/index.html'));
+    res.send('hello world');
   });
 
   app.get('/auth/google/callback', async (req, res) => {
     const code = req.query.code;
-    
+
     // oauth 위임을 위한 절차
     try {
       const response = await axios.post('https://oauth2.googleapis.com/token', {
-        code:code,
+        code: code,
         client_id: GOOGLE_CLIENT_ID,
         client_secret: GOOGLE_CLIENT_SECRET,
         redirect_uri: GOOGLE_REDIRECT_URI,
         grant_type:'authorization_code', 
         
       });
-      console.log(GOOGLE_CLIENT_ID)
+      // console.log(GOOGLE_CLIENT_ID);
       const accessToken = response.data.access_token;
 
       // 구글에서 유저인포 가져오기위한작업
@@ -41,7 +45,7 @@ const routeLoader = (app: Application): Application => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(userInfo.data);
+      // console.log(userInfo.data);
       // 최소한으로 db 에 저장해야 회원가입.
       // email과 가입유형
       // 따로나눠서 저장

@@ -149,18 +149,25 @@ export const addTouristDestinationModel = async (
   name_en: string,
   name_ko: string,
   image: string,
-  introduction: string
+  introduction: string,
+  latitude: number,
+  longitude: number
 ): Promise<void> => {
   try {
     const encodedImage = image ? encodeURI(image) : '';
-    
-    await db.execute('INSERT INTO travel_destination (name_en, name_ko, image, introduction) VALUES (?, ?, ?, ?)', [
-      name_en,
-      name_ko,
-      encodedImage,
-      // image,
-      introduction,
-    ]);
+
+    await db.execute(
+      'INSERT INTO travel_destination (name_en, name_ko, image, introduction, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        name_en,
+        name_ko,
+        encodedImage,
+        // image,
+        introduction,
+        latitude,
+        longitude,
+      ]
+    );
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to add tourist destination', 500);

@@ -13,6 +13,8 @@ export interface CustomRequest extends Request {
     comment_id?: string;
   };
   body: {
+    latitude?: number;
+    longitude?: number;
     id?: number;
     username: string;
     diary_id?: number; // Add this if diary_id comes from body

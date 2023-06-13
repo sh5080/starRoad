@@ -3,7 +3,6 @@ import * as userService from '../services/userService';
 import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 import { UserType } from '../types/user';
-
 // 회원가입
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -74,8 +73,7 @@ export const logout = async (req: CustomRequest, res: Response, next: NextFuncti
     // if (!req.user) {
     //   throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     // }
-    res.clearCookie('token' ,{ domain: 'localhost', path: '/' });
-
+    res.clearCookie('token');
     res.status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (error) {
     console.error(error);
@@ -95,7 +93,7 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
     //   throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     // }
     const username = req.user?.username;
-    console.log(username)
+    console.log(username);
     const userData = await userService.getUser(username);
 
     if (!userData) {
