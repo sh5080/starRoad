@@ -8,7 +8,8 @@ import { compressImage } from '../api/middlewares/sharp';
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const imgName = req.file ? `https://localhost:3000/static/compressed/${req.file.filename}` : '';
-    const { title, content, image, plan_id, ...extraFields } = req.body;
+    const { title, content, image, ...extraFields } = req.body;
+    const plan_id = req.params
     const username = req.user?.username;
 
     if (!username) {
@@ -23,7 +24,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     }
 
     const diary = await diaryService.createDiary(
-      { username, plan_id, title, content, image: imgName },
+      { username, title, content, image: imgName },
       username,
       Number(plan_id)
     );
