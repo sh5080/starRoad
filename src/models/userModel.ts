@@ -1,9 +1,9 @@
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { db } from '../loaders/dbLoader';
 import { AppError, CommonError } from '../types/AppError';
-import { UserType } from '../types/user';
+import * as User from '../types/user';
 
-export const createUser = async (user: UserType): Promise<void> => {
+export const createUser = async (user: User.UserType): Promise<void> => {
   try {
     await db.execute('INSERT INTO user (name, username, password, email) VALUES (?, ?, ?, ?)', [
       user.name,
@@ -17,11 +17,12 @@ export const createUser = async (user: UserType): Promise<void> => {
   }
 };
 
-export const getUserByUsername = async (username?: string): Promise<UserType | null> => {
+
+export const getUserByUsername = async (username?: string): Promise<User.UserType | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM user WHERE username = ?', [username]);
     if (Array.isArray(rows) && rows.length > 0) {
-      const userData = rows[0] as UserType;
+      const userData = rows[0] as User.UserType;
       return userData;
     }
     return null;
@@ -32,11 +33,25 @@ export const getUserByUsername = async (username?: string): Promise<UserType | n
     }
   }
 };
+export const getUserByEmail = async (email?: string): Promise<User.UserType | null> => {
+  try {
+    const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const userData = rows[0] as User.UserType;
+      return userData;
+    }
+    return null;
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
+  }
+};
+
 
 export const updateUserByUsername = async (
   userId: string,
-  updateData: Partial<Pick<UserType, 'email' | 'password'>>
-): Promise<UserType | null> => {
+  updateData: Partial<Pick<User.UserType, 'email' | 'password'>>
+): Promise<User.UserType | null> => {
   try{const { email, password } = updateData;
 
   await db.execute('UPDATE user SET email = ?, password = ? WHERE username = ?', [email, password, userId]);
@@ -51,7 +66,7 @@ export const updateUserByUsername = async (
 }
 };
 
-export const deleteUserByUsername = async (username: string): Promise<UserType | null> => {
+export const deleteUserByUsername = async (username: string): Promise<User.UserType | null> => {
 try{  const [result] = await db.execute<RowDataPacket[]>('SELECT * FROM user WHERE username = ?', [username]);
 
   if (result.length === 0) {
@@ -61,7 +76,7 @@ try{  const [result] = await db.execute<RowDataPacket[]>('SELECT * FROM user WHE
   const [deletedUser] = result;
   await db.execute<OkPacket>('DELETE FROM user WHERE username = ?', [username]);
 
-  return deletedUser as UserType;
+  return deletedUser as User.UserType;
 }catch (error) {
   console.error(error);
   {

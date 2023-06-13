@@ -8,3 +8,10 @@ export interface UserType {
   accessToken?: string;
   activated?: number;
 }
+export interface OauthUser extends UserType {
+  username: string;
+  email: string;
+  activated?: number;
+  oauthProvider: 'kakao' | 'google';
+
+}

@@ -19,6 +19,9 @@ export const compressImage = async (
       case 'jpeg':
         await image.jpeg({ quality: 80 }).toFile(outputPath);
         break;
+      case 'jpg':
+        await image.jpeg({ quality: 80 }).toFile(outputPath);
+        break;
       case 'png':
         await image.png({ quality: 80 }).toFile(outputPath);
         break;
