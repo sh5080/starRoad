@@ -28,7 +28,8 @@ const upload = multer({ storage: storage });
 
 // 미들웨어 함수
 export const processImage = (req: Request, res: Response, next: NextFunction) => {
-  upload.single('image')(req, res, (err) => {
+  upload.array('image', 4)(req, res, (err) => {
+    // upload.array 사용
     if (err) {
       return next(new AppError(CommonError.RESOURCE_NOT_FOUND, '업로드중 에러 발생', 400));
     } else {

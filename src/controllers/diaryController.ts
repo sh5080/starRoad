@@ -7,11 +7,18 @@ import { compressImage } from '../api/middlewares/sharp';
 
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const imgName = req.file ? `https://localhost:3000/static/compressed/${req.file.filename}` : '';
+    let imgNames = '';
+    if (req.files && 'image' in req.files) {
+      // Check if files exist and 'image' field exists
+      imgNames = req.files['image']
+        .map((file) => `https://localhost:3000/static/compressed/${file.filename}`)
+        .join(' ');
+    }
     const { title, content, image, ...extraFields } = req.body;
-    const {plan_id} = req.params
+    const { plan_id } = req.params;
     const username = req.user?.username;
-
+    console.log(image);
+    
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
@@ -24,16 +31,19 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     }
 
     const diary = await diaryService.createDiary(
-      { username, title, content, image: imgName },
+      { username, title, content, image: imgNames },
       username,
       Number(plan_id)
     );
 
-    const inputPath = `../../public/${req.file?.filename}`;
-    const compressed = `../../public/compressed/${req.file?.filename}`;
-    await compressImage(inputPath, compressed, 600, 600);
-    fs.unlinkSync(`../../public/${req.file?.filename}`);
-
+    if (req.files && 'image' in req.files) {
+      for (let file of req.files['image']) {
+        const inputPath = `../../public/${file.filename}`;
+        const compressed = `../../public/compressed/${file.filename}`;
+        await compressImage(inputPath, compressed, 600, 600);
+        fs.unlinkSync(`../../public/${file.filename}`);
+      }
+    }
     res.status(201).json(diary);
   } catch (error) {
     console.error(error);
