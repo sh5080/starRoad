@@ -12,14 +12,14 @@ if (!fs.existsSync('public')) {
 const storage = multer.diskStorage({
   destination: function (
     req: Request,
-    file: Express.Multer.File,
+    files: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) {
     cb(null, './public');
   },
-  filename: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
+  filename: function (req: Request, files: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
     // 유니크한 파일명
-    cb(null, crypto.randomUUID() + '-' + file.originalname);
+    cb(null, crypto.randomUUID() + '-' + files.originalname);
   },
 });
 

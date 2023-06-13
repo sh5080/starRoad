@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express';
 import { AppError, CommonError } from '../types/AppError';
 import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
-import * as fs from 'node:fs';
+import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
 
 // [관리자] 모든 회원 조회하기
@@ -175,7 +175,7 @@ export const addTouristDestinationController = async (req: CustomRequest, res: R
     const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`;
     const compressed = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${req.file?.filename}`;
     await compressImage(inputPath, compressed, 600, 600);
-    fs.unlinkSync(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`);
+    fs.unlink(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${req.file?.filename}`);
     res.status(200).json({ message });
   } catch (err) {
     console.error(err);
@@ -217,13 +217,9 @@ export const deleteTouristDestinationController = async (req: CustomRequest, res
       // 상대경로 오류남 -> 절대경로로 수정
       const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed${imgName}`;
 
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error(err);
-        }
-        console.log('File deleted successfully');
-      });
+      fs.unlink(filePath);
     }
+    console.log('이미지 파일 삭제 완료');
 
     res.status(200).json({ deletedData });
   } catch (err) {

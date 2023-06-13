@@ -5,19 +5,25 @@ import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
 
+// 다이어리 작성(이미지 포함)
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    let imgNames = '';
-    if (req.files && 'image' in req.files) {
-      // Check if files exist and 'image' field exists
-      imgNames = req.files['image']
-        .map((file) => `https://localhost:3000/static/compressed/${file.filename}`)
-        .join(' ');
+    console.log('컨트롤러들어옴');
+    console.log(req.files); // 배열
+
+    let imgNames: string[] = [];
+
+    if (req.files && Array.isArray(req.files)) {
+      const files = req.files as Express.Multer.File[];
+      imgNames = files.map((file) => `http://localhost:3000/static/compressed/${file.filename}`);
     }
-    const { title, content, image, ...extraFields } = req.body;
+
+    console.log('imgNames = ', imgNames);
+    const { title, content, ...extraFields } = req.body;
+
     const { plan_id } = req.params;
     const username = req.user?.username;
-    
+
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
@@ -35,15 +41,17 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
       Number(plan_id)
     );
 
-    if (req.files && 'image' in req.files) {
-      for (let file of req.files['image']) {
-        const inputPath = `/Users/seunghwankim/myproject/intro-me/intro-me/back-end/public/${req.file?.filename}`;
-        const compressed = `/Users/seunghwankim/myproject/intro-me/intro-me/back-end/public/compressed/${req.file?.filename}`;
+    if (req.files && Array.isArray(req.files)) {
+      const files = req.files as Express.Multer.File[];
+      const promises = files.map(async (file) => {
+        const inputPath = `/Users/heesankim/Desktop/eliceProject2/back-end/public/${file.filename}`;
+        const compressed = `/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${file.filename}`;
         await compressImage(inputPath, compressed, 600, 600);
-        fs.unlink(`/Users/seunghwankim/myproject/intro-me/intro-me/back-end/public/${req.file?.filename}`);
-      }
-    }
+        fs.unlink(`/Users/heesankim/Desktop/eliceProject2/back-end/public/${file.filename}`);
+      });
 
+      await Promise.all(promises);
+    }
 
     res.status(201).json(diary);
   } catch (error) {
@@ -132,14 +140,14 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 여행기가 아닙니다.', 404);
     }
     if (deletedDiary.image) {
-      const imgName = deletedDiary.image.split('/compressed')[1];
+      const imgName = String(deletedDiary.image).split('/compressed')[1];
 
       const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/compressed
       /${imgName}`;
       fs.unlink(filePath);
     }
-    console.log("이미지 삭제 성공");
-    
+    console.log('이미지 삭제 성공');
+
     res.status(200).json(deletedDiary);
   } catch (error) {
     console.error(error);

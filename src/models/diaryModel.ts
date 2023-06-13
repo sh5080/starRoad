@@ -6,12 +6,12 @@ import { AppError, CommonError } from '../types/AppError';
 export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<void> => {
   //console.log(plan)
   try {
-    const image = diary.image ? encodeURI(diary.image) : '';
+    // const image = diary.image ? encodeURI(diary.image) : '';
     await db.execute('INSERT INTO travel_diary (plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?)', [
       plan.plan_id,
       diary.title,
       diary.content,
-      image,
+      JSON.stringify(diary.image),
       diary.destination,
     ]);
   } catch (error) {
@@ -75,7 +75,6 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
     throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
   }
 };
-
 
 export const getOneDiaryByUsername = async (diary_id: number): Promise<Diary | null> => {
   try {

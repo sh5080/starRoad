@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import { validateToken } from '../middlewares/jwt';
-import { ensureAdmin } from '../middlewares/admin';
 import * as commentController from '../../controllers/commentController';
-
 
 const router = Router();
 
@@ -12,4 +10,3 @@ router.patch('/:comment_id', validateToken, commentController.updateCommentContr
 router.delete('/:comment_id', validateToken, commentController.deleteCommentController); // comment의 id값 입력
 
 export default router;
-
