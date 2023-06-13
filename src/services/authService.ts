@@ -65,8 +65,8 @@ export const OauthSignupUser = async (user: User.OauthUser): Promise<User.OauthU
     if (!user) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
     }
-    const { id,  ...userData } = user;
-  
+    const { id,  password, ...userData } = user;
+    //console.log(userData)
     return userData;
   };
   

@@ -93,7 +93,6 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
     //   throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
     // }
     const username = req.user?.username;
-    console.log(username);
     const userData = await userService.getUser(username);
 
     if (!userData) {
