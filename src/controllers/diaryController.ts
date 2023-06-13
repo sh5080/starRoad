@@ -9,7 +9,9 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
   try {
     const imgName = req.file ? `https://localhost:3000/static/compressed/${req.file.filename}` : '';
     const { title, content, image, ...extraFields } = req.body;
-    const plan_id = req.params
+    const { plan_id } = req.params;
+    console.log(plan_id);
+
     const username = req.user?.username;
 
     if (!username) {
@@ -33,7 +35,6 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     const compressed = `../../public/compressed/${req.file?.filename}`;
     await compressImage(inputPath, compressed, 600, 600);
     fs.unlinkSync(`../../public/${req.file?.filename}`);
-
 
     res.status(201).json(diary);
   } catch (error) {
