@@ -81,7 +81,6 @@ export const googleLogin = (req: CustomRequest, res: Response, next: NextFunctio
   const loginUrl = authService.generateLoginUrl();
   res.redirect(loginUrl);
 };
-
 export const googleCallback = async (req: CustomRequest, res: Response, next: NextFunction) => {
   const code = req.query.code;
 
@@ -108,8 +107,7 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
     // 기존 사용자 여부 이메일로 확인
     const existingInfo = await authService.getUserForOauth(googleEmail);
     // 회원가입 및 로그인 처리 등 필요한 로직 수행
-
-    if (existingInfo.email === googleEmail) {
+    if (existingInfo) {
       // 기존에 회원 가입되어 있는 경우, 해당 유저로 로그인
       const token = await authService.OauthLoginUser(existingInfo.username || '');
     
@@ -117,32 +115,27 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
       console.log('token= ', token);
       res.cookie('token', token, {
         httpOnly: true,
-        // secure: true, // Uncomment this line if you're serving over HTTPS
-        maxAge: 7200000, // 쿠키의 유효 시간 설정(예: 2 hours)
-        // sameSite: 'none', // SameSite 옵션 설정
-        // 필요에 따라 쿠키 설정을 추가할 수 있습니다.
-      });
-   
+        maxAge: 7200000, 
 
+      });
       res.status(200).json({ message: '구글 로그인 성공!', user: existingInfo });
     } else {
+
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
-      const newUser = await authService.OauthSignupUser(existingInfo);
-      const token = await authService.OauthLoginUser(newUser.username);
-
-      res.cookie('token', token, {
-        httpOnly: true,
-        maxAge: 7200000,
-      });
-
-      res.status(200).json({ message: '간편 로그인되었습니다.', user: newUser });
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '회원 가입되어 있지 않습니다.', 404);
+      try {
+        const newInfo = await authService.OauthSignupUser({
+          username: googleEmail,
+          email: googleEmail,
+          oauthProvider: 'google',
+        });
+        res.status(200).json({ message: '회원가입되었습니다.', user: newInfo });
+      } catch (error) {
+        console.error(error);
+        throw new AppError(CommonError.UNEXPECTED_ERROR, '간편 회원가입 실패', 500);
+      }
     }
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Authentication failed.');
+  } catch (error) {
+    console.error(error);
+    next(error)
   }
 };
-
-//export default { googleCallback };

@@ -3,28 +3,17 @@ import { db } from '../loaders/dbLoader';
 import { AppError, CommonError } from '../types/AppError';
 import * as User from '../types/user';
 
-// export const saveOauthUser = async (OauthUser: User.OauthUser):Promise<User.OauthUser> => {
-//     try{ const { username, email, oauthProvider } = OauthUser;
-//      const query = 'INSERT INTO user (username, email, oauth_provider) VALUES (?, ?, ?)';
-//    await db.execute(query, [username, email, oauthProvider]);
-
-//      return OauthUser
-//    }catch(error){
-//      console.error(error)
-//      throw new AppError(CommonError.UNEXPECTED_ERROR,'간편 로그인 실패',500)
-//    }
-//    };
-
 export const saveOauthUser = async (user: User.OauthUser): Promise<User.OauthUser> => {
-  const query = 'INSERT INTO user (username, email, oauth_provider) VALUES (?, ?, ?)';
-  const values = [user.username, user.email, user.oauthProvider];
+  const query = 'INSERT INTO user (username, name, email, oauth_provider, password) VALUES (?, ?, ?, ?, ?)';
+  const values = [user.username, user.username, user.email, user.oauthProvider, null];
 
-  const [result] = await db.query<ResultSetHeader>(query, values);
+  const [result] = await db.execute<ResultSetHeader>(query, values);
   const insertId = result.insertId;
 
   const createdUser: User.OauthUser = {
     ...user,
     id: insertId,
+    name:user.username
   };
 
   return createdUser;

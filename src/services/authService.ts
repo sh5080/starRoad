@@ -12,15 +12,15 @@ const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 
-export const OauthSignupUser = async (user: User.OauthUser): Promise<User.OauthUser> => {
+export const OauthSignupUser = async (user: User.OauthUser) => {
     try {
       // 이메일과 이름을 기반으로 사용자를 생성하고, 필요한 추가 정보를 설정합니다.
-      const newUser: User.OauthUser = {
-        id: user.id,
-        username: generateUsername(user.username),
+      const newUser:User.OauthUser = {
+        username: await generateUsername(user.username),
         email: user.email,
-        oauthProvider: user.oauthProvider,
+        oauthProvider: 'google',
       };
+   
   
       // 생성된 사용자를 저장하고 반환합니다.
       const createdUser = await authModel.saveOauthUser(newUser);
@@ -32,11 +32,9 @@ export const OauthSignupUser = async (user: User.OauthUser): Promise<User.OauthU
     }
   };
   
-    const generateUsername = (name: string): string => {
-      // 사용자 이름을 기반으로 고유한 사용자명을 생성하는 로직을 구현
-      // 사용자 이름의 일부와 랜덤한 숫자를 조합하여 사용자명 생성
-      const randomSuffix = Math.floor(Math.random() * 10000);
-      return `${name.replace(' ', '')}_${randomSuffix}`;
+  const generateUsername = async (username: string): Promise<string> => {
+    const randomSuffix = Math.floor(Math.random() * 10000);
+    return `${username.replace(' ', '')}_${randomSuffix}`;
   };
   export const OauthLoginUser = async (username: string): Promise<object> => {
     const user = await authModel.getUserByUsername(username);
@@ -59,13 +57,14 @@ export const OauthSignupUser = async (user: User.OauthUser): Promise<User.OauthU
   
     return { accessToken, refreshToken };
   };
-  export const getUserForOauth = async (email?: string) => {
+  export const getUserForOauth = async (email: string) => {
     const user = await authModel.getUserByEmail(email);
   
     if (!user) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
+     // throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
+    return (user)
     }
-    const { id,  password, ...userData } = user;
+    const { ...userData } = user;
     //console.log(userData)
     return userData;
   };
