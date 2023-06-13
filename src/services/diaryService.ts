@@ -9,12 +9,22 @@ export const createDiary = async (
   plan_id: number
   ) => {
     const plan = await diaryModel.getPlan(plan_id, username);
+    //console.log(plan)
+   // console.log(diary)
     if (!plan) {
       throw new AppError(CommonError.INVALID_INPUT, '나의 일정만 여행기를 등록할 수 있습니다.', 404);
     }
     const { destination } = plan; // 일정의 destination 값
     diary.destination = destination;
-    await diaryModel.createDiaryByUsername(diary);
+    
+    const { title, content, image } = diary
+    diary.title = title
+    diary.content = content
+    diary.image = image
+   const planData= plan.plan_id
+    //console.log(planData)
+    await diaryModel.createDiaryByUsername(diary, plan);
+    
     return diary
     
 };

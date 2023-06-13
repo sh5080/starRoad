@@ -3,15 +3,19 @@ import { Diary } from '../types/diary';
 import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
 
-export const createDiaryByUsername = async (diary: Diary): Promise<void> => {
+export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<void> => {
+  //console.log(plan)
   try {
     const image = diary.image ? encodeURI(diary.image) : '';
     await db.execute('INSERT INTO travel_diary (plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?)', [
-      diary.plan_id,
+      plan.plan_id,
       diary.title,
       diary.content,
       image,
       diary.destination,
+
+     // console.log(plan.plan_id)
+      console.log(diary.destination)
     ]);
   } catch (error) {
     console.error(error);
@@ -25,6 +29,7 @@ export const getPlan = async (plan_id: number, username: string): Promise<Travel
       plan_id,
       username,
     ]);
+
     if (Array.isArray(rows) && rows.length > 0) {
       const plan = rows[0] as TravelPlan;
       return plan;

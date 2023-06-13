@@ -9,7 +9,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
   try {
     const imgName = req.file ? `https://localhost:3000/static/compressed/${req.file.filename}` : '';
     const { title, content, image, ...extraFields } = req.body;
-    const plan_id = req.params
+    const {plan_id} = req.params
     const username = req.user?.username;
 
     if (!username) {
