@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as diaryService from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
-import * as fs from 'node:fs';
+import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
 
 export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -18,7 +18,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
     const { plan_id } = req.params;
     const username = req.user?.username;
     console.log(image);
-    
+
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
@@ -41,7 +41,7 @@ export const createDiaryController = async (req: CustomRequest, res: Response, n
         const inputPath = `../../public/${file.filename}`;
         const compressed = `../../public/compressed/${file.filename}`;
         await compressImage(inputPath, compressed, 600, 600);
-        fs.unlinkSync(`../../public/${file.filename}`);
+        fs.unlink(`/Users/heesankim/Desktop/eliceProject2/back-end/public/compressed/${file.filename}`);
       }
     }
     res.status(201).json(diary);
@@ -131,19 +131,14 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 여행기가 아닙니다.', 404);
     }
     if (deletedDiary.image) {
-      const imgName = deletedDiary.image.split('/static')[4];
+      const imgName = deletedDiary.image.split('/compressed')[1];
 
-      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public
+      const filePath = `/Users/heesankim/Desktop/eliceProject2/back-end/src/public/compressed
       /${imgName}`;
-
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error(err);
-        }
-        console.log('File deleted successfully');
-      });
+      fs.unlink(filePath);
     }
-
+    console.log("이미지 삭제 성공");
+    
     res.status(200).json(deletedDiary);
   } catch (error) {
     console.error(error);
