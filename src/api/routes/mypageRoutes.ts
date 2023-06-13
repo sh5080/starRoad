@@ -12,7 +12,7 @@ router.delete('/', validateToken, userController.deleteUserInfo); //회원 탈�
 
 
 router.post('/diary', validateToken, processImage, diaryController.createDiaryController); //여행기 작성
-router.get('/', validateToken, diaryController.getMyDiaries); //나의 여행기 조회
+router.get('/diary', validateToken, diaryController.getMyDiaries); //나의 여행기 조회
 router.patch('/diary/:diary_id', validateToken, diaryController.updateDiary);
 router.delete('/diary/:diary_id', validateToken, diaryController.deleteDiary);
 
