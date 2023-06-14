@@ -125,11 +125,7 @@ export const getUserAllComment = async (username: string): Promise<Comment[]> =>
 };
 
 // [관리자] 특정 회원이 작성한 댓글 삭제하기
-export const deleteCommentByAdmin = async (
-  username: string,
-  diary_id: number,
-  comment_id: number
-): Promise<void> => {
+export const deleteCommentByAdmin = async (username: string, diary_id: number, comment_id: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND comment_id = ?', [
       username,
@@ -154,14 +150,14 @@ export const addTouristDestination = async (
   longitude: number
 ): Promise<void> => {
   try {
-    const encodedImage = image ? encodeURI(image) : '';
-
+    let correctedImage = image.replace(/\\/g, '/');
+    correctedImage = correctedImage.replace('http:/', 'http://');
     await db.execute(
       'INSERT INTO travel_destination (name_en, name_ko, image, introduction, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
       [
         name_en,
         name_ko,
-        encodedImage,
+        correctedImage,
         // image,
         introduction,
         latitude,
@@ -175,10 +171,7 @@ export const addTouristDestination = async (
 };
 
 // [관리자] 관광지 수정하기
-export const updateTouristDestination = async (
-  id: string,
-  product: Partial<TouristDestinationType>
-): Promise<void> => {
+export const updateTouristDestination = async (id: string, product: Partial<TouristDestinationType>): Promise<void> => {
   try {
     await db.execute(
       'UPDATE travel_destination SET name_en = ?, name_ko = ?, image = ?, introduction = ? WHERE id = ?',
