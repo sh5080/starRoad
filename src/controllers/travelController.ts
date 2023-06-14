@@ -22,8 +22,8 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
 
-    const startDate: Date | string | undefined = start_date ? new Date(start_date) : undefined;
-    const endDate: Date | string | undefined = end_date ? new Date(end_date) : undefined;
+    const startDate: Number | string | undefined = start_date ? Number(start_date) : undefined;
+    const endDate: Number | string | undefined = end_date ? Number(end_date) : undefined;
 
     if ((startDate && startDate.toString() === 'Invalid Date') || (endDate && endDate.toString() === 'Invalid Date')) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
@@ -48,7 +48,7 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
         if (!dateInfo.date) {
           throw new AppError(CommonError.INVALID_INPUT, '날짜가 없는 장소입니다.', 400);
         }
-        const locationDate = new Date(dateInfo.date);
+        const locationDate = Number(dateInfo.date);
         if (startDate && endDate && (locationDate < startDate || locationDate > endDate)) {
           throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
         }
