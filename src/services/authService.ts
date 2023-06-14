@@ -18,7 +18,7 @@ export const OauthSignupUser = async (user: User.OauthUser) => {
       const newUser:User.OauthUser = {
         username: await generateUsername(user.username),
         email: user.email,
-        oauthProvider: 'google',
+        oauthProvider: user.oauthProvider
       };
    
   
@@ -57,6 +57,7 @@ export const OauthSignupUser = async (user: User.OauthUser) => {
   
     return { accessToken, refreshToken };
   };
+  
   export const getUserForOauth = async (email: string) => {
     const user = await authModel.getUserByEmail(email);
   
@@ -68,50 +69,68 @@ export const OauthSignupUser = async (user: User.OauthUser) => {
     //console.log(userData)
     return userData;
   };
+
+  export const generateLoginUrl = (oauthProvider: string): string => {
+    const clientId = process.env[`${oauthProvider.toUpperCase()}_CLIENT_ID`] as string;
+    const redirectUri = process.env[`${oauthProvider.toUpperCase()}_REDIRECT_URI`] as string;
+    let params: Record<string, string> = {};
   
-  export const generateLoginUrl = (): string => {
-    const clientId = process.env.GOOGLE_CLIENT_ID as string;
-    const redirectUri = process.env.GOOGLE_REDIRECT_URI as string;
-    const scope =
-      'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
-    const responseType = 'code';
-  
-    const params = {
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      scope,
-      response_type: responseType,
-    };
+    if (oauthProvider === 'kakao') {
+      const responseType = 'code';
+      params = {
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: responseType,
+      };
+    } else if (oauthProvider === 'google') {
+      const scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
+      const responseType = 'code';
+      params = {
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        scope,
+        response_type: responseType,
+      };
+    } else {
+      throw new Error(`Unsupported OAuth provider: ${oauthProvider}`);
+    }
   
     const queryString = qs.stringify(params);
-    return `https://accounts.google.com/o/oauth2/v2/auth?${queryString}`;
+    return `https://${oauthProvider === 'kakao' ? 'kauth.kakao.com' : 'accounts.google.com'}/oauth/authorize?${queryString}`;
   };
   
-  export const getUserInfo = async (code: string): Promise<any> => {
-    const clientId = process.env.GOOGLE_CLIENT_ID as string;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET as string;
-    const redirectUri = process.env.GOOGLE_REDIRECT_URI as string;
-    const grantType = 'authorization_code';
+
+  // export const generateLoginUrlForKakao = (): string => {
+  //   const clientId = process.env.KAKAO_CLIENT_ID as string;
+  //   const redirectUri = process.env.KAKAO_REDIRECT_URI as string;
+  //   const responseType = 'code';
   
-    const tokenUrl = 'https://oauth2.googleapis.com/token';
-    const tokenParams = {
-      code,
-      client_id: clientId,
-      client_secret: clientSecret,
-      redirect_uri: redirectUri,
-      grant_type: grantType,
-    };
+  //   const params = {
+  //     client_id: clientId,
+  //     redirect_uri: redirectUri,
+  //     response_type: responseType,
+  //   };
   
-    const tokenResponse = await axios.post(tokenUrl, qs.stringify(tokenParams));
-    const { access_token: accessToken } = tokenResponse.data;
+  //   const queryString = qs.stringify(params);
+  //   return `https://kauth.kakao.com/oauth/authorize?${queryString}`;
+  // };
+
   
-    const userInfoUrl = 'https://www.googleapis.com/oauth2/v2/userinfo';
-    const userInfoResponse = await axios.get(userInfoUrl, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+  // export const generateLoginUrlForGoogle = (): string => {
+  //   const clientId = process.env.GOOGLE_CLIENT_ID as string;
+  //   const redirectUri = process.env.GOOGLE_REDIRECT_URI as string;
+  //   const scope =
+  //     'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
+  //   const responseType = 'code';
   
-    return userInfoResponse.data;
-  };
+  //   const params = {
+  //     client_id: clientId,
+  //     redirect_uri: redirectUri,
+  //     scope,
+  //     response_type: responseType,
+  //   };
+  
+  //   const queryString = qs.stringify(params);
+  //   return `https://accounts.google.com/o/oauth2/v2/auth?${queryString}`;
+  // };
   
