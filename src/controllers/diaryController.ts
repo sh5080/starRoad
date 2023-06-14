@@ -127,6 +127,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
   }
 };
 
+// 유저 다이어리 삭제
 export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(String(req.params.diary_id), 10);
@@ -144,7 +145,7 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
 
       const filePath = `../../public/compressed
       /${imgName}`;
-      fs.unlink(filePath);
+      await fs.unlink(filePath);
     }
     console.log('이미지 삭제 성공');
 
