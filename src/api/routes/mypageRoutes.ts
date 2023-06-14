@@ -14,7 +14,11 @@ router.get('/', validateToken, userController.getUserInfo); //회원정보 조�
 router.put('/diary/:diary_id', validateToken, diaryController.updateDiary); // 다이어리 수정
 router.put('/', validateToken, userController.updateUserInfo); //회원정보 수정
 
-router.delete('/diary/:diary_id', validateToken, diaryController.deleteDiary);
+
+
+router.delete('/diary/:diary_id', validateToken, diaryController.deleteDiary); // 여행기 삭제
+
+
 router.delete('/', validateToken, userController.deleteUserInfo); //회원 탈퇴
 
 export default router;
