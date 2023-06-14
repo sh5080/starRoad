@@ -10,7 +10,7 @@ interface QueryResult extends RowDataPacket {
   comment: string;
 }
 
-export const createCommentModel = async (comment: Comment): Promise<void> => {
+export const createComment = async (comment: Comment): Promise<void> => {
   try {
     await db.execute('INSERT INTO comment (username, diary_id, comment) VALUES (?, ?, ?)', [
       comment.username,
@@ -23,7 +23,7 @@ export const createCommentModel = async (comment: Comment): Promise<void> => {
   }
 };
 
-export const getCommentsByDiaryModel = async (
+export const getCommentsByDiary = async (
   diary_id: number,
   page: number,
   limit: number
@@ -53,7 +53,7 @@ export const getCommentsByDiaryModel = async (
   }
 };
 
-export const updateCommentModel = async (id: number, comment: Comment) => {
+export const updateComment = async (id: number, comment: Comment) => {
   try {
     await db.execute('UPDATE comment SET comment = ? WHERE id = ?', [comment.comment, id]);
 
@@ -63,7 +63,7 @@ export const updateCommentModel = async (id: number, comment: Comment) => {
   }
 };
 
-export const getCommentModel = async (id: number): Promise<Comment | null> => {
+export const getComment = async (id: number): Promise<Comment | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -76,7 +76,7 @@ export const getCommentModel = async (id: number): Promise<Comment | null> => {
   }
 };
 
-export const deleteCommentModel = async (id: number): Promise<void> => {
+export const deleteComment = async (id: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM comment WHERE id = ?', [id]);
   } catch (error) {

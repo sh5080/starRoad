@@ -7,7 +7,7 @@ import { AppError, CommonError } from '../types/AppError';
 import { TouristDestinationType } from '../types/destination';
 
 // [관리자] 모든 회원 정보 불러오기
-export const getAllUsersService = async (): Promise<UserType[]> => {
+export const getAllUsers = async (): Promise<UserType[]> => {
   try {
     return await adminModel.getAllUsersModel();
   } catch (error) {
@@ -16,7 +16,7 @@ export const getAllUsersService = async (): Promise<UserType[]> => {
 };
 
 // [관리자] 회원 정보 업데이트
-export const updateUserService = async (id: number, user: Partial<UserType>): Promise<UserType> => {
+export const updateUser = async (id: number, user: Partial<UserType>): Promise<UserType> => {
   try {
     const updatedUser = await adminModel.updateUserByIdModel(id, user);
     return updatedUser;
@@ -26,9 +26,9 @@ export const updateUserService = async (id: number, user: Partial<UserType>): Pr
 };
 
 // [관리자] 회원 정보 삭제
-export const deleteUserService = async (id: number): Promise<string> => {
+export const deleteUser = async (id: number): Promise<string> => {
   try {
-    await adminModel.deleteUserByIdModel(id);
+    await adminModel.deleteUserById(id);
     return '회원 정보가 정상적으로 삭제되었습니다.';
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user information', 500);
@@ -36,9 +36,9 @@ export const deleteUserService = async (id: number): Promise<string> => {
 };
 
 // [관리자] 회원이 작성한 여행 일정 조회하기
-export const getUserInfoTravelService = async (username: string): Promise<TravelPlan[]> => {
+export const getUserInfoTravel = async (username: string): Promise<TravelPlan[]> => {
   try {
-    const travelPlans = await adminModel.getUserInfoTravelModel(username);
+    const travelPlans = await adminModel.getUserInfoTravel(username);
     return travelPlans;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user travel plans', 500);
@@ -46,9 +46,9 @@ export const getUserInfoTravelService = async (username: string): Promise<Travel
 };
 
 // [관리자] 회원이 작성한 여행 장소 날짜 조회하기
-export const getUserInfoTravelLocationService = async (plan_id: number): Promise<TravelPlan[]> => {
+export const getUserInfoTravelLocation = async (plan_id: number): Promise<TravelPlan[]> => {
   try {
-    const travelPlans = await adminModel.getUserInfoLocationModel(plan_id);
+    const travelPlans = await adminModel.getUserInfoLocation(plan_id);
     return travelPlans;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user travel locations', 500);
@@ -56,9 +56,9 @@ export const getUserInfoTravelLocationService = async (plan_id: number): Promise
 };
 
 // [관리자] 회원이 작성한 다이어리 조회하기
-export const getUserInfoDiaryService = async (username: string): Promise<Diary[]> => {
+export const getUserInfoDiary = async (username: string): Promise<Diary[]> => {
   try {
-    const travelDiaries = await adminModel.getUserInfoDiaryModel(username);
+    const travelDiaries = await adminModel.getUserInfoDiary(username);
     return travelDiaries;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user diaries', 500);
@@ -66,9 +66,9 @@ export const getUserInfoDiaryService = async (username: string): Promise<Diary[]
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByAdminService = async (username: string, diary_id: number): Promise<string> => {
+export const deleteDiaryByAdmin = async (username: string, diary_id: number): Promise<string> => {
   try {
-    await adminModel.deleteDiaryByAdminModel(username, diary_id);
+    await adminModel.deleteDiaryByAdmin(username, diary_id);
     return '다이어리가 정상적으로 삭제되었습니다.';
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user diary', 500);
@@ -76,9 +76,9 @@ export const deleteDiaryByAdminService = async (username: string, diary_id: numb
 };
 
 // [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기
-export const getUserInfoCommentService = async (username: string, diary_id: number): Promise<Comment[]> => {
+export const getUserInfoComment = async (username: string, diary_id: number): Promise<Comment[]> => {
   try {
-    const diaryComments = await adminModel.getUserInfoDiaryCommentModel(username, diary_id);
+    const diaryComments = await adminModel.getUserInfoDiaryComment(username, diary_id);
     return diaryComments;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user diary comments', 500);
@@ -86,9 +86,9 @@ export const getUserInfoCommentService = async (username: string, diary_id: numb
 };
 
 // [관리자] 특정 회원이 작성한 모든 댓글 조회하기
-export const getUserAllCommentService = async (username: string): Promise<Comment[]> => {
+export const getUserAllComment = async (username: string): Promise<Comment[]> => {
   try {
-    const userComments = await adminModel.getUserAllCommentModel(username);
+    const userComments = await adminModel.getUserAllComment(username);
     return userComments;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user comments', 500);
@@ -96,13 +96,13 @@ export const getUserAllCommentService = async (username: string): Promise<Commen
 };
 
 // [관리자] 회원이 작성한 댓글 삭제하기
-export const deleteCommentByAdminService = async (
+export const deleteCommentByAdmin = async (
   username: string,
   diary_id: number,
   comment_id: number
 ): Promise<string> => {
   try {
-    await adminModel.deleteCommentByAdminModel(username, diary_id, comment_id);
+    await adminModel.deleteCommentByAdmin(username, diary_id, comment_id);
     return '댓글이 정상적으로 삭제되었습니다.';
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user comment', 500);
@@ -110,7 +110,7 @@ export const deleteCommentByAdminService = async (
 };
 
 // [관리자] 관광지 추가하기
-export const addTouristDestinationService = async (
+export const addTouristDestination = async (
   name_en: string,
   name_ko: string,
   image: string,
@@ -119,7 +119,7 @@ export const addTouristDestinationService = async (
   longitude: number
 ): Promise<string> => {
   try {
-    await adminModel.addTouristDestinationModel(name_en, name_ko, image, introduction, latitude, longitude);
+    await adminModel.addTouristDestination(name_en, name_ko, image, introduction, latitude, longitude);
     return '관광지 추가에 성공하였습니다.';
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to add tourist destination', 500);
@@ -127,12 +127,12 @@ export const addTouristDestinationService = async (
 };
 
 // [관리자] 관광지 수정하기
-export const updateTouristDestinationService = async (
+export const updateTouristDestination = async (
   id: string,
   product: Partial<TouristDestinationType>
 ): Promise<string> => {
   try {
-    await adminModel.updateTouristDestinationModel(id, product);
+    await adminModel.updateTouristDestination(id, product);
     return '관광지 수정에 성공하였습니다.';
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update tourist destination', 500);
@@ -150,9 +150,9 @@ interface DeletedData {
 }
 
 // [관리자] 관광지 삭제하기
-export const deleteTouristDestinationService = async (id: string): Promise<DeletedData> => {
+export const deleteTouristDestination = async (id: string): Promise<DeletedData> => {
   try {
-    const touristDestination = await adminModel.deleteTouristDestinationModel(id);
+    const touristDestination = await adminModel.deleteTouristDestination(id);
     return { message: '관광지 삭제에 성공하였습니다.', touristDestination };
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete tourist destination', 500);

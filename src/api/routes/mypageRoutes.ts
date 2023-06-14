@@ -6,7 +6,7 @@ import { validateToken } from '../middlewares/jwt';
 
 const router = Router();
 
-router.post('/diary/:plan_id', validateToken, processImage, diaryController.createDiaryController); //여행기 작성
+router.post('/diary/:plan_id', validateToken, processImage, diaryController.createDiary); //여행기 작성
 
 router.get('/diary', validateToken, diaryController.getMyDiaries); //나의 여행기 조회
 router.get('/', validateToken, userController.getUserInfo); //회원정보 조회

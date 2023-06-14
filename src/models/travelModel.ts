@@ -36,7 +36,7 @@ export const createTravelLocation = async (travelLocation: TravelLocation, plan_
   }
 };
 
-export const getTravelPlansByUserId = async (username: string): Promise<TravelPlan[]> => {
+export const getTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
     return rows as TravelPlan[];

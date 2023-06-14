@@ -10,7 +10,7 @@ const DELETE_INPUT_PATH = config.paths.DELETE_INPUT_PATH;
 const DELETE_COMPRESSED_PATH = config.paths.DELETE_COMPRESSED_PATH;
 
 // 다이어리 작성(이미지 포함)
-export const createDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     let imgNames: string[] = [];
 

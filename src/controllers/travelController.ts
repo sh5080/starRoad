@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import * as travelService from '../services/travelService';
 import { CustomRequest } from '../types/customRequest';
 
-export const createTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const createTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
@@ -22,8 +22,8 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
 
-    const startDate: Number | string | undefined = start_date ? Number(start_date) : undefined;
-    const endDate: Number | string | undefined = end_date ? Number(end_date) : undefined;
+    const startDate: Date | string | undefined = start_date ? new Date(start_date) : undefined;
+    const endDate: Date | string | undefined = end_date ? new Date(end_date) : undefined;
 
     if ((startDate && startDate.toString() === 'Invalid Date') || (endDate && endDate.toString() === 'Invalid Date')) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
@@ -48,7 +48,7 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
         if (!dateInfo.date) {
           throw new AppError(CommonError.INVALID_INPUT, '날짜가 없는 장소입니다.', 400);
         }
-        const locationDate = Number(dateInfo.date);
+        const locationDate = new Date(dateInfo.date);
         if (startDate && endDate && (locationDate < startDate || locationDate > endDate)) {
           throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
         }
@@ -78,7 +78,7 @@ export const createTravelPlanController = async (req: CustomRequest, res: Respon
 };
 
 // 여행 일정 조회
-export const getTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
@@ -108,7 +108,7 @@ export const getTravelPlanController = async (req: CustomRequest, res: Response,
 };
 
 // 여행 일정 상세 조회
-export const getTravelPlanDetailController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getTravelPlanDetail = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
@@ -135,7 +135,7 @@ export const getTravelPlanDetailController = async (req: CustomRequest, res: Res
 };
 
 // 여행 일정의 날짜별 장소 수정
-export const updateTravelPlanAndLocationController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: '인증이 필요합니다.' });
@@ -204,7 +204,7 @@ export const updateTravelPlanAndLocationController = async (req: CustomRequest, 
 };
 
 // 여행 일정 삭제
-export const deleteTravelPlanController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     // 로그인 확인
     if (!req.user) {

@@ -3,6 +3,9 @@ import * as userService from '../services/userService';
 import { AppError, CommonError } from '../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 import { UserType } from '../types/user';
+interface CustomRequest extends Request {
+  user?: JwtPayload & { username: string };
+}
 // 회원가입
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -53,7 +56,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const token = await userService.loginUser(username, password);
-    // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
+
     res.cookie('token', token, {
       httpOnly: true,
       // secure: true, // HTTPS시에
@@ -77,17 +80,9 @@ export const logout = async (req: CustomRequest, res: Response, next: NextFuncti
   }
 };
 
-interface CustomRequest extends Request {
-  user?: JwtPayload & { username: string };
-}
-
 // 내 정보 조회
 export const getUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    // req.user가 없는 경우 에러 처리
-    // if (!req.user) {
-    //   throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
-    // }
     const username = req.user?.username;
     const userData = await userService.getUser(username);
 

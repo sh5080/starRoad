@@ -4,7 +4,7 @@ import { getOneDiary } from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
 
-export const createCommentController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const createComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diary_id, comment, ...extraFields } = req.body;
 
@@ -31,7 +31,7 @@ export const createCommentController = async (req: CustomRequest, res: Response,
     next(error);
   }
 };
-export const getCommentsByDiaryController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getCommentsByDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diary_id } = req.params;
     const { page } = req.query;
@@ -47,7 +47,7 @@ export const getCommentsByDiaryController = async (req: CustomRequest, res: Resp
   }
 };
 
-export const updateCommentController = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { comment_id } = req.params;
     const { comment, ...extraFields } = req.body;
@@ -67,7 +67,7 @@ export const updateCommentController = async (req: CustomRequest, res: Response,
   }
 };
 
-export const deleteCommentController = async (req: CustomRequest, res: Response, next:NextFunction) => {
+export const deleteComment = async (req: CustomRequest, res: Response, next:NextFunction) => {
   try {
     const { comment_id } = req.params;
     const username = req.user?.username;

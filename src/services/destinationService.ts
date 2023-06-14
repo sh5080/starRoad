@@ -4,9 +4,9 @@ import * as destinationModel from '../models/destinationModel';
 
 // 관광지 모두 조회하기
 
-export const getAllTouristDestinationService = async (): Promise<TouristDestinationType[]> => {
+export const getAllTouristDestination = async (): Promise<TouristDestinationType[]> => {
   try {
-    const destinations = await destinationModel.getAllTouristDestinationModel();
+    const destinations = await destinationModel.getAllTouristDestination();
     return destinations;
   } catch (error) {
     console.error(error);
@@ -15,9 +15,9 @@ export const getAllTouristDestinationService = async (): Promise<TouristDestinat
 };
 
 // 관광지 상세 조회하기
-export const getTouristDestinationService = async (id: number): Promise<TouristDestinationType> => {
+export const getTouristDestination = async (id: number): Promise<TouristDestinationType> => {
   try {
-    const destination = await destinationModel.getTouristDestinationModel(id);
+    const destination = await destinationModel.getTouristDestination(id);
     return destination;
   } catch (error) {
     console.error(error);

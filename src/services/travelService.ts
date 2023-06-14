@@ -35,7 +35,7 @@ export const createLocation = async (travelLocation: TravelLocation, plan_id: nu
 
 // 여행 일정 조회
 export const getPlans = async (username: string): Promise<TravelPlan[]> => {
-  const travelPlans = await travelModel.getTravelPlansByUserId(username);
+  const travelPlans = await travelModel.getTravelPlansByUsername(username);
   return travelPlans;
 };
 

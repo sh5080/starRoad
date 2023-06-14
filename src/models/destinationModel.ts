@@ -4,7 +4,7 @@ import { TouristDestinationType } from '../types/destination';
 import { AppError, CommonError } from '../types/AppError';
 
 // 관광지 전부 조회하기
-export const getAllTouristDestinationModel = async (): Promise<TouristDestinationType[]> => {
+export const getAllTouristDestination = async (): Promise<TouristDestinationType[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_destination');
     const touristDestinations = rows as TouristDestinationType[];
@@ -17,7 +17,7 @@ export const getAllTouristDestinationModel = async (): Promise<TouristDestinatio
 };
 
 // 관광지 상세 조회하기
-export const getTouristDestinationModel = async (id: number): Promise<TouristDestinationType> => {
+export const getTouristDestination = async (id: number): Promise<TouristDestinationType> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_destination WHERE id = ?', [id]);
     const touristDestination = (rows as RowDataPacket[])[0] as TouristDestinationType;

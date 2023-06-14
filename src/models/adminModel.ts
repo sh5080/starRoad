@@ -32,7 +32,7 @@ export const updateUserByIdModel = async (id: number, user: Partial<UserType>): 
 };
 
 // [관리자] 회원 정보 삭제
-export const deleteUserByIdModel = async (id: number): Promise<void> => {
+export const deleteUserById = async (id: number): Promise<void> => {
   try {
     await db.execute('UPDATE user SET activated = 0 WHERE id = ?', [id]);
   } catch (error) {
@@ -42,7 +42,7 @@ export const deleteUserByIdModel = async (id: number): Promise<void> => {
 };
 
 // [관리자] 회원이 작성한 일정 불러오기
-export const getUserInfoTravelModel = async (username: string): Promise<TravelPlan[]> => {
+export const getUserInfoTravel = async (username: string): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
     const travelPlans = rows as TravelPlan[];
@@ -55,7 +55,7 @@ export const getUserInfoTravelModel = async (username: string): Promise<TravelPl
 };
 
 // [관리자] 회원이 작성한 여행 장소 날짜 조회하기
-export const getUserInfoLocationModel = async (plan_id: number): Promise<TravelPlan[]> => {
+export const getUserInfoLocation = async (plan_id: number): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
     const travelPlans = rows as TravelPlan[];
@@ -68,7 +68,7 @@ export const getUserInfoLocationModel = async (plan_id: number): Promise<TravelP
 };
 
 // [관리자] 회원이 작성한 다이어리 조회하기
-export const getUserInfoDiaryModel = async (username: string): Promise<Diary[]> => {
+export const getUserInfoDiary = async (username: string): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
     const travelDiaries = rows as Diary[];
@@ -81,7 +81,7 @@ export const getUserInfoDiaryModel = async (username: string): Promise<Diary[]> 
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByAdminModel = async (username: string, diary_id: number): Promise<void> => {
+export const deleteDiaryByAdmin = async (username: string, diary_id: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM travel_diary WHERE username = ? AND diary_id = ?', [username, diary_id]);
   } catch (error) {
@@ -93,7 +93,7 @@ export const deleteDiaryByAdminModel = async (username: string, diary_id: number
 };
 
 // [관리자] 회원이 작성한 다이어리 댓글 모두 조회하기
-export const getUserInfoDiaryCommentModel = async (username: string, diary_id: number): Promise<Comment[]> => {
+export const getUserInfoDiaryComment = async (username: string, diary_id: number): Promise<Comment[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE diary_id = ? AND username = ?', [diary_id, username]);
     const diaryComments = rows as Comment[];
@@ -106,7 +106,7 @@ export const getUserInfoDiaryCommentModel = async (username: string, diary_id: n
 };
 
 // [관리자] 특정 회원이 작성한 모든 댓글 조회하기 ( LEFT JOIN을 통해서 다이어리 제목도 함께 조회 )
-export const getUserAllCommentModel = async (username: string): Promise<Comment[]> => {
+export const getUserAllComment = async (username: string): Promise<Comment[]> => {
   try {
     const [rows] = await db.execute(
       'SELECT comment.*, travel_diary.title ' +
@@ -125,7 +125,7 @@ export const getUserAllCommentModel = async (username: string): Promise<Comment[
 };
 
 // [관리자] 특정 회원이 작성한 댓글 삭제하기
-export const deleteCommentByAdminModel = async (
+export const deleteCommentByAdmin = async (
   username: string,
   diary_id: number,
   comment_id: number
@@ -145,7 +145,7 @@ export const deleteCommentByAdminModel = async (
 // ----------------------------------------------------------------------------
 
 // [관리자] 관광지 추가
-export const addTouristDestinationModel = async (
+export const addTouristDestination = async (
   name_en: string,
   name_ko: string,
   image: string,
@@ -175,7 +175,7 @@ export const addTouristDestinationModel = async (
 };
 
 // [관리자] 관광지 수정하기
-export const updateTouristDestinationModel = async (
+export const updateTouristDestination = async (
   id: string,
   product: Partial<TouristDestinationType>
 ): Promise<void> => {
@@ -191,7 +191,7 @@ export const updateTouristDestinationModel = async (
 };
 
 // [관리자] 관광지 삭제하기
-export const deleteTouristDestinationModel = async (id: string): Promise<object> => {
+export const deleteTouristDestination = async (id: string): Promise<object> => {
   try {
     // First, get the tourist destination data
     const [rows] = await db.execute('SELECT * FROM travel_destination WHERE id = ?', [id]);
