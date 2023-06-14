@@ -5,7 +5,9 @@ import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
 import config from '../config';
+import path from 'node:path';
 const IMG_PATH = config.server.IMG_PATH;
+
 // 다이어리 작성(이미지 포함)
 export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -41,11 +43,12 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
       const promises = files.map(async (file) => {
-        const inputPath = `../../public/${file.filename}`;
-        const compressed = `../../public/compressed/${file.filename}`;
+        // __dirname을 사용하여 절대경로를 만듭니다.
+        const inputPath = path.join(__dirname, '../../public', file.filename);
+        const compressed = path.join(__dirname, '../../public/compressed', file.filename);
         await compressImage(inputPath, compressed, 600, 600);
 
-        await fs.unlink(`../../public/${file.filename}`);
+        await fs.unlink(path.join(__dirname, '../../public', file.filename));
       });
       await Promise.all(promises);
     }

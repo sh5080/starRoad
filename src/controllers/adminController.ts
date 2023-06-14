@@ -5,6 +5,8 @@ import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
 import config from '../config';
+import path from 'node:path';
+
 const IMG_PATH = config.server.IMG_PATH;
 
 // [관리자] 모든 회원 조회하기
@@ -147,9 +149,9 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
 
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
-      imgName = files.length > 0 ? `${IMG_PATH}/${files[0].filename}` : '';
-      inputPath = files.length > 0 ? `../../public/${files[0].filename}` : '';
-      compressed = files.length > 0 ? `../../public/compressed/${files[0].filename}` : '';
+      imgName = files.length > 0 ? path.join(IMG_PATH, files[0].filename) : '';
+      inputPath = files.length > 0 ? path.join(__dirname, '../../public', files[0].filename) : '';
+      compressed = files.length > 0 ? path.join(__dirname, '../../public/compressed', files[0].filename) : '';
     }
 
     const { name_en, name_ko, introduction, latitude, longitude } = req.body;

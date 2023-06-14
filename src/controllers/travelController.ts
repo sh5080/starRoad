@@ -6,6 +6,8 @@ import { CustomRequest } from '../types/customRequest';
 
 import { TravelDate } from '../types/travel';
 import { TravelLocation } from '../types/travel';
+
+// 여행기 작성
 export const createTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
