@@ -127,7 +127,6 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
   }
 };
 
-// 유저 다이어리 삭제
 export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(String(req.params.diary_id), 10);
@@ -140,12 +139,18 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
     if (!deletedDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 여행기가 아닙니다.', 404);
     }
-    if (deletedDiary.image) {
-      const imgName = String(deletedDiary.image).split('/compressed')[1];
+    if (deletedDiary.image && typeof deletedDiary.image === 'string') {
+      // Parsing image URLs
+      const imgURLs = JSON.parse(deletedDiary.image);
 
-      const filePath = `../../public/compressed
-      /${imgName}`;
-      await fs.unlink(filePath);
+      const promises = imgURLs.map(async (url: string) => {
+        const imgName = url.split('/compressed')[1];
+
+        const filePath = path.join(__dirname, '../../public/compressed', imgName);
+        return await fs.unlink(filePath);
+      });
+
+      await Promise.all(promises);
     }
     console.log('이미지 삭제 성공');
 
