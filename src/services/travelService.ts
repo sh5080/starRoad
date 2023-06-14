@@ -33,15 +33,9 @@ export const createLocation = async (travelLocation: TravelLocation, plan_id: nu
   await travelModel.createTravelLocation(travelLocation, plan_id);
 };
 
-// 여행 일정 조회
+// 여행 일정 모두 조회
 export const getPlans = async (username: string): Promise<TravelPlan[]> => {
   const travelPlans = await travelModel.getTravelPlansByUsername(username);
-  return travelPlans;
-};
-
-// 여행 일정 상세 조회
-export const getPlan = async (plan_id: string): Promise<TravelPlan> => {
-  const travelPlans = await travelModel.getTravelPlanByPlanId(plan_id);
   return travelPlans;
 };
 
@@ -51,6 +45,11 @@ export const getLocations = async (plan_id: number): Promise<TravelLocation[]> =
   return travelLocations;
 };
 
+// 여행 일정 상세 조회
+export const getPlan = async (plan_id: string): Promise<TravelPlan> => {
+  const travelPlans = await travelModel.getTravelPlanByPlanId(plan_id);
+  return travelPlans;
+};
 // // 여행 일정 수정
 // export const updatePlan = async (username: string, travelPlan: TravelPlan) => {
 //   if (

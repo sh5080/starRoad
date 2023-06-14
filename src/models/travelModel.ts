@@ -36,6 +36,7 @@ export const createTravelLocation = async (travelLocation: TravelLocation, plan_
   }
 };
 
+// 모든 여행 일정 조회
 export const getTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
@@ -46,6 +47,7 @@ export const getTravelPlansByUsername = async (username: string): Promise<Travel
   }
 };
 
+// 여행의 날짜별 장소 조회
 export const getTravelLocationsByPlanId = async (plan_id: number): Promise<TravelLocation[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);

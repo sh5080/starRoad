@@ -4,6 +4,8 @@ import { NextFunction, Request, Response } from 'express';
 import * as travelService from '../services/travelService';
 import { CustomRequest } from '../types/customRequest';
 
+import { TravelDate } from '../types/travel';
+import { TravelLocation } from '../types/travel';
 export const createTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
@@ -77,15 +79,13 @@ export const createTravelPlan = async (req: CustomRequest, res: Response, next: 
   }
 };
 
-// 여행 일정 조회
+// 유저의 모든 일정 조회
 export const getTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
     const { username } = req.user;
-
-    // 내 여행 일정 조회 해서 여행 일정 데이터에 있는 plan_id 를 통해서 장소 데이터 조회
 
     const travelPlanData = await travelService.getPlans(username); // 여행 일정 데이터
     if (!travelPlanData) {
@@ -96,7 +96,16 @@ export const getTravelPlan = async (req: CustomRequest, res: Response, next: Nex
     for (const plan of travelPlanData) {
       // plan_id가 정의되어 있으면 해당 장소 정보를 조회합니다.
       if (plan.plan_id !== undefined) {
-        plan.locations = await travelService.getLocations(plan.plan_id);
+        const locations = await travelService.getLocations(plan.plan_id);
+        plan.dates = locations.reduce((dates: TravelDate[], location: TravelLocation) => {
+          let date = dates.find((date) => date.date === location.date);
+          if (!date) {
+            date = { date: location.date, locations: [] };
+            dates.push(date);
+          }
+          date.locations?.push(location);
+          return dates;
+        }, []);
       }
     }
 
@@ -107,15 +116,13 @@ export const getTravelPlan = async (req: CustomRequest, res: Response, next: Nex
   }
 };
 
-// 여행 일정 상세 조회
+// 유저의 여행 일정 상세 조회
 export const getTravelPlanDetail = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
     const { plan_id } = req.params;
-
-    // 내 여행 일정 조회 해서 여행 일정 데이터에 있는 plan_id 를 통해서 장소 데이터 조회
 
     const travelPlanData = await travelService.getPlan(String(plan_id)); // 여행 일정 데이터
     if (!travelPlanData) {
@@ -124,7 +131,16 @@ export const getTravelPlanDetail = async (req: CustomRequest, res: Response, nex
 
     // plan_id가 정의되어 있으면 해당 장소 정보를 조회합니다.
     if (travelPlanData.plan_id !== undefined) {
-      travelPlanData.locations = await travelService.getLocations(travelPlanData.plan_id);
+      const locations = await travelService.getLocations(travelPlanData.plan_id);
+      travelPlanData.dates = locations.reduce((dates: TravelDate[], location: TravelLocation) => {
+        let date = dates.find((date) => date.date === location.date);
+        if (!date) {
+          date = { date: location.date, locations: [] };
+          dates.push(date);
+        }
+        date.locations?.push(location);
+        return dates;
+      }, []);
     }
 
     res.status(200).json({ travelPlanData });
@@ -144,7 +160,7 @@ export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Respo
     const { plan_id } = req.params;
     // const { dates, start_date, end_date, destination, ...extraFields } = req.body;
     const { dates, ...extraFields } = req.body;
-    
+
     const { username } = req.user;
 
     if (Object.keys(extraFields).length > 0) {
