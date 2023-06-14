@@ -6,8 +6,6 @@ import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
 import config from '../config';
 const IMG_PATH = config.server.IMG_PATH;
-const DELETE_INPUT_PATH = config.paths.DELETE_INPUT_PATH;
-const DELETE_COMPRESSED_PATH = config.paths.DELETE_COMPRESSED_PATH;
 
 // [관리자] 모든 회원 조회하기
 export const getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -17,7 +15,7 @@ export const getAllUsers = async (req: CustomRequest, res: Response, next: NextF
 
     res.status(200).json({ data: { users, userCount, message: '모든 회원을 불러왔습니다.' } });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -30,7 +28,7 @@ export const updateUser = async (req: CustomRequest, res: Response, next: NextFu
     const data = await adminService.updateUser(Number(id), userInfo);
     res.status(200).json({ data, message: '회원 정보 수정을 완료했습니다.' });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -43,7 +41,7 @@ export const deleteUser = async (req: CustomRequest, res: Response, next: NextFu
     const message = await adminService.deleteUser(Number(id));
     res.status(200).json({ message });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -56,7 +54,7 @@ export const getAllUserInfoTravel = async (req: CustomRequest, res: Response, ne
     const userTravelInfos = await adminService.getUserInfoTravel(String(username));
     res.status(200).json({ data: userTravelInfos, message: '회원이 작성한 여행 일정을 조회했습니다.' });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -70,7 +68,7 @@ export const getUserInfoAllLocation = async (req: CustomRequest, res: Response, 
 
     res.status(200).json({ data: userTravelLocationInfos, message: '회원이 작성한 날짜별 장소를 조회했습니다.' });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -83,7 +81,7 @@ export const getUserInfoAllDiary = async (req: CustomRequest, res: Response, nex
 
     res.status(200).json({ data: userTravelDiaryInfos, message: '회원이 작성한 다이어리를 조회했습니다.' });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -95,7 +93,7 @@ export const deleteDiaryByAdmin = async (req: CustomRequest, res: Response, next
     const message = await adminService.deleteDiaryByAdmin(String(username), Number(plan_id));
     res.status(200).json({ data: message });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -105,16 +103,13 @@ export const getUserInfoAllComment = async (req: CustomRequest, res: Response, n
   try {
     const { username, diary_id } = req.params;
 
-    const userTravelDiaryCommentInfos = await adminService.getUserInfoComment(
-      String(username),
-      Number(diary_id)
-    );
+    const userTravelDiaryCommentInfos = await adminService.getUserInfoComment(String(username), Number(diary_id));
 
     res
       .status(200)
       .json({ data: userTravelDiaryCommentInfos, message: '회원이 작성한 다이어리의 댓글을 조회했습니다.' });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -126,7 +121,7 @@ export const getUserAllComments = async (req: CustomRequest, res: Response, next
 
     res.status(200).json({ data: userAllComments, message: '회원이 작성한 모든 댓글을 조회했습니다.' });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -135,14 +130,10 @@ export const getUserAllComments = async (req: CustomRequest, res: Response, next
 export const deleteCommentByAdminController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diary_id, comment_id } = req.params;
-    const message = await adminService.deleteCommentByAdmin(
-      String(username),
-      Number(diary_id),
-      Number(comment_id)
-    );
+    const message = await adminService.deleteCommentByAdmin(String(username), Number(diary_id), Number(comment_id));
     res.status(200).json({ data: message });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -157,8 +148,8 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
       imgName = files.length > 0 ? `${IMG_PATH}/${files[0].filename}` : '';
-      inputPath = files.length > 0 ? `/${DELETE_INPUT_PATH}/${files[0].filename}` : '';
-      compressed = files.length > 0 ? `/${DELETE_COMPRESSED_PATH}/${files[0].filename}` : '';
+      inputPath = files.length > 0 ? `../../public/${files[0].filename}` : '';
+      compressed = files.length > 0 ? `../../public/compressed/${files[0].filename}` : '';
     }
 
     const { name_en, name_ko, introduction, latitude, longitude } = req.body;
@@ -183,7 +174,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
 
     res.status(200).json({ message });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -205,7 +196,7 @@ export const updateTouristDestination = async (req: CustomRequest, res: Response
     const message = await adminService.updateTouristDestination(String(location_id), product);
     res.status(200).json({ message: message });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -221,7 +212,7 @@ export const deleteTouristDestination = async (req: CustomRequest, res: Response
 
       // imgName 파일을 찾아서 삭제
       // 상대경로 오류남 -> 절대경로로 수정
-      const filePath = `/${DELETE_COMPRESSED_PATH}/${imgName}`;
+      const filePath = `../../public/compressed/${imgName}`;
 
       fs.unlink(filePath);
     }
@@ -229,7 +220,7 @@ export const deleteTouristDestination = async (req: CustomRequest, res: Response
 
     res.status(200).json({ deletedData });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };

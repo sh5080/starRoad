@@ -6,9 +6,6 @@ import * as fs from 'node:fs/promises';
 import { compressImage } from '../api/middlewares/sharp';
 import config from '../config';
 const IMG_PATH = config.server.IMG_PATH;
-const DELETE_INPUT_PATH = config.paths.DELETE_INPUT_PATH;
-const DELETE_COMPRESSED_PATH = config.paths.DELETE_COMPRESSED_PATH;
-
 // 다이어리 작성(이미지 포함)
 export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -44,12 +41,12 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
       const promises = files.map(async (file) => {
-        const inputPath = `/${DELETE_INPUT_PATH}/${file.filename}`;
-        const compressed = `/${DELETE_COMPRESSED_PATH}/${file.filename}`;
+        const inputPath = `../../public/${file.filename}`;
+        const compressed = `../../public/compressed/${file.filename}`;
         await compressImage(inputPath, compressed, 600, 600);
-        fs.unlink(`${DELETE_INPUT_PATH}/${file.filename}`);
-      });
 
+        await fs.unlink(`../../public/${file.filename}`);
+      });
       await Promise.all(promises);
     }
 
@@ -142,7 +139,7 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
     if (deletedDiary.image) {
       const imgName = String(deletedDiary.image).split('/compressed')[1];
 
-      const filePath = `/${DELETE_COMPRESSED_PATH}
+      const filePath = `../../public/compressed
       /${imgName}`;
       fs.unlink(filePath);
     }

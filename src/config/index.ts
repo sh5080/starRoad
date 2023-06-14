@@ -5,11 +5,6 @@ dotenv.config();
 const config: Config = {
   port: process.env.SERVER_MODE === 'PRO' ? Number(process.env.PRO_PORT) : Number(process.env.DEV_PORT),
 
-  paths: {
-    DELETE_INPUT_PATH: String(process.env.DELETE_INPUT_PATH),
-    DELETE_COMPRESSED_PATH: String(process.env.DELETE_COMPRESSED_PATH),
-  },
-
   server: {
     SERVER_MODE: process.env.SERVER_MODE || 'DEV',
     SERVER_URL:

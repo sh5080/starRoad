@@ -1,9 +1,5 @@
 export interface Config {
   port: number;
-  paths: {
-    DELETE_INPUT_PATH: string;
-    DELETE_COMPRESSED_PATH: string;
-  };
   server: {
     SERVER_MODE: string;
     SERVER_URL: string;
