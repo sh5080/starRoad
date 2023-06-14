@@ -214,11 +214,10 @@ export const deleteTouristDestination = async (req: CustomRequest, res: Response
 
       // imgName 파일을 찾아서 삭제
       // 상대경로 오류남 -> 절대경로로 수정
-      const filePath = `../../public/compressed/${imgName}`;
+      const filePath = path.join(__dirname, '../../public/compressed', imgName);
 
-      fs.unlink(filePath);
+      await fs.unlink(filePath);
     }
-    console.log('이미지 파일 삭제 완료');
 
     res.status(200).json({ deletedData });
   } catch (error) {
