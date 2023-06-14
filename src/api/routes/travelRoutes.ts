@@ -13,7 +13,7 @@ router.get('/:plan_id', validateToken, travelController.getTravelPlanDetail);
 router.get('/', validateToken, travelController.getTravelPlan);
 
 // 여행 일정 수정
-router.patch('/:plan_id', validateToken, travelController.updateTravelPlanAndLocation);
+router.put('/:plan_id', validateToken, travelController.updateTravelPlanAndLocation);
 
 // 특정 날짜 장소 수정
 // router.patch('/location/:plan_id/:location_id', validateToken, travelController.updateTravelLocationController);

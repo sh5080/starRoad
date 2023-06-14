@@ -42,7 +42,7 @@ router.get('/users/:username/diary', validateToken, ensureAdmin, adminController
 router.get('/users/:username/comments', validateToken, ensureAdmin, adminController.getUserAllComments);
 
 // [관리자] 회원 정보 수정하기
-router.patch('/users/:id', validateToken, ensureAdmin, adminController.updateUser);
+router.put('/users/:id', validateToken, ensureAdmin, adminController.updateUser);
 
 // [관리자] 회원 정보 삭제하기
 router.delete('/users/:id', validateToken, ensureAdmin, adminController.deleteUser);
@@ -54,7 +54,7 @@ router.get('/users', validateToken, ensureAdmin, adminController.getAllUsers);
 router.post('/locations', validateToken, ensureAdmin, processImage, adminController.addTouristDestination);
 
 // [관리자] 관광지 수정하기
-router.patch('/locations/:location_id', validateToken, ensureAdmin, adminController.updateTouristDestination);
+router.put('/locations/:location_id', validateToken, ensureAdmin, adminController.updateTouristDestination);
 
 // [관리자] 관광지 삭제하기
 router.delete(
