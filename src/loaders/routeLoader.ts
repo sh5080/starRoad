@@ -14,6 +14,7 @@ const routeLoader = (app: Application): Application => {
   });
 
   app.get('/auth/google/callback', authRouter);
+  app.get('/auth/kakao/callback', authRouter);
 
   app.use('/static', express.static('public'));
 
