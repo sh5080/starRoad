@@ -10,7 +10,7 @@ export const createTravelPlan = async (travelPlan: TravelPlan) => {
   try {
     const [rows] = await db.execute(
       'INSERT INTO travel_plan (username, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
-      [travelPlan.username, travelPlan.start_date, travelPlan.end_date, travelPlan.destination]
+      [travelPlan.username, travelPlan.startDate, travelPlan.endDate, travelPlan.destination]
     );
     const insertId = (rows as any).insertId;
     return insertId;
@@ -98,19 +98,19 @@ export const updateTravelLocation = async (
         travelLocation.order,
         travelLocation.latitude,
         travelLocation.longitude,
-        travelLocation.plan_id,
-        travelLocation.location_id,
+        travelLocation.planId,
+        travelLocation.locationId,
       ]
     );
 
     const [rawLocation] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
-      travelLocation.location_id,
+      travelLocation.locationId,
     ])) as [RowDataPacket[], FieldPacket[]];
 
     // Convert rawLocation (a RowDataPacket) to TravelLocation type
     let updatedLocation: TravelLocation = {
-      location_id: rawLocation[0].location_id,
-      plan_id: rawLocation[0].plan_id,
+      locationId: rawLocation[0].locationId,
+      planId: rawLocation[0].planId,
       location: rawLocation[0].location,
       newDate: rawLocation[0].date,
       order: rawLocation[0].order,
@@ -130,21 +130,21 @@ export const updateTravelLocation = async (
  */
 export const deleteTravelPlan = async (
   username: string,
-  plan_id: number
+  planId: number
 ): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
   try {
     const [planData] = (await db.execute('SELECT * FROM travel_plan WHERE username = ? AND plan_id = ?', [
       username,
-      plan_id,
+      planId,
     ])) as [RowDataPacket[], FieldPacket[]];
 
-    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id])) as [
+    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [planId])) as [
       RowDataPacket[],
       FieldPacket[]
     ];
 
-    await db.execute('DELETE FROM travel_location WHERE plan_id = ?', [plan_id]);
-    await db.execute('DELETE FROM travel_plan WHERE username = ? AND plan_id = ?', [username, plan_id]);
+    await db.execute('DELETE FROM travel_location WHERE plan_id = ?', [planId]);
+    await db.execute('DELETE FROM travel_plan WHERE username = ? AND plan_id = ?', [username, planId]);
 
     return {
       deletedPlan: planData,

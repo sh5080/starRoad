@@ -7,18 +7,18 @@ export interface CustomRequest extends Request {
   params: {
     username?: string;
     id?: string;
-    diary_id?: string; // Add this if diary_id comes from params
-    plan_id?: string;
+    diaryId?: string; // Add this if diaryId comes from params
+    planId?: string;
     date?: string;
-    location_id?: string;
-    comment_id?: string;
+    locationId?: string;
+    commentId?: string;
   };
   body: {
     latitude?: number;
     longitude?: number;
     id?: number;
     username: string;
-    diary_id?: number; // Add this if diary_id comes from body
+    diaryId?: number; // Add this if diaryId comes from body
     comment?: string;
     title?: string;
     content?: string;
@@ -28,20 +28,20 @@ export interface CustomRequest extends Request {
     order?: number;
     lat?: number;
     lng?: number;
-    start_date?: Date;
-    end_date?: Date;
+    startDate?: Date;
+    endDate?: Date;
     destination?: string;
     locations?: TravelLocation[];
     createdAt?: Date;
     updatedAt?: Date;
-    name_ko?: string;
-    name_en?: string;
+    nameKo?: string;
+    nameEn?: string;
     image?: string;
     introduction?: string;
     role?: string;
-    plan_id?: number;
-    location_id?: number;
-    comment_id?: number;
+    planId?: number;
+    locationId?: number;
+    commentId?: number;
     dates?: {
       date?: string;
       locations?: TravelLocation[];

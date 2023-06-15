@@ -7,9 +7,9 @@ import { AppError, CommonError } from '../types/AppError';
  */
 export const createComment = async (comment: Comment): Promise<void> => {
   try {
-    const { username, diary_id, comment: commentText } = comment;
+    const { username, diaryId, comment: commentText } = comment;
 
-    await commentModel.createComment({ username, diary_id, comment: commentText });
+    await commentModel.createComment({ username, diaryId, comment: commentText });
   } catch (error) {
     console.error(error);
   }
@@ -19,11 +19,11 @@ export const createComment = async (comment: Comment): Promise<void> => {
  * 게시물별 댓글 조회
  */
 export const getCommentsByDiary = async (
-  diary_id: number,
+  diaryId: number,
   page: number,
   limit: number
 ): Promise<Comment[]> => {
-  const comments = await commentModel.getCommentsByDiary(diary_id, page, limit); // pagination 적용
+  const comments = await commentModel.getCommentsByDiary(diaryId, page, limit); // pagination 적용
   return comments;
 };
 

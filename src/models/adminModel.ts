@@ -42,7 +42,7 @@ export const deleteUserById = async (id: number): Promise<void> => {
 };
 
 /** [관리자] 회원이 작성한 일정 불러오기 */ 
-export const getUserInfoTravel = async (username: string): Promise<TravelPlan[]> => {
+export const getAllTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
     const travelPlans = rows as TravelPlan[];
@@ -55,9 +55,9 @@ export const getUserInfoTravel = async (username: string): Promise<TravelPlan[]>
 };
 
 /** [관리자] 회원이 작성한 여행 장소 날짜 조회하기 */
-export const getUserInfoLocation = async (plan_id: number): Promise<TravelPlan[]> => {
+export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPlan[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [planId]);
     const travelPlans = rows as TravelPlan[];
 
     return travelPlans;
@@ -68,7 +68,7 @@ export const getUserInfoLocation = async (plan_id: number): Promise<TravelPlan[]
 };
 
 /** [관리자] 회원이 작성한 다이어리 조회하기 */
-export const getUserInfoDiary = async (username: string): Promise<Diary[]> => {
+export const getAllDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
     const travelDiaries = rows as Diary[];
@@ -81,9 +81,9 @@ export const getUserInfoDiary = async (username: string): Promise<Diary[]> => {
 };
 
 /** [관리자] 회원이 작성한 다이어리 삭제하기 */ 
-export const deleteDiaryByAdmin = async (username: string, diary_id: number): Promise<void> => {
+export const deleteDiaryByUsername = async (username: string, diaryId: number): Promise<void> => {
   try {
-    await db.execute('DELETE FROM travel_diary WHERE username = ? AND diary_id = ?', [username, diary_id]);
+    await db.execute('DELETE FROM travel_diary WHERE username = ? AND diary_id = ?', [username, diaryId]);
   } catch (error) {
     console.error(error);
     {
@@ -93,9 +93,9 @@ export const deleteDiaryByAdmin = async (username: string, diary_id: number): Pr
 };
 
 /** [관리자] 회원이 작성한 다이어리 댓글 모두 조회하기 */
-export const getUserInfoDiaryComment = async (username: string, diary_id: number): Promise<Comment[]> => {
+export const getAllCommentsByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<Comment[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM comment WHERE diary_id = ? AND username = ?', [diary_id, username]);
+    const [rows] = await db.execute('SELECT * FROM comment WHERE diary_id = ? AND username = ?', [diaryId, username]);
     const diaryComments = rows as Comment[];
 
     return diaryComments;
@@ -106,7 +106,7 @@ export const getUserInfoDiaryComment = async (username: string, diary_id: number
 };
 
 /** [관리자] 특정 회원이 작성한 모든 댓글 조회하기 ( LEFT JOIN을 통해서 다이어리 제목도 함께 조회 ) */
-export const getUserAllComment = async (username: string): Promise<Comment[]> => {
+export const getAllCommentsByUsername = async (username: string): Promise<Comment[]> => {
   try {
     const [rows] = await db.execute(
       'SELECT comment.*, travel_diary.title ' +
@@ -125,12 +125,12 @@ export const getUserAllComment = async (username: string): Promise<Comment[]> =>
 };
 
 /** [관리자] 특정 회원이 작성한 댓글 삭제하기 */
-export const deleteCommentByAdmin = async (username: string, diary_id: number, comment_id: number): Promise<void> => {
+export const deleteCommentByUsernameAndDiaryId = async (username: string, diaryId: number, commentId: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND comment_id = ?', [
       username,
-      diary_id,
-      comment_id,
+      diaryId,
+      commentId,
     ]);
   } catch (error) {
     console.error(error);
@@ -140,8 +140,8 @@ export const deleteCommentByAdmin = async (username: string, diary_id: number, c
 
 /** [관리자] 관광지 추가 */
 export const addTouristDestination = async (
-  name_en: string,
-  name_ko: string,
+  nameEn: string,
+  nameKo: string,
   image: string,
   introduction: string,
   latitude: number,
@@ -153,8 +153,8 @@ export const addTouristDestination = async (
     await db.execute(
       'INSERT INTO travel_destination (name_en, name_ko, image, introduction, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
       [
-        name_en,
-        name_ko,
+        nameEn,
+        nameKo,
         correctedImage,
         // image,
         introduction,
@@ -173,7 +173,7 @@ export const updateTouristDestination = async (id: string, product: Partial<Tour
   try {
     await db.execute(
       'UPDATE travel_destination SET name_en = ?, name_ko = ?, image = ?, introduction = ? WHERE id = ?',
-      [product.name_en, product.name_ko, product.image, product.introduction, id]
+      [product.nameEn, product.nameKo, product.image, product.introduction, id]
     );
   } catch (error) {
     console.error(error);

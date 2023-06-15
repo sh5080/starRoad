@@ -8,15 +8,15 @@ const router = Router();
 router.post('/', validateToken, travelController.createTravelPlan);
 
 /** [여행 일정] 여행 일정 상세 조회 */
-router.get('/:plan_id', validateToken, travelController.getTravelPlanDetail);
+router.get('/:planId', validateToken, travelController.getTravelPlanDetail);
 
 /** [여행 일정] 여행 일정 조회 */
-router.get('/', validateToken, travelController.getTravelPlan);
+router.get('/', validateToken, travelController.getTravelPlans);
 
 /** [여행 일정] 여행 일정 수정 */
-router.put('/:plan_id', validateToken, travelController.updateTravelPlanAndLocation);
+router.put('/:planId', validateToken, travelController.updateTravelPlanAndLocation);
 
 /** [여행 일정] 여행 일정 삭제 */
-router.delete('/:plan_id', validateToken, travelController.deleteTravelPlan);
+router.delete('/:planId', validateToken, travelController.deleteTravelPlan);
 
 export default router;

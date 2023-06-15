@@ -6,35 +6,35 @@ import { processImage } from '../middlewares/multer';
 const router = Router();
 
 /** [관리자] 회원이 작성한 여행 일정의 모든 장소 조회하기 */
-router.get('/users/:plan_id/locations', validateToken, ensureAdmin, adminController.getUserInfoAllLocation);
+router.get('/users/:planId/locations', validateToken, ensureAdmin, adminController.getAllLocationsByPlanId);
 
 /** [관리자] 회원이 작성한 댓글 삭제하기 */
 router.delete(
-  '/users/:username/:diary_id/:comment_id/comments',
+  '/users/:username/:diaryId/:commentId/comments',
   validateToken,
   ensureAdmin,
-  adminController.deleteCommentByAdminController
+  adminController.deleteCommentByUsernameAndDiaryId
 );
 
 /** [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기 */
 router.get(
-  '/users/:username/diary/:diary_id/comments',
+  '/users/:username/diary/:diaryId/comments',
   validateToken,
   ensureAdmin,
-  adminController.getUserInfoAllComment
+  adminController.getAllCommentsByUsernameAndDiaryId
 );
 
 /** [관리자] 회원이 작성한 다이어리 삭제하기 */
-router.delete('/users/:username/:diary_id/diary', validateToken, ensureAdmin, adminController.deleteDiaryByAdmin);
+router.delete('/users/:username/:diaryId/diary', validateToken, ensureAdmin, adminController.deleteDiaryByUsername);
 
 /** [관리자] 회원이 작성한 여행 일정 조회하기 */
-router.get('/users/:username/plans', validateToken, ensureAdmin, adminController.getAllUserInfoTravel);
+router.get('/users/:username/plans', validateToken, ensureAdmin, adminController.getAllTravelPlansByUsername);
 
 /** [관리자] 회원이 작성한 여행 일정의 모든 일기 조회하기 */
-router.get('/users/:username/diary', validateToken, ensureAdmin, adminController.getUserInfoAllDiary);
+router.get('/users/:username/diary', validateToken, ensureAdmin, adminController.getAllDiariesByUsername);
 
 /** [관리자] 회원이 작성한 모든 댓글 조회하기 */
-router.get('/users/:username/comments', validateToken, ensureAdmin, adminController.getUserAllComments);
+router.get('/users/:username/comments', validateToken, ensureAdmin, adminController.getAllCommentsByUsername);
 
 /** [관리자] 회원 정보 수정하기 */
 router.put('/users/:id', validateToken, ensureAdmin, adminController.updateUser);
@@ -49,9 +49,9 @@ router.get('/users', validateToken, ensureAdmin, adminController.getAllUsers);
 router.post('/locations', validateToken, ensureAdmin, processImage, adminController.addTouristDestination);
 
 /** [관리자] 관광지 수정하기 */
-router.put('/locations/:location_id', validateToken, ensureAdmin, adminController.updateTouristDestination);
+router.put('/locations/:locationId', validateToken, ensureAdmin, adminController.updateTouristDestination);
 
 /** [관리자] 관광지 삭제하기 */
-router.delete('/locations/:location_id', validateToken, ensureAdmin, adminController.deleteTouristDestination);
+router.delete('/locations/:locationId', validateToken, ensureAdmin, adminController.deleteTouristDestination);
 
 export default router;

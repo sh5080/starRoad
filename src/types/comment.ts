@@ -1,6 +1,6 @@
 export interface Comment {
   username?: string;
-  diary_id?: number;
+  diaryId?: number;
   comment?: string;
   title?: string;
 }

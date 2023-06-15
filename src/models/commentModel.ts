@@ -6,7 +6,7 @@ import { AppError, CommonError } from '../types/AppError';
 interface QueryResult extends RowDataPacket {
   id: number;
   username: string;
-  diary_id: number;
+  diaryId: number;
   comment: string;
 }
 
@@ -17,7 +17,7 @@ export const createComment = async (comment: Comment): Promise<void> => {
   try {
     await db.execute('INSERT INTO comment (username, diary_id, comment) VALUES (?, ?, ?)', [
       comment.username,
-      comment.diary_id,
+      comment.diaryId,
       comment.comment,
     ]);
   } catch (error) {
@@ -30,7 +30,7 @@ export const createComment = async (comment: Comment): Promise<void> => {
  * 특정 다이어리의 댓글 조회
  */
 export const getCommentsByDiary = async (
-  diary_id: number,
+  diaryId: number,
   page: number,
   limit: number
 ): Promise<Comment[]> => {
@@ -39,7 +39,7 @@ export const getCommentsByDiary = async (
 
     const [rows] = await db.query<RowDataPacket[]>(
       `SELECT * FROM comment WHERE diary_id = ? LIMIT ${limit} OFFSET ${offset}`,
-      [diary_id, limit, offset]
+      [diaryId, limit, offset]
     );
 
     const comments: Comment[] = rows.map(
@@ -47,7 +47,7 @@ export const getCommentsByDiary = async (
         ({
           id: row['id'],
           username: row['username'],
-          diary_id: row['diary_id'],
+          diaryId: row['diary_id'],
           comment: row['comment'],
         } as QueryResult)
     );

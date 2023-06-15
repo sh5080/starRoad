@@ -1,8 +1,8 @@
 export interface TravelPlan {
-  plan_id?: number;
+  planId?: number;
   username?: string;
-  start_date?: Date;
-  end_date?: Date;
+  startDate?: Date;
+  endDate?: Date;
   destination?: string;
   locations?: TravelLocation[];
   createdAt?: Date;
@@ -16,8 +16,8 @@ export interface TravelDate {
 }
 
 export interface TravelLocation {
-  location_id?: number;
-  plan_id?: number;
+  locationId?: number;
+  planId?: number;
   newDate?: string;
   date?: string;
   location?: string;

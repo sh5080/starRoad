@@ -8,9 +8,9 @@ import { AppError, CommonError } from '../types/AppError';
 export const createDiary = async (
   diary: Diary,
   username: string,
-  plan_id: number
+  planId: number
 ) => {
-  const plan = await diaryModel.getPlan(plan_id, username);
+  const plan = await diaryModel.getPlan(planId, username);
 
   if (!plan) {
     throw new AppError(CommonError.INVALID_INPUT, '나의 일정만 여행기를 등록할 수 있습니다.', 404);
@@ -80,10 +80,10 @@ export const updateDiary = async (
   if (!diary) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
   }
-  if (typeof diary.plan_id === 'undefined') {
+  if (typeof diary.planId === 'undefined') {
     throw new AppError(CommonError.INVALID_INPUT, '여행기의 일정 정보가 없습니다.', 400);
   }
-  const plan = await diaryModel.getPlan(diary.plan_id, username);
+  const plan = await diaryModel.getPlan(diary.planId, username);
   if (plan?.username !== username) {
     throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
   }
@@ -101,11 +101,11 @@ export const deleteDiary = async (diary_id: number, username: string) => {
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기 찾을 수 없습니다.', 404);
     }
-    if (typeof diary.plan_id === 'undefined') {
+    if (typeof diary.planId === 'undefined') {
       throw new AppError(CommonError.INVALID_INPUT, '여행기의 일정 정보가 없습니다.', 400);
     }
 
-    const plan = await diaryModel.getPlan(diary.plan_id, username);
+    const plan = await diaryModel.getPlan(diary.planId, username);
     if (!plan) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '일정을 찾을 수 없습니다.', 404);
     }

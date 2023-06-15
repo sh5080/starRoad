@@ -9,7 +9,7 @@ import { AppError, CommonError } from '../types/AppError';
 export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<void> => {
   try {
     await db.execute('INSERT INTO travel_diary (plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?)', [
-      plan.plan_id,
+      plan.planId,
       diary.title,
       diary.content,
       JSON.stringify(diary.image),
@@ -24,10 +24,10 @@ export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<
 /**
  * 특정 여행 일정 조회
  */
-export const getPlan = async (plan_id: number, username: string): Promise<TravelPlan | null> => {
+export const getPlan = async (planId: number, username: string): Promise<TravelPlan | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?', [
-      plan_id,
+      planId,
       username,
     ]);
 
@@ -79,9 +79,9 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
 /**
  * 특정 여행기 조회
  */
-export const getOneDiaryByUsername = async (diary_id: number): Promise<Diary | null> => {
+export const getOneDiaryByUsername = async (diaryId: number): Promise<Diary | null> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diary_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diaryId]);
     if (Array.isArray(rows) && rows.length > 0) {
       const diary = rows[0] as Diary;
       return diary;
@@ -113,9 +113,9 @@ export const updateDiaryByUsername = async (diary: Omit<Diary, 'id'>, diary_id: 
 /**
  * 여행기 삭제
  */
-export const deleteDiaryByUsername = async (diary_id: number): Promise<void> => {
+export const deleteDiaryByUsername = async (diaryId: number): Promise<void> => {
   try {
-    await db.execute('DELETE FROM travel_diary WHERE id = ?', [diary_id]);
+    await db.execute('DELETE FROM travel_diary WHERE id = ?', [diaryId]);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);

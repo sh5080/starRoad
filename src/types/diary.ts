@@ -1,6 +1,6 @@
 export interface Diary {
   username?: string;
-  plan_id?: number;
+  planId?: number;
   title?: string;
   content?: string;
   image?: string[] | string;

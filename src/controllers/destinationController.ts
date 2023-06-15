@@ -18,9 +18,9 @@ export const getAllTouristDestination = async (req: CustomRequest, res: Response
 /** 관광지 상세 조회하기 */
 export const getTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { location_id } = req.params;
+    const { locationId } = req.params;
 
-    const destination = await destinationService.getTouristDestination(Number(location_id));
+    const destination = await destinationService.getTouristDestination(Number(locationId));
 
     res.status(200).json({ data: { destination, message: '여행지 상세 조회를 완료했습니다.' } });
   } catch (error) {

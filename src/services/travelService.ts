@@ -9,32 +9,32 @@ import { RowDataPacket } from 'mysql2';
 export const createPlan = async (travelPlan: TravelPlan) => {
   if (
     !travelPlan.username?.trim() ||
-    !travelPlan.start_date ||
-    !travelPlan.end_date ||
+    !travelPlan.startDate ||
+    !travelPlan.endDate ||
     !travelPlan.destination?.trim()
   ) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
-  const plan_id = await travelModel.createTravelPlan(travelPlan);
-  return plan_id;
+  const planId = await travelModel.createTravelPlan(travelPlan);
+  return planId;
 };
 
 /**
  * 여행 날짜별 장소 등록
  */
-export const createLocation = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
+export const createLocation = async (travelLocation: TravelLocation, planId: number): Promise<void> => {
   if (
     !travelLocation.date ||
     !travelLocation.location ||
     !travelLocation.order ||
     !travelLocation.latitude ||
     !travelLocation.longitude ||
-    !plan_id
+    !planId
   ) {
     throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
-  await travelModel.createTravelLocation(travelLocation, plan_id);
+  await travelModel.createTravelLocation(travelLocation, planId);
 };
 
 /**
@@ -48,16 +48,16 @@ export const getPlans = async (username: string): Promise<TravelPlan[]> => {
 /**
  * 여행 날짜별 장소 조회.
  */
-export const getLocations = async (plan_id: number): Promise<TravelLocation[]> => {
-  const travelLocations = await travelModel.getTravelLocationsByPlanId(plan_id);
+export const getLocations = async (planId: number): Promise<TravelLocation[]> => {
+  const travelLocations = await travelModel.getTravelLocationsByPlanId(planId);
   return travelLocations;
 };
 
 /**
  * 여행 일정 상세 조회
  */
-export const getPlan = async (plan_id: string): Promise<TravelPlan> => {
-  const travelPlan = await travelModel.getTravelPlanByPlanId(plan_id);
+export const getPlan = async (planId: string): Promise<TravelPlan> => {
+  const travelPlan = await travelModel.getTravelPlanByPlanId(planId);
   return travelPlan;
 };
 
@@ -69,8 +69,8 @@ export const updateLocation = async (
   username: string
 ): Promise<TravelLocation> => {
   if (
-    !travelLocation.location_id ||
-    !travelLocation.plan_id ||
+    !travelLocation.locationId ||
+    !travelLocation.planId ||
     !travelLocation.location?.trim() ||
     !travelLocation.newDate ||
     !travelLocation.order?.toString().trim() ||
@@ -88,8 +88,8 @@ export const updateLocation = async (
  */
 export const deletePlan = async (
   username: string,
-  plan_id: number
+  planId: number
 ): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
-  const deletedPlan = await travelModel.deleteTravelPlan(username, plan_id);
+  const deletedPlan = await travelModel.deleteTravelPlan(username, planId);
   return deletedPlan;
 };

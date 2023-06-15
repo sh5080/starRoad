@@ -33,7 +33,7 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
 
     const { title, content, image, ...extraFields } = req.body;
 
-    const { plan_id } = req.params;
+    const { planId } = req.params;
     const username = req.user?.username;
 
     if (!username) {
@@ -50,7 +50,7 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
     const diary = await diaryService.createDiary(
       { username, title, content, image: imgNames },
       username,
-      Number(plan_id)
+      Number(planId)
     );
 
     res.status(201).json(diary);
@@ -92,8 +92,8 @@ export const getMyDiaries = async (req: CustomRequest, res: Response, next: Next
 /** 특정 여행기 조회 */
 export const getOneDiary = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const diary_id = parseInt(req.params.diary_id, 10);
-    const diary = await diaryService.getOneDiary(diary_id);
+    const diaryId = parseInt(req.params.diaryId, 10);
+    const diary = await diaryService.getOneDiary(diaryId);
 
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
@@ -108,7 +108,7 @@ export const getOneDiary = async (req: Request, res: Response, next: NextFunctio
 /** 여행기 수정 */
 export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const diary_id = parseInt(String(req.params.diary_id), 10);
+    const diaryId = parseInt(String(req.params.diaryId), 10);
     const { title, content, ...extraFields } = req.body;
     const username = req.user?.username;
 
@@ -123,7 +123,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
     }
 
     // Get existing diary
-    const existingDiary = await diaryService.getOneDiary(diary_id);
+    const existingDiary = await diaryService.getOneDiary(diaryId);
     if (!existingDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
     }
@@ -193,7 +193,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
 
     // Update the diary
     const diaryData = { title, content, image: JSON.stringify(imgNames) };
-    await diaryService.updateDiary(diaryData, diary_id, username);
+    await diaryService.updateDiary(diaryData, diaryId, username);
 
     res.status(200).json(diaryData);
   } catch (error) {
@@ -205,12 +205,12 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
 /** 여행기 삭제 */
 export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const diary_id = parseInt(String(req.params.diary_id), 10);
+    const diaryId = parseInt(String(req.params.diaryId), 10);
     const username = req.user?.username;
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
-    const deletedDiary = await diaryService.deleteDiary(diary_id, username);
+    const deletedDiary = await diaryService.deleteDiary(diaryId, username);
 
     if (!deletedDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 여행기가 아닙니다.', 404);

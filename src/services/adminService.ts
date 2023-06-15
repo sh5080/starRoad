@@ -36,9 +36,9 @@ export const deleteUser = async (id: number): Promise<string> => {
 };
 
 // [관리자] 회원이 작성한 여행 일정 조회하기
-export const getUserInfoTravel = async (username: string): Promise<TravelPlan[]> => {
+export const getAllTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
-    const travelPlans = await adminModel.getUserInfoTravel(username);
+    const travelPlans = await adminModel.getAllTravelPlansByUsername(username);
     return travelPlans;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user travel plans', 500);
@@ -46,9 +46,9 @@ export const getUserInfoTravel = async (username: string): Promise<TravelPlan[]>
 };
 
 // [관리자] 회원이 작성한 여행 장소 날짜 조회하기
-export const getUserInfoTravelLocation = async (plan_id: number): Promise<TravelPlan[]> => {
+export const getAllLocationsByPlanId = async (plan_id: number): Promise<TravelPlan[]> => {
   try {
-    const travelPlans = await adminModel.getUserInfoLocation(plan_id);
+    const travelPlans = await adminModel.getAllLocationsByPlanId(plan_id);
     return travelPlans;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user travel locations', 500);
@@ -56,9 +56,9 @@ export const getUserInfoTravelLocation = async (plan_id: number): Promise<Travel
 };
 
 // [관리자] 회원이 작성한 다이어리 조회하기
-export const getUserInfoDiary = async (username: string): Promise<Diary[]> => {
+export const getAllDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
-    const travelDiaries = await adminModel.getUserInfoDiary(username);
+    const travelDiaries = await adminModel.getAllDiariesByUsername(username);
     return travelDiaries;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user diaries', 500);
@@ -66,9 +66,9 @@ export const getUserInfoDiary = async (username: string): Promise<Diary[]> => {
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByAdmin = async (username: string, diary_id: number): Promise<string> => {
+export const deleteDiaryByUsername = async (username: string, diary_id: number): Promise<string> => {
   try {
-    await adminModel.deleteDiaryByAdmin(username, diary_id);
+    await adminModel.deleteDiaryByUsername(username, diary_id);
     return '다이어리가 정상적으로 삭제되었습니다.';
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user diary', 500);
@@ -76,9 +76,9 @@ export const deleteDiaryByAdmin = async (username: string, diary_id: number): Pr
 };
 
 // [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기
-export const getUserInfoComment = async (username: string, diary_id: number): Promise<Comment[]> => {
+export const getAllCommentsByUsernameAndDiaryId = async (username: string, diary_id: number): Promise<Comment[]> => {
   try {
-    const diaryComments = await adminModel.getUserInfoDiaryComment(username, diary_id);
+    const diaryComments = await adminModel.getAllCommentsByUsernameAndDiaryId(username, diary_id);
     return diaryComments;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user diary comments', 500);
@@ -86,9 +86,9 @@ export const getUserInfoComment = async (username: string, diary_id: number): Pr
 };
 
 // [관리자] 특정 회원이 작성한 모든 댓글 조회하기
-export const getUserAllComment = async (username: string): Promise<Comment[]> => {
+export const getAllCommentsByUsername = async (username: string): Promise<Comment[]> => {
   try {
-    const userComments = await adminModel.getUserAllComment(username);
+    const userComments = await adminModel.getAllCommentsByUsername(username);
     return userComments;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user comments', 500);
@@ -96,13 +96,13 @@ export const getUserAllComment = async (username: string): Promise<Comment[]> =>
 };
 
 // [관리자] 회원이 작성한 댓글 삭제하기
-export const deleteCommentByAdmin = async (
+export const deleteCommentByUsernameAndDiaryId = async (
   username: string,
   diary_id: number,
   comment_id: number
 ): Promise<string> => {
   try {
-    await adminModel.deleteCommentByAdmin(username, diary_id, comment_id);
+    await adminModel.deleteCommentByUsernameAndDiaryId(username, diary_id, comment_id);
     return '댓글이 정상적으로 삭제되었습니다.';
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user comment', 500);
