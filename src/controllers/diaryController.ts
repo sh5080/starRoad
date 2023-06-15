@@ -15,7 +15,20 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
 
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
-      imgNames = files.map((file) => `${IMG_PATH}/${file.filename}`);
+
+      const promises = files.map(async (file) => {
+        const inputPath = path.join(__dirname, '../../public', file.filename);
+        const compressedPath = path.join(__dirname, '../../public/compressed', file.filename);
+        await compressImage(inputPath, compressedPath, 600, 600);
+
+        const compressedFilename = path.basename(compressedPath);
+        const encodedFilename = encodeURIComponent(compressedFilename);
+        imgNames.push(`${IMG_PATH}/${encodedFilename}`);
+
+        await fs.unlink(path.join(__dirname, '../../public', file.filename));
+        console.log('오리지널 이미지 삭제 완료');
+      });
+      await Promise.all(promises);
     }
 
     const { title, content, image, ...extraFields } = req.body;
@@ -39,18 +52,6 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
       username,
       Number(plan_id)
     );
-
-    if (req.files && Array.isArray(req.files)) {
-      const files = req.files as Express.Multer.File[];
-      const promises = files.map(async (file) => {
-        const inputPath = path.join(__dirname, '../../public', file.filename);
-        const compressed = path.join(__dirname, '../../public/compressed', file.filename);
-        await compressImage(inputPath, compressed, 600, 600);
-
-        await fs.unlink(path.join(__dirname, '../../public', file.filename));
-      });
-      await Promise.all(promises);
-    }
 
     res.status(201).json(diary);
   } catch (error) {
@@ -108,7 +109,7 @@ export const getOneDiary = async (req: Request, res: Response, next: NextFunctio
 export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(String(req.params.diary_id), 10);
-    const { title, content, image, ...extraFields } = req.body;
+    const { title, content, ...extraFields } = req.body;
     const username = req.user?.username;
 
     if (!username) {
@@ -118,37 +119,81 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
     if (!title || !content) {
-      throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
+      throw new AppError(CommonError.INVALID_INPUT, '제목과 본문은 필수 입력 항목입니다.', 400);
     }
 
+    // Get existing diary
     const existingDiary = await diaryService.getOneDiary(diary_id);
     if (!existingDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
     }
-    const existingImages = existingDiary.image || [];
 
-    let imgNames: string[] = [];
-    if (req.files && Array.isArray(req.files)) {
-      const files = req.files as Express.Multer.File[];
-      imgNames = files.map((file) => `${IMG_PATH}/${file.filename}`);
+    // Delete existing images
+    if (existingDiary.image) {
+      let imageArray: string[];
+
+      if (typeof existingDiary.image === 'string') {
+        try {
+          imageArray = JSON.parse(existingDiary.image);
+          if (!Array.isArray(imageArray)) {
+            throw new Error();
+          }
+        } catch {
+          imageArray = [existingDiary.image];
+        }
+      } else {
+        imageArray = existingDiary.image;
+      }
+
+      console.log(imageArray);
+      for (const imageName of imageArray) {
+        const url = new URL(imageName);
+        const pathname = url.pathname;
+        const baseDir = '/static/compressed/';
+        const start = pathname.indexOf(baseDir);
+        if (start === -1) {
+          throw new AppError(CommonError.UNEXPECTED_ERROR, 'Unexpected file path', 500);
+        }
+        const encodedFilename = pathname.substring(start + baseDir.length);
+        const filename = decodeURIComponent(encodedFilename);
+
+        if (filename) {
+          try {
+            console.log('@@@@@@@@@@@@@@@@@filename@@@@@@@@@@@@@@@@', filename);
+            await fs.unlink(path.join(__dirname, '../../public/compressed', filename));
+            console.log('Deleted existing image');
+          } catch (err) {
+            console.error(`Failed to delete image at ${imageName}: `, err);
+            throw new AppError(CommonError.UNEXPECTED_ERROR, 'Failed to delete image', 500);
+          }
+        }
+      }
     }
 
-    imgNames = ([] as string[]).concat(existingImages, imgNames);
-    const diaryData = { title, content, image: imgNames };
+    let imgNames: string[] = [];
 
-    await diaryService.updateDiary(diaryData, diary_id, username);
-
+    // Upload new images and compress
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
+
       const promises = files.map(async (file) => {
         const inputPath = path.join(__dirname, '../../public', file.filename);
-        const compressed = path.join(__dirname, '../../public/compressed', file.filename);
-        await compressImage(inputPath, compressed, 600, 600);
+        const compressedPath = path.join(__dirname, '../../public/compressed', file.filename);
+        await compressImage(inputPath, compressedPath, 600, 600);
 
-        await fs.unlink(path.join(__dirname, '../../public', file.filename));
+        // Save the compressed image filename to the array
+        const compressedFilename = path.basename(compressedPath);
+        imgNames.push(`${IMG_PATH}/${compressedFilename}`);
+
+        await fs.unlink(inputPath);
+        console.log('Original image deleted');
       });
       await Promise.all(promises);
     }
+
+    // Update the diary
+    const diaryData = { title, content, image: JSON.stringify(imgNames) };
+    await diaryService.updateDiary(diaryData, diary_id, username);
 
     res.status(200).json(diaryData);
   } catch (error) {

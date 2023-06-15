@@ -4,7 +4,7 @@ import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
 
 /**
- * 다이어리 생성
+ * 여행기 생성
  */
 export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<void> => {
   try {
