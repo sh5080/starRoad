@@ -101,13 +101,38 @@ export const getOneDiary = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
+// export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
+//   try {
+//     const diary_id = parseInt(String(req.params.diary_id), 10);
+//     const { title, content, image, ...extraFields } = req.body;
+//     const username = req.user?.username;
+
+//     const diaryData = { title, content, image };
+//     if (!username) {
+//       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
+//     }
+//     if (Object.keys(extraFields).length > 0) {
+//       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
+//     }
+//     if (!title || !content) {
+//       throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
+//     }
+
+//     await diaryService.updateDiary(diaryData, diary_id, username);
+
+//     res.status(200).json(diaryData);
+//   } catch (error) {
+//     console.error(error);
+//     next(error);
+//   }
+// };
+
 export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(String(req.params.diary_id), 10);
-    const { title, content, image, ...extraFields } = req.body;
+    const { title, content, ...extraFields } = req.body;
     const username = req.user?.username;
 
-    const diaryData = { title, content, image };
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
@@ -118,7 +143,36 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
     }
 
+    // 다이어리 수정 시 기존 이미지 유지
+    const existingDiary = await diaryService.getOneDiary(diary_id);
+    if (!existingDiary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
+    }
+    const existingImages = existingDiary.image || [];
+
+    let imgNames: string[] = [];
+    if (req.files && Array.isArray(req.files)) {
+      const files = req.files as Express.Multer.File[];
+      imgNames = files.map((file) => `${IMG_PATH}/${file.filename}`);
+    }
+
+    //imgNames = [...existingImages, ...imgNames];
+    imgNames = ([] as string[]).concat(existingImages, imgNames);
+    const diaryData = { title, content, image: imgNames };
+
     await diaryService.updateDiary(diaryData, diary_id, username);
+
+    if (req.files && Array.isArray(req.files)) {
+      const files = req.files as Express.Multer.File[];
+      const promises = files.map(async (file) => {
+        const inputPath = path.join(__dirname, '../../public', file.filename);
+        const compressed = path.join(__dirname, '../../public/compressed', file.filename);
+        await compressImage(inputPath, compressed, 600, 600);
+
+        await fs.unlink(path.join(__dirname, '../../public', file.filename));
+      });
+      await Promise.all(promises);
+    }
 
     res.status(200).json(diaryData);
   } catch (error) {
@@ -126,6 +180,8 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
     next(error);
   }
 };
+
+
 
 export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
