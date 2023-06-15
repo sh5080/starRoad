@@ -3,6 +3,9 @@ import { Diary } from '../types/diary';
 import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
 
+/**
+ * 다이어리 생성
+ */
 export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<void> => {
   try {
     await db.execute('INSERT INTO travel_diary (plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?)', [
@@ -18,6 +21,9 @@ export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<
   }
 };
 
+/**
+ * 특정 여행 일정 조회
+ */
 export const getPlan = async (plan_id: number, username: string): Promise<TravelPlan | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?', [
@@ -37,6 +43,9 @@ export const getPlan = async (plan_id: number, username: string): Promise<Travel
   }
 };
 
+/**
+ * 모든 여행기 조회
+ */
 export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary');
@@ -47,6 +56,10 @@ export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
     throw new AppError(CommonError.UNEXPECTED_ERROR, '모든 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
   }
 };
+
+/**
+ * 내 여행기 조회
+ */
 export const getMyDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
     const query = `
@@ -63,6 +76,9 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
   }
 };
 
+/**
+ * 특정 여행기 조회
+ */
 export const getOneDiaryByUsername = async (diary_id: number): Promise<Diary | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diary_id]);
@@ -77,6 +93,9 @@ export const getOneDiaryByUsername = async (diary_id: number): Promise<Diary | n
   }
 };
 
+/**
+ * 여행기 업데이트
+ */
 export const updateDiaryByUsername = async (diary: Omit<Diary, 'id'>, diary_id: number): Promise<void> => {
   try {
     await db.execute('UPDATE travel_diary SET title = ?, content = ?, image = ? WHERE id = ?', [
@@ -91,6 +110,9 @@ export const updateDiaryByUsername = async (diary: Omit<Diary, 'id'>, diary_id: 
   }
 };
 
+/**
+ * 여행기 삭제
+ */
 export const deleteDiaryByUsername = async (diary_id: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM travel_diary WHERE id = ?', [diary_id]);

@@ -6,7 +6,7 @@ import { UserType } from '../types/user';
 interface CustomRequest extends Request {
   user?: JwtPayload & { username: string };
 }
-// 회원가입
+/** 회원가입 */
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, username, password, email, ...extraFields } = req.body;
@@ -38,7 +38,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-// 로그인
+/** 로그인 */
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, password, ...extraFields }: UserType = req.body;
@@ -59,17 +59,16 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     res.cookie('token', token, {
       httpOnly: true,
-      // secure: true, // HTTPS시에
-      maxAge: 3600000, // 쿠키의 유효 시간 설정(예: 2 hours)
-      // sameSite: 'none', // SameSite 옵션 설정
-      // 필요에 따라 쿠키 설정을 추가할 수 있습니다.
+      maxAge: 3600000,
     });
+
     res.status(200).json({ message: '로그인 성공', user: userData });
   } catch (error) {
     console.error(error);
     next(error);
   }
 };
+/** 로그아웃 */
 export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     res.clearCookie('token');
@@ -80,7 +79,7 @@ export const logout = async (req: CustomRequest, res: Response, next: NextFuncti
   }
 };
 
-// 내 정보 조회
+/** 내 정보 조회 */
 export const getUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const username = req.user?.username;
@@ -95,7 +94,8 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
     next(error);
   }
 };
-// 회원 정보 수정
+
+/** 회원 정보 수정 */
 export const updateUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
@@ -125,7 +125,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response, next: Ne
   }
 };
 
-// 회원 탈퇴
+/** 회원 탈퇴 */
 export const deleteUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {

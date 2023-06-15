@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError, CommonError } from '../../types/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 
 interface CustomRequest extends Request {

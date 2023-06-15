@@ -9,7 +9,7 @@ import { TouristDestinationType } from '../types/destination';
 // [관리자] 모든 회원 정보 불러오기
 export const getAllUsers = async (): Promise<UserType[]> => {
   try {
-    return await adminModel.getAllUsersModel();
+    return await adminModel.getAllUsers();
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get all user information', 500);
   }
@@ -18,7 +18,7 @@ export const getAllUsers = async (): Promise<UserType[]> => {
 // [관리자] 회원 정보 업데이트
 export const updateUser = async (id: number, user: Partial<UserType>): Promise<UserType> => {
   try {
-    const updatedUser = await adminModel.updateUserByIdModel(id, user);
+    const updatedUser = await adminModel.updateUserById(id, user);
     return updatedUser;
   } catch (error) {
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update user information', 500);

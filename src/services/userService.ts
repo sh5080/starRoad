@@ -11,6 +11,9 @@ const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 
+/**
+ * 사용자 회원가입
+ */
 export const signupUser = async (user: User.UserType): Promise<string> => {
   const hashedPassword = await bcrypt.hash(String(user.password), saltRounds);
 
@@ -24,6 +27,9 @@ export const signupUser = async (user: User.UserType): Promise<string> => {
   return '회원가입이 정상적으로 완료되었습니다.';
 };
 
+/**
+ * 사용자 로그인
+ */
 export const loginUser = async (username: string, password: string): Promise<object> => {
   const user = await userModel.getUserByUsername(username);
 
@@ -51,7 +57,9 @@ export const loginUser = async (username: string, password: string): Promise<obj
   return { accessToken, refreshToken };
 };
 
-
+/**
+ * 사용자 정보 조회
+ */
 export const getUser = async (username?: string) => {
   const user = await userModel.getUserByUsername(username);
 
@@ -63,6 +71,9 @@ export const getUser = async (username?: string) => {
   return userData;
 };
 
+/**
+ * 사용자 정보 업데이트
+ */
 export const updateUser = async (username: string, updateData: Partial<User.UserType>) => {
   // 기존 유저 정보 가져오기
   const existingUser = await userModel.getUserByUsername(username);
@@ -96,6 +107,9 @@ export const updateUser = async (username: string, updateData: Partial<User.User
   return userInfo;
 };
 
+/**
+ * 사용자 삭제
+ */
 export const deleteUser = async (username: string) => {
   try {
     const deletedUser = await userModel.deleteUserByUsername(username);

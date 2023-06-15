@@ -8,7 +8,6 @@ if (!fs.existsSync('public')) {
   fs.mkdirSync('public');
 }
 
-// Configure storage
 const storage = multer.diskStorage({
   destination: function (
     req: Request,
@@ -18,15 +17,12 @@ const storage = multer.diskStorage({
     cb(null, './public');
   },
   filename: function (req: Request, files: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
-    // 유니크한 파일명
     cb(null, crypto.randomUUID() + '-' + files.originalname);
   },
 });
 
-// 스토리지 초기화
 const upload = multer({ storage: storage });
 
-// 미들웨어 함수
 export const processImage = (req: Request, res: Response, next: NextFunction) => {
   upload.array('image', 4)(req, res, (err) => {
     // upload.array 사용

@@ -1,7 +1,7 @@
 import * as authService from '../services/authService';
 import { NextFunction, Request, Response } from 'express';
 import config from '../config/index';
-import qs from 'qs'
+import qs from 'qs';
 import axios from 'axios';
 import { JwtPayload } from 'jsonwebtoken';
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = config.google;
@@ -10,15 +10,19 @@ interface CustomRequest extends Request {
   user?: JwtPayload & { username: string };
 }
 
+/** 카카오 로그인 */
 export const kakaoLogin = (req: CustomRequest, res: Response, next: NextFunction) => {
   const loginUrl = authService.generateLoginUrl('kakao');
   res.redirect(loginUrl);
 };
+
+/** 구글 로그인 */
 export const googleLogin = (req: CustomRequest, res: Response, next: NextFunction) => {
   const loginUrl = authService.generateLoginUrl('google');
   res.redirect(loginUrl);
 };
 
+/** 카카오 로그인 콜백 */
 export const kakaoCallback = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const code = req.query.code;
@@ -43,15 +47,15 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
 
     // 카카오 사용자 정보 요청
     const kakaoInfo = await axios.get('https://kapi.kakao.com/v2/user/me', {
-  headers: {
-    Authorization: `Bearer ${accessToken}`,
-  },
-});
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     const kakaoUserInfo = kakaoInfo.data;
 
     // 카카오 사용자 정보에서 이메일을 가져옵니다.
     const kakaoEmail = kakaoUserInfo.kakao_account.email;
-   // console.log(kakaoEmail)
+
     // 이메일을 기준으로 기존에 회원 가입되어 있는지 확인
     const existingInfo = await authService.getUserForOauth(kakaoEmail);
 
@@ -61,10 +65,10 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
 
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
       res.cookie('token', token, {
-        //httpOnly: true,
+        // httpOnly: true,
         maxAge: 7200000,
-      });      
-      // res.redirect(`http://localhost:5173?token=${token}`);
+      });
+
       res.redirect(`http://localhost:5173`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
@@ -86,6 +90,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
   }
 };
 
+/** 구글 로그인 콜백 */
 export const googleCallback = async (req: CustomRequest, res: Response, next: NextFunction) => {
   const code = req.query.code;
 
@@ -108,8 +113,10 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
       },
     });
     const googleEmail = googleInfo.data.email;
+
     // 기존 사용자 여부 이메일로 확인
     const existingInfo = await authService.getUserForOauth(googleEmail);
+
     // 회원가입 및 로그인 처리 등 필요한 로직 수행
     if (existingInfo) {
       // 기존에 회원 가입되어 있는 경우, 해당 유저로 로그인
@@ -117,11 +124,8 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
 
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
       res.cookie('token', token, {
-        // httpOnly: true,
         maxAge: 7200000,
       });
-
-      // res.redirect(`http://localhost:5173?token=${token}`);
 
       res.redirect(`http://localhost:5173`);
     } else {

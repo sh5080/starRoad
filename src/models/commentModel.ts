@@ -10,6 +10,9 @@ interface QueryResult extends RowDataPacket {
   comment: string;
 }
 
+/**
+ * 댓글 생성
+ */
 export const createComment = async (comment: Comment): Promise<void> => {
   try {
     await db.execute('INSERT INTO comment (username, diary_id, comment) VALUES (?, ?, ?)', [
@@ -19,10 +22,13 @@ export const createComment = async (comment: Comment): Promise<void> => {
     ]);
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 생성에 실패했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 생성에 실패했습니다.', 500);
   }
 };
 
+/**
+ * 특정 다이어리의 댓글 조회
+ */
 export const getCommentsByDiary = async (
   diary_id: number,
   page: number,
@@ -49,20 +55,25 @@ export const getCommentsByDiary = async (
     return comments;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 조회에 실패했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 조회에 실패했습니다.', 500);
   }
 };
 
+/**
+ * 댓글 업데이트
+ */
 export const updateComment = async (id: number, comment: Comment) => {
   try {
     await db.execute('UPDATE comment SET comment = ? WHERE id = ?', [comment.comment, id]);
-
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 업데이트에 실패했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 업데이트에 실패했습니다.', 500);
   }
 };
 
+/**
+ * 댓글 조회
+ */
 export const getComment = async (id: number): Promise<Comment | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
@@ -72,15 +83,18 @@ export const getComment = async (id: number): Promise<Comment | null> => {
     return null;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 조회에 실패했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 조회에 실패했습니다.', 500);
   }
 };
 
+/**
+ * 댓글 삭제
+ */
 export const deleteComment = async (id: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM comment WHERE id = ?', [id]);
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'댓글 삭제에 실패했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 삭제에 실패했습니다.', 500);
   }
 };

@@ -3,7 +3,10 @@ import * as diaryController from '../../controllers/diaryController';
 
 const router = Router();
 
-router.get('/:diary_id', diaryController.getOneDiary); //특정 여행기 조회
-router.get('/', diaryController.getAllDiaries); //여행기 전체 조회
+/** [여행기] 특정 여행기 조회 */
+router.get('/:diary_id', diaryController.getOneDiary);
+
+/** [여행기] 여행기 전체 조회 */
+router.get('/', diaryController.getAllDiaries);
 
 export default router;

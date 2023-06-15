@@ -2,7 +2,7 @@ import { CustomRequest } from '../types/customRequest';
 import { Response, NextFunction } from 'express';
 import * as destinationService from '../services/destinationService';
 
-// 관광지 모두 조회하기
+/** 관광지 모두 조회하기 */
 export const getAllTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const destinations = await destinationService.getAllTouristDestination();
@@ -15,7 +15,7 @@ export const getAllTouristDestination = async (req: CustomRequest, res: Response
   }
 };
 
-// 관광지 상세 조회하기
+/** 관광지 상세 조회하기 */
 export const getTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { location_id } = req.params;

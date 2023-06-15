@@ -8,7 +8,7 @@ import config from '../config';
 import path from 'node:path';
 const IMG_PATH = config.server.IMG_PATH;
 
-// 다이어리 작성(이미지 포함)
+/** 여행기 작성 */
 export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     let imgNames: string[] = [];
@@ -43,7 +43,6 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
       const promises = files.map(async (file) => {
-        // __dirname을 사용하여 절대경로를 만듭니다.
         const inputPath = path.join(__dirname, '../../public', file.filename);
         const compressed = path.join(__dirname, '../../public/compressed', file.filename);
         await compressImage(inputPath, compressed, 600, 600);
@@ -60,9 +59,9 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
   }
 };
 
+/** 전체 여행기 조회 */
 export const getAllDiaries = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // 다이어리 조회
     const diary = await diaryService.getAllDiaries();
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '전체 여행기를 찾을 수 없습니다.', 404);
@@ -73,6 +72,8 @@ export const getAllDiaries = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
+
+/** 내 여행기 조회 */
 export const getMyDiaries = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const username = req.user?.username;
@@ -86,6 +87,8 @@ export const getMyDiaries = async (req: CustomRequest, res: Response, next: Next
     next(error);
   }
 };
+
+/** 특정 여행기 조회 */
 export const getOneDiary = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(req.params.diary_id, 10);
@@ -101,32 +104,7 @@ export const getOneDiary = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
-//   try {
-//     const diary_id = parseInt(String(req.params.diary_id), 10);
-//     const { title, content, image, ...extraFields } = req.body;
-//     const username = req.user?.username;
-
-//     const diaryData = { title, content, image };
-//     if (!username) {
-//       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
-//     }
-//     if (Object.keys(extraFields).length > 0) {
-//       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
-//     }
-//     if (!title || !content) {
-//       throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
-//     }
-
-//     await diaryService.updateDiary(diaryData, diary_id, username);
-
-//     res.status(200).json(diaryData);
-//   } catch (error) {
-//     console.error(error);
-//     next(error);
-//   }
-// };
-
+/** 여행기 수정 */
 export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(String(req.params.diary_id), 10);
@@ -143,7 +121,6 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
     }
 
-    // 다이어리 수정 시 기존 이미지 유지
     const existingDiary = await diaryService.getOneDiary(diary_id);
     if (!existingDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
@@ -156,7 +133,6 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
       imgNames = files.map((file) => `${IMG_PATH}/${file.filename}`);
     }
 
-    //imgNames = [...existingImages, ...imgNames];
     imgNames = ([] as string[]).concat(existingImages, imgNames);
     const diaryData = { title, content, image: imgNames };
 
@@ -181,8 +157,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
   }
 };
 
-
-
+/** 여행기 삭제 */
 export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(String(req.params.diary_id), 10);

@@ -3,6 +3,9 @@ import { TravelPlan, TravelLocation } from '../types/travel';
 import { RowDataPacket, FieldPacket } from 'mysql2';
 import { AppError, CommonError } from '../types/AppError';
 
+/**
+ * 여행 일정 생성
+ */
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
   try {
     const [rows] = await db.execute(
@@ -17,6 +20,9 @@ export const createTravelPlan = async (travelPlan: TravelPlan) => {
   }
 };
 
+/**
+ * 여행 장소 생성
+ */
 export const createTravelLocation = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
   try {
     await db.execute(
@@ -36,7 +42,9 @@ export const createTravelLocation = async (travelLocation: TravelLocation, plan_
   }
 };
 
-// 모든 여행 일정 조회
+/**
+ * 사용자별 모든 여행 일정 조회
+ */
 export const getTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
@@ -47,7 +55,9 @@ export const getTravelPlansByUsername = async (username: string): Promise<Travel
   }
 };
 
-// 여행의 날짜별 장소 조회
+/**
+ * 특정 여행 일정의 모든 장소 조회
+ */
 export const getTravelLocationsByPlanId = async (plan_id: number): Promise<TravelLocation[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
@@ -58,7 +68,9 @@ export const getTravelLocationsByPlanId = async (plan_id: number): Promise<Trave
   }
 };
 
-// 여행 일정 상세 조회
+/**
+ * 특정 여행 일정 조회
+ */
 export const getTravelPlanByPlanId = async (plan_id: string): Promise<TravelPlan> => {
   try {
     const [rows] = await db.execute<RowDataPacket[]>('SELECT * FROM travel_plan WHERE plan_id = ?', [plan_id]);
@@ -69,19 +81,9 @@ export const getTravelPlanByPlanId = async (plan_id: string): Promise<TravelPlan
   }
 };
 
-// 여행 일정 수정 ( -> 삭제만 하는 걸로 하기로 함 )
-// export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
-//   try {
-//     await db.execute(
-//       'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ?',
-//       [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id]
-//     );
-//   } catch (error) {
-//     console.error(error);
-//     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 수정에 실패했습니다.', 500);
-//   }
-// };
-
+/**
+ * 여행 장소 수정
+ */
 export const updateTravelLocation = async (
   username: string,
   travelLocation: TravelLocation
@@ -123,7 +125,9 @@ export const updateTravelLocation = async (
   }
 };
 
-// [사용자] 일정 삭제
+/**
+ * 사용자별 일정 삭제
+ */
 export const deleteTravelPlan = async (
   username: string,
   plan_id: number
@@ -151,29 +155,3 @@ export const deleteTravelPlan = async (
     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 삭제에 실패했습니다.', 500);
   }
 };
-
-// 특정 날짜별 장소 삭제는 일정 수정에서 처리(null값으로)
-// export const deleteTravelLocation = async (
-//   location_id:number,
-//   travelLocation: TravelLocation
-//   ): Promise<{deletedLocations:RowDataPacket[]}> => {
-//   try {
-//     const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
-//       location_id,
-//     ])) as [
-//       RowDataPacket[],
-//       FieldPacket[]
-//     ];
-//     await db.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND location_id = ?', [
-//       travelLocation.plan_id,
-//       travelLocation.location_id,
-//     ])
-// return {
-//   deletedLocations: locationData
-// }
-
-//   } catch (error) {
-//     console.error(error);
-//     throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 삭제에 실패했습니다.',500);
-//   }
-// };

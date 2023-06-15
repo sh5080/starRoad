@@ -2,7 +2,7 @@ import { AppError, CommonError } from '../types/AppError';
 import { TouristDestinationType } from '../types/destination';
 import * as destinationModel from '../models/destinationModel';
 
-// 관광지 모두 조회하기
+/** 관광지 모두 조회하기 */
 
 export const getAllTouristDestination = async (): Promise<TouristDestinationType[]> => {
   try {
@@ -14,7 +14,7 @@ export const getAllTouristDestination = async (): Promise<TouristDestinationType
   }
 };
 
-// 관광지 상세 조회하기
+/** 관광지 모두 조회하기 */
 export const getTouristDestination = async (id: number): Promise<TouristDestinationType> => {
   try {
     const destination = await destinationModel.getTouristDestination(id);

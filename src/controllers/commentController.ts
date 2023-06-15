@@ -4,6 +4,7 @@ import { getOneDiary } from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
 
+/** 댓글 생성 */
 export const createComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diary_id, comment, ...extraFields } = req.body;
@@ -31,6 +32,8 @@ export const createComment = async (req: CustomRequest, res: Response, next: Nex
     next(error);
   }
 };
+
+/** 여행기에 대한 댓글 조회 */
 export const getCommentsByDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diary_id } = req.params;
@@ -47,6 +50,7 @@ export const getCommentsByDiary = async (req: CustomRequest, res: Response, next
   }
 };
 
+/** 댓글 수정 */
 export const updateComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { comment_id } = req.params;
@@ -60,13 +64,14 @@ export const updateComment = async (req: CustomRequest, res: Response, next: Nex
     }
 
     await commentService.updateComment({ comment }, Number(comment_id), username as string);
-    res.status(200).json({message : comment});
+    res.status(200).json({ message: comment });
   } catch (error) {
     console.error(error);
     next(error);
   }
 };
 
+/** 댓글 삭제 */
 export const deleteComment = async (req: CustomRequest, res: Response, next:NextFunction) => {
   try {
     const { comment_id } = req.params;

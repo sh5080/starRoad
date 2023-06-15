@@ -1,32 +1,37 @@
 import * as diaryModel from '../models/diaryModel';
 import { Diary } from '../types/diary';
-import { AppError,CommonError } from "../types/AppError";
+import { AppError, CommonError } from '../types/AppError';
 
-
+/**
+ * 여행기 생성
+ */
 export const createDiary = async (
-  diary: Diary, 
-  username: string, 
+  diary: Diary,
+  username: string,
   plan_id: number
-  ) => {
-    const plan = await diaryModel.getPlan(plan_id, username);
+) => {
+  const plan = await diaryModel.getPlan(plan_id, username);
 
-    if (!plan) {
-      throw new AppError(CommonError.INVALID_INPUT, '나의 일정만 여행기를 등록할 수 있습니다.', 404);
-    }
-    const { destination } = plan; // 일정의 destination 값
-    diary.destination = destination;
-    
-    const { title, content, image } = diary
-    diary.title = title
-    diary.content = content
-    diary.image = image
+  if (!plan) {
+    throw new AppError(CommonError.INVALID_INPUT, '나의 일정만 여행기를 등록할 수 있습니다.', 404);
+  }
 
-    await diaryModel.createDiaryByUsername(diary, plan);
-    
-    return diary
-    
+  const { destination } = plan; // 일정의 destination 값
+  diary.destination = destination;
+
+  const { title, content, image } = diary;
+  diary.title = title;
+  diary.content = content;
+  diary.image = image;
+
+  await diaryModel.createDiaryByUsername(diary, plan);
+
+  return diary;
 };
 
+/**
+ * 전체 여행기 조회
+ */
 export const getAllDiaries = async (): Promise<Diary[]> => {
   try {
     const diaries = await diaryModel.getAllDiariesByUsername();
@@ -36,6 +41,10 @@ export const getAllDiaries = async (): Promise<Diary[]> => {
     throw new AppError(CommonError.UNEXPECTED_ERROR, '전체 여행기 조회에 실패했습니다.', 500);
   }
 };
+
+/**
+ * 내 다이어리 조회
+ */
 export const getMyDiaries = async (username: string): Promise<Diary[]> => {
   try {
     const diary = await diaryModel.getMyDiariesByUsername(username);
@@ -45,6 +54,10 @@ export const getMyDiaries = async (username: string): Promise<Diary[]> => {
     throw new AppError(CommonError.UNEXPECTED_ERROR, '내 다이어리 조회에 실패했습니다.', 500);
   }
 };
+
+/**
+ * 특정 여행기 조회
+ */
 export const getOneDiary = async (diary_id: number): Promise<Diary | null> => {
   try {
     const diary = await diaryModel.getOneDiaryByUsername(diary_id);
@@ -55,26 +68,32 @@ export const getOneDiary = async (diary_id: number): Promise<Diary | null> => {
   }
 };
 
+/**
+ * 여행기 수정
+ */
 export const updateDiary = async (
   newDiary: Diary,
   diary_id: number,
   username: string
 ) => {
-    const diary = await diaryModel.getOneDiaryByUsername(diary_id);
-    if (!diary) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
-    }
-    if (typeof diary.plan_id === 'undefined') {
-      throw new AppError(CommonError.INVALID_INPUT, '여행기의 일정 정보가 없습니다.', 400);
-    }
-    const plan = await diaryModel.getPlan(diary.plan_id,username);
-    if (plan?.username !== username) {
-      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
-    }
-    await diaryModel.updateDiaryByUsername(newDiary, diary_id);
-    return diary;
+  const diary = await diaryModel.getOneDiaryByUsername(diary_id);
+  if (!diary) {
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
+  }
+  if (typeof diary.plan_id === 'undefined') {
+    throw new AppError(CommonError.INVALID_INPUT, '여행기의 일정 정보가 없습니다.', 400);
+  }
+  const plan = await diaryModel.getPlan(diary.plan_id, username);
+  if (plan?.username !== username) {
+    throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
+  }
+  await diaryModel.updateDiaryByUsername(newDiary, diary_id);
+  return diary;
 };
 
+/**
+ * 여행기 삭제
+ */
 export const deleteDiary = async (diary_id: number, username: string) => {
   try {
     const diary = await diaryModel.getOneDiaryByUsername(diary_id);
@@ -86,7 +105,7 @@ export const deleteDiary = async (diary_id: number, username: string) => {
       throw new AppError(CommonError.INVALID_INPUT, '여행기의 일정 정보가 없습니다.', 400);
     }
 
-    const plan = await diaryModel.getPlan(diary.plan_id,username);
+    const plan = await diaryModel.getPlan(diary.plan_id, username);
     if (!plan) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '일정을 찾을 수 없습니다.', 404);
     }
@@ -100,4 +119,3 @@ export const deleteDiary = async (diary_id: number, username: string) => {
     console.error(error);
   }
 };
-

@@ -9,7 +9,7 @@ import path from 'node:path';
 
 const IMG_PATH = config.server.IMG_PATH;
 
-// [관리자] 모든 회원 조회하기
+/** [관리자] 모든 회원 조회하기 */
 export const getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const users = await adminService.getAllUsers();
@@ -22,7 +22,7 @@ export const getAllUsers = async (req: CustomRequest, res: Response, next: NextF
   }
 };
 
-// [관리자] 회원 정보 수정하기
+/** [관리자] 회원 정보 수정하기 */
 export const updateUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
@@ -35,7 +35,7 @@ export const updateUser = async (req: CustomRequest, res: Response, next: NextFu
   }
 };
 
-// [관리자] 회원 삭제하기
+/** [관리자] 회원 삭제하기 */
 export const deleteUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
@@ -48,7 +48,7 @@ export const deleteUser = async (req: CustomRequest, res: Response, next: NextFu
   }
 };
 
-// [관리자] 회원이 작성한 여행 일정 조회하기
+/** [관리자] 회원이 작성한 여행 일정 조회하기 */
 export const getAllUserInfoTravel = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
@@ -61,7 +61,7 @@ export const getAllUserInfoTravel = async (req: CustomRequest, res: Response, ne
   }
 };
 
-// [관리자] 회원이 작성한 날짜 장소 조회하기
+/** [관리자] 회원이 작성한 날짜 장소 조회하기 */
 export const getUserInfoAllLocation = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { plan_id } = req.params;
@@ -75,7 +75,7 @@ export const getUserInfoAllLocation = async (req: CustomRequest, res: Response, 
   }
 };
 
-// [관리자] 회원이 작성한 다이어리 모두 조회하기
+/** [관리자] 회원이 작성한 다이어리 모두 조회하기 */
 export const getUserInfoAllDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
@@ -88,7 +88,7 @@ export const getUserInfoAllDiary = async (req: CustomRequest, res: Response, nex
   }
 };
 
-// [관리자] 회원이 작성한 다이어리 삭제하기
+/** [관리자] 회원이 작성한 다이어리 삭제하기 */
 export const deleteDiaryByAdmin = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, plan_id } = req.params;
@@ -100,7 +100,7 @@ export const deleteDiaryByAdmin = async (req: CustomRequest, res: Response, next
   }
 };
 
-// [관리자] 회원이 작성한 다이어리의 댓글 모두 조회하기
+/** [관리자] 회원이 작성한 다이어리의 댓글 모두 조회하기 */ 
 export const getUserInfoAllComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diary_id } = req.params;
@@ -115,6 +115,9 @@ export const getUserInfoAllComment = async (req: CustomRequest, res: Response, n
     next(error);
   }
 };
+/**
+ * [관리자] 회원이 작성한 모든 댓글 조회하기
+ */
 export const getUserAllComments = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
@@ -128,7 +131,7 @@ export const getUserAllComments = async (req: CustomRequest, res: Response, next
   }
 };
 
-// [관리자] 특정 회원이 작성한 댓글 삭제하기
+/** [관리자] 특정 회원이 작성한 댓글 삭제하기 */
 export const deleteCommentByAdminController = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diary_id, comment_id } = req.params;
@@ -140,7 +143,7 @@ export const deleteCommentByAdminController = async (req: CustomRequest, res: Re
   }
 };
 
-// [관리자] 관광지 추가하기
+/** [관리자] 관광지 추가하기 */
 export const addTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     let imgName = '';
@@ -181,9 +184,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
   }
 };
 
-// [관리자] 관광지 수정하기
-// 현재 4가지 모두가 와야 수정되는 상황임.
-// 안오는 프로퍼티가 있다면 undefined로 정의되고 데이터에 undefined로 들어가게 됨.
+/** [관리자] 관광지 수정하기 */
 export const updateTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { location_id } = req.params;
@@ -203,7 +204,7 @@ export const updateTouristDestination = async (req: CustomRequest, res: Response
   }
 };
 
-// [관리자] 관광지 삭제하기
+/** [관리자] 관광지 삭제하기 */
 export const deleteTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { location_id } = req.params;
@@ -212,8 +213,6 @@ export const deleteTouristDestination = async (req: CustomRequest, res: Response
     if (deletedData) {
       const imgName = deletedData.touristDestination.image.split('/compressed')[1];
 
-      // imgName 파일을 찾아서 삭제
-      // 상대경로 오류남 -> 절대경로로 수정
       const filePath = path.join(__dirname, '../../public/compressed', imgName);
 
       await fs.unlink(filePath);

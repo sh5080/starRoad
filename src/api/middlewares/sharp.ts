@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import path from 'path';
 
+
 export const compressImage = async (
   inputPath: string,
   outputPath: string,

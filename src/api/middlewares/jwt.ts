@@ -9,13 +9,13 @@ const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES_IN } = c
 export const validateToken = async (req: CustomRequest, res: Response, next: NextFunction) => {
   let accessToken;
   let refreshToken;
+
   if (req.headers.cookie) {
     const cookies = req.headers.cookie.split('; ');
     for (let i = 0; i < cookies.length; i++) {
       if (cookies[i].startsWith('token=')) {
         const cookieValue = cookies[i].substring(6);
         const decodedValue = decodeURIComponent(cookieValue);
-        // 'j:' 접두사 제거
         const jsonStr = decodedValue.substring(2);
         const cookieObject = JSON.parse(jsonStr);
         accessToken = cookieObject.accessToken;
@@ -24,6 +24,7 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
       }
     }
   }
+
   if (req.method === 'GET' && !accessToken) {
     return next();
   }
@@ -65,7 +66,7 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
           username: decodedRefreshToken.username,
           role: decodedRefreshToken.role,
         };
-        // 새로운 엑세스 토큰 쿠키에 담아서 보냄
+        
         res.cookie('accessToken', newAccessToken, {
           httpOnly: true,
         });

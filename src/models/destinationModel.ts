@@ -3,7 +3,7 @@ import { db } from '../loaders/dbLoader';
 import { TouristDestinationType } from '../types/destination';
 import { AppError, CommonError } from '../types/AppError';
 
-// 관광지 전부 조회하기
+/** 관광지 전부 조회하기 */
 export const getAllTouristDestination = async (): Promise<TouristDestinationType[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_destination');
@@ -16,7 +16,7 @@ export const getAllTouristDestination = async (): Promise<TouristDestinationType
   }
 };
 
-// 관광지 상세 조회하기
+/** 관광지 상세 조회하기 */
 export const getTouristDestination = async (id: number): Promise<TouristDestinationType> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_destination WHERE id = ?', [id]);

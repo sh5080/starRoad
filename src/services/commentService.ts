@@ -1,8 +1,10 @@
 import * as commentModel from '../models/commentModel';
-
 import { Comment } from '../types/comment';
 import { AppError, CommonError } from '../types/AppError';
 
+/**
+ * 댓글 생성
+ */
 export const createComment = async (comment: Comment): Promise<void> => {
   try {
     const { username, diary_id, comment: commentText } = comment;
@@ -12,11 +14,22 @@ export const createComment = async (comment: Comment): Promise<void> => {
     console.error(error);
   }
 };
-export const getCommentsByDiary = async (diary_id: number, page: number, limit: number): Promise<Comment[]> => {
+
+/**
+ * 게시물별 댓글 조회
+ */
+export const getCommentsByDiary = async (
+  diary_id: number,
+  page: number,
+  limit: number
+): Promise<Comment[]> => {
   const comments = await commentModel.getCommentsByDiary(diary_id, page, limit); // pagination 적용
   return comments;
 };
 
+/**
+ * 댓글 수정
+ */
 export const updateComment = async (newComment: Comment, id: number, username: string) => {
   const existingComment = await commentModel.getComment(id);
   if (!existingComment) {
@@ -31,6 +44,9 @@ export const updateComment = async (newComment: Comment, id: number, username: s
   return existingComment;
 };
 
+/**
+ * 댓글 삭제
+ */
 export const deleteComment = async (id: number, username: string) => {
   const comment = await commentModel.getComment(id);
   if (!comment) {
