@@ -4,7 +4,7 @@ CREATE TABLE `travel_location` (
     `date` DATE,
     `location` VARCHAR(255),
     `order` INT,
-    `latitude` DECIMAL(10,8),
-    `longitude` DECIMAL(11,8),
+    `latitude` DECIMAL(10, 8),
+    `longitude` DECIMAL(11, 8),
     PRIMARY KEY (`location_id`)
 );
