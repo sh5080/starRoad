@@ -92,7 +92,6 @@ export const updateTravelLocation = async (
   travelLocation: TravelLocation
 ): Promise<TravelLocation> => {
   try {
-    // Perform the update query
     await db.execute(
       'UPDATE travel_location SET location = ?, date = ?, `order` = ?, latitude = ?, longitude = ? WHERE plan_id = ? AND location_id = ?',
       [
@@ -129,29 +128,28 @@ export const updateTravelLocation = async (
 };
 
 /**
- * 사용자별 일정 삭제
+ * 여행 일정 삭제
  */
 export const deleteTravelPlan = async (
   username: string,
   planId: number
-): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
+): Promise<{ deletedPlan: TravelPlan[]; deletedLocations: TravelLocation[] }> => {
   try {
-    const [planData] = (await db.execute('SELECT * FROM travel_plan WHERE username = ? AND plan_id = ?', [
-      username,
-      planId,
-    ])) as [RowDataPacket[], FieldPacket[]];
+    const [planData] = await db.execute<RowDataPacket[]>(
+      'SELECT * FROM travel_plan WHERE username = ? AND plan_id = ?',
+      [username, planId]
+    );
 
-    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [planId])) as [
-      RowDataPacket[],
-      FieldPacket[]
-    ];
+    const [locationData] = await db.execute<RowDataPacket[]>('SELECT * FROM travel_location WHERE plan_id = ?', [
+      planId,
+    ]);
 
     await db.execute('DELETE FROM travel_location WHERE plan_id = ?', [planId]);
     await db.execute('DELETE FROM travel_plan WHERE username = ? AND plan_id = ?', [username, planId]);
 
     return {
-      deletedPlan: planData,
-      deletedLocations: locationData,
+      deletedPlan: planData.map(rowToCamelCase) as TravelPlan[],
+      deletedLocations: locationData.map(rowToCamelCase) as TravelLocation[],
     };
   } catch (error) {
     console.error(error);

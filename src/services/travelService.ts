@@ -66,6 +66,8 @@ export const getTravelPlanDetailsByPlanId = async (planId: string): Promise<Trav
   return rowToCamelCase(travelPlan);
 };
 
+
+
 /**
  * 여행 날짜별 장소 수정
  */
@@ -91,7 +93,7 @@ export const updateLocation = async (travelLocation: TravelLocation, username: s
 export const deletePlan = async (
   username: string,
   planId: number
-): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
+): Promise<{ deletedPlan: TravelPlan[]; deletedLocations: TravelLocation[] }> => {
   const deletedPlan = await travelModel.deleteTravelPlan(username, planId);
   return deletedPlan;
 };
