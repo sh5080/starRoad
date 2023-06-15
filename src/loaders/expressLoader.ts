@@ -4,7 +4,6 @@ import cors from 'cors';
 import { dbLoader } from '../loaders/dbLoader';
 import routeLoader from './routeLoader';
 import { errorHandler } from '../api/middlewares/errorHandler';
-import cookieParser from 'cookie-parser';
 
 export default async function expressLoader(app: Application): Promise<Application> {
   try {
@@ -15,7 +14,6 @@ export default async function expressLoader(app: Application): Promise<Applicati
     };
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(cookieParser());
 
     app.use(cors(corsOptions));
 
