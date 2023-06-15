@@ -18,7 +18,7 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
       imgNames = files.map((file) => `${IMG_PATH}/${file.filename}`);
     }
 
-    const { title, content, ...extraFields } = req.body;
+    const { title, content, image, ...extraFields } = req.body;
 
     const { plan_id } = req.params;
     const username = req.user?.username;
@@ -130,7 +130,7 @@ export const getOneDiary = async (req: Request, res: Response, next: NextFunctio
 export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diary_id = parseInt(String(req.params.diary_id), 10);
-    const { title, content, ...extraFields } = req.body;
+    const { title, content, image, ...extraFields } = req.body;
     const username = req.user?.username;
 
     if (!username) {
