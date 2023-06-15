@@ -13,7 +13,6 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
   try {
     let imgNames: string[] = [];
 
-
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
 
@@ -27,7 +26,6 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
         imgNames.push(`${IMG_PATH}/${encodedFilename}`);
 
         await fs.unlink(path.join(__dirname, '../../public', file.filename));
-        console.log('오리지널 이미지 삭제 완료');
       });
       await Promise.all(promises);
     }
@@ -116,13 +114,11 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.INVALID_INPUT, '제목과 본문은 필수 입력 항목입니다.', 400);
     }
 
-    // Get existing diary
     const existingDiary = await diaryService.getOneDiaryByDiaryId(diaryId);
     if (!existingDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
     }
 
-    // Delete existing images
     if (existingDiary.image) {
       let imageArray: string[];
 
@@ -139,7 +135,6 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
         imageArray = existingDiary.image;
       }
 
-      console.log(imageArray);
       for (const imageName of imageArray) {
         const url = new URL(imageName);
         const pathname = url.pathname;
@@ -153,9 +148,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
 
         if (filename) {
           try {
-            console.log('@@@@@@@@@@@@@@@@@filename@@@@@@@@@@@@@@@@', filename);
             await fs.unlink(path.join(__dirname, '../../public/compressed', filename));
-            console.log('Deleted existing image');
           } catch (err) {
             console.error(`Failed to delete image at ${imageName}: `, err);
             throw new AppError(CommonError.UNEXPECTED_ERROR, 'Failed to delete image', 500);
@@ -166,7 +159,6 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
 
     let imgNames: string[] = [];
 
-    // Upload new images and compress
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
 
@@ -174,18 +166,14 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
         const inputPath = path.join(__dirname, '../../public', file.filename);
         const compressedPath = path.join(__dirname, '../../public/compressed', file.filename);
         await compressImage(inputPath, compressedPath, 600, 600);
-
-        // Save the compressed image filename to the array
         const compressedFilename = path.basename(compressedPath);
         imgNames.push(`${IMG_PATH}/${compressedFilename}`);
 
         await fs.unlink(inputPath);
-        console.log('Original image deleted');
       });
       await Promise.all(promises);
     }
 
-    // Update the diary
     const diaryData = { title, content, image: JSON.stringify(imgNames) };
     await diaryService.updateDiary(diaryData, diaryId, username);
 
@@ -222,7 +210,6 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
 
       await Promise.all(promises);
     }
-    console.log('이미지 삭제 성공');
 
     res.status(200).json(deletedDiary);
   } catch (error) {

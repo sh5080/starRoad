@@ -2,17 +2,22 @@ import { TravelPlan, TravelLocation } from '../types/travel';
 import * as travelModel from '../models/travelModel';
 import { AppError, CommonError } from '../types/AppError';
 import { RowDataPacket } from 'mysql2';
+import { toCamelCase } from '../util/rowToCamelCase';
+
+function rowToCamelCase(row: any): any {
+  const newRow: any = {};
+  for (const key in row) {
+    const camelKey = toCamelCase(key);
+    newRow[camelKey] = row[key];
+  }
+  return newRow;
+}
 
 /**
  * 여행 일정 등록
  */
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
-  if (
-    !travelPlan.username?.trim() ||
-    !travelPlan.startDate ||
-    !travelPlan.endDate ||
-    !travelPlan.destination?.trim()
-  ) {
+  if (!travelPlan.username?.trim() || !travelPlan.startDate || !travelPlan.endDate || !travelPlan.destination?.trim()) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
   }
   const planId = await travelModel.createTravelPlan(travelPlan);
@@ -42,7 +47,7 @@ export const createTravelLocationByPlanId = async (travelLocation: TravelLocatio
  */
 export const getTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   const travelPlans = await travelModel.getTravelPlansByUsername(username);
-  return travelPlans;
+  return travelPlans.map(rowToCamelCase);
 };
 
 /**
@@ -50,24 +55,21 @@ export const getTravelPlansByUsername = async (username: string): Promise<Travel
  */
 export const getTravelLocationsByPlanId = async (planId: number): Promise<TravelLocation[]> => {
   const travelLocations = await travelModel.getTravelLocationsByPlanId(planId);
-  return travelLocations;
+  return travelLocations.map(rowToCamelCase);
 };
 
 /**
  * 여행 일정 상세 조회
  */
-export const getTravelPlanDetailsByPlanId  = async (planId: string): Promise<TravelPlan> => {
+export const getTravelPlanDetailsByPlanId = async (planId: string): Promise<TravelPlan> => {
   const travelPlan = await travelModel.getTravelPlanDetailsByPlanId(planId);
-  return travelPlan;
+  return rowToCamelCase(travelPlan);
 };
 
 /**
  * 여행 날짜별 장소 수정
  */
-export const updateLocation = async (
-  travelLocation: TravelLocation,
-  username: string
-): Promise<TravelLocation> => {
+export const updateLocation = async (travelLocation: TravelLocation, username: string): Promise<TravelLocation> => {
   if (
     !travelLocation.locationId ||
     !travelLocation.planId ||

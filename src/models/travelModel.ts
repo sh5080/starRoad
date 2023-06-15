@@ -2,6 +2,7 @@ import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
 import { RowDataPacket, FieldPacket } from 'mysql2';
 import { AppError, CommonError } from '../types/AppError';
+import { rowToCamelCase } from '../util/rowToCamelCase';
 
 /**
  * 여행 일정 생성
@@ -48,7 +49,7 @@ export const createTravelLocationByPlanId = async (travelLocation: TravelLocatio
 export const getTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
-    return rows as TravelPlan[];
+    return (rows as RowDataPacket[]).map(rowToCamelCase) as TravelPlan[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 조회에 실패했습니다.', 500);
@@ -63,7 +64,7 @@ export const getTravelLocationsByPlanId = async (planId: number): Promise<Travel
     const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ? ORDER BY date ASC, `order` ASC', [
       planId,
     ]);
-    return rows as TravelLocation[];
+    return (rows as RowDataPacket[]).map(rowToCamelCase) as TravelLocation[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜별 장소 조회에 실패했습니다.', 500);
@@ -73,10 +74,10 @@ export const getTravelLocationsByPlanId = async (planId: number): Promise<Travel
 /**
  * 특정 여행 일정 조회
  */
-export const getTravelPlanDetailsByPlanId  = async (planId: string): Promise<TravelPlan> => {
+export const getTravelPlanDetailsByPlanId = async (planId: string): Promise<TravelPlan> => {
   try {
     const [rows] = await db.execute<RowDataPacket[]>('SELECT * FROM travel_plan WHERE plan_id = ?', [planId]);
-    return rows[0] as unknown as TravelPlan;
+    return rowToCamelCase(rows[0]) as TravelPlan;
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 상세 조회에 실패했습니다.', 500);

@@ -14,8 +14,6 @@ export const createDiary = async (diary: Diary, username: string, planId: number
 
   const { destination } = plan;
   diary.destination = destination;
-  console.log(diary);
-  console.log(plan);
 
   await diaryModel.createDiary(diary, plan);
 

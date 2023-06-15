@@ -6,6 +6,7 @@ import { Comment } from '../types/comment';
 import { TouristDestinationType } from '../types/destination';
 import { AppError, CommonError } from '../types/AppError';
 import { RowDataPacket } from 'mysql2';
+import { toCamelCase } from '../util/rowToCamelCase';
 
 /** [관리자] 모든 회원 정보 불러오기 */
 export const getAllUsers = async (): Promise<UserType[]> => {
@@ -41,7 +42,7 @@ export const deleteUserById = async (id: number): Promise<void> => {
   }
 };
 
-/** [관리자] 회원이 작성한 일정 불러오기 */ 
+/** [관리자] 회원이 작성한 일정 불러오기 */
 export const getAllTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
@@ -80,7 +81,7 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리 삭제하기 */ 
+/** [관리자] 회원이 작성한 다이어리 삭제하기 */
 export const deleteDiaryByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM travel_diary WHERE username = ? AND diary_id = ?', [username, diaryId]);
@@ -124,8 +125,13 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
   }
 };
 
+
 /** [관리자] 특정 회원이 작성한 댓글 삭제하기 */
-export const deleteCommentByUsernameAndDiaryId = async (username: string, diaryId: number, commentId: number): Promise<void> => {
+export const deleteCommentByUsernameAndDiaryId = async (
+  username: string,
+  diaryId: number,
+  commentId: number
+): Promise<void> => {
   try {
     await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND comment_id = ?', [
       username,

@@ -155,10 +155,10 @@ export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Respo
     }
 
     const { planId } = req.params;
-    // const { dates, startDate, endDate, destination, ...extraFields } = req.body;
     const { dates } = req.body;
     const { username } = req.user;
 
+    
     // 각 날짜별 장소 수정
     if (dates) {
       for (const dateInfo of dates) {

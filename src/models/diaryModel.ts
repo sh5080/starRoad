@@ -2,7 +2,8 @@ import { db } from '../loaders/dbLoader';
 import { Diary } from '../types/diary';
 import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
-import { toCamelCase } from '../util/toCamelCase';
+import { RowDataPacket } from 'mysql2';
+import { rowToCamelCase } from '../util/rowToCamelCase';
 
 /**
  * 여행기 생성
@@ -30,18 +31,7 @@ export const getPlan = async (planId: number, username: string): Promise<TravelP
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?', [planId, username]);
 
     if (Array.isArray(rows) && rows.length > 0) {
-      const rawPlan = rows[0];
-      const plan: any = {};
-
-      if (typeof rawPlan === 'object' && rawPlan !== null && 'plan_id' in rawPlan && 'username' in rawPlan) {
-        for (const key in rawPlan) {
-          if (rawPlan.hasOwnProperty(key)) {
-            plan[toCamelCase(key)] = rawPlan[key];
-          }
-        }
-      }
-
-      return plan as TravelPlan;
+      return rowToCamelCase(rows[0]) as TravelPlan;
     }
 
     return null;
@@ -57,8 +47,7 @@ export const getPlan = async (planId: number, username: string): Promise<TravelP
 export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary');
-    const diary = rows as Diary[];
-    return diary;
+    return (rows as RowDataPacket[]).map(rowToCamelCase);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '모든 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
@@ -77,7 +66,7 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
       WHERE p.username = ?;
     `;
     const [rows] = await db.execute(query, [username]);
-    return rows as Diary[];
+    return (rows as RowDataPacket[]).map(rowToCamelCase);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
@@ -91,8 +80,7 @@ export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | nul
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diaryId]);
     if (Array.isArray(rows) && rows.length > 0) {
-      const diary = rows[0] as Diary;
-      return diary;
+      return rowToCamelCase(rows[0]) as Diary;
     }
     return null;
   } catch (error) {

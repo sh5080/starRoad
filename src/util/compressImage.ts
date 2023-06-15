@@ -28,8 +28,6 @@ export const compressImage = async (
       default:
         console.log(`Unsupported image format: ${format}`);
     }
-
-    console.log(`이미지 압축 완료`);
   } catch (error) {
     console.error('Error compressing image', error);
   }

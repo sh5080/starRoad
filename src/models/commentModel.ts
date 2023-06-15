@@ -2,13 +2,7 @@ import { db } from '../loaders/dbLoader';
 import { Comment } from '../types/comment';
 import { RowDataPacket } from 'mysql2';
 import { AppError, CommonError } from '../types/AppError';
-
-interface QueryResult extends RowDataPacket {
-  id: number;
-  username: string;
-  diaryId: number;
-  comment: string;
-}
+import { rowToCamelCase } from '../util/rowToCamelCase';
 
 /**
  * 댓글 생성
@@ -29,30 +23,16 @@ export const createComment = async (comment: Comment): Promise<void> => {
 /**
  * 특정 다이어리의 댓글 조회
  */
-export const getCommentsByDiary = async (
-  diaryId: number,
-  page: number,
-  limit: number
-): Promise<Comment[]> => {
+export const getCommentsByDiary = async (diaryId: number, page: number, limit: number): Promise<Comment[]> => {
   try {
     const offset = Math.floor(page - 1) * limit;
 
     const [rows] = await db.query<RowDataPacket[]>(
       `SELECT * FROM comment WHERE diary_id = ? LIMIT ${limit} OFFSET ${offset}`,
-      [diaryId, limit, offset]
+      [diaryId]
     );
 
-    const comments: Comment[] = rows.map(
-      (row) =>
-        ({
-          id: row['id'],
-          username: row['username'],
-          diaryId: row['diary_id'],
-          comment: row['comment'],
-        } as QueryResult)
-    );
-
-    return comments;
+    return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 조회에 실패했습니다.', 500);
@@ -78,7 +58,7 @@ export const getComment = async (id: number): Promise<Comment | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
     if (Array.isArray(rows) && rows.length > 0) {
-      return rows[0] as Comment;
+      return rowToCamelCase(rows[0]);
     }
     return null;
   } catch (error) {
