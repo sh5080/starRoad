@@ -25,9 +25,9 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
     }
   }
 
-  if (req.method === 'GET' && !accessToken) {
-    return next();
-  }
+  // if (req.method === 'GET' && !accessToken) {
+  //   return next();
+  // }
 
   if (!accessToken) {
     return next(new AppError(CommonError.UNAUTHORIZED_ACCESS, '접근 거부. 유효한 토큰을 제공해주세요.', 401));
@@ -36,7 +36,7 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
   try {
     req.user = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as JwtPayload & { username: string; role: string };
     next();
-  } catch (err: unknown) {
+  } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {
       if (!refreshToken) {
         console.error(err);
@@ -66,15 +66,15 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
           username: decodedRefreshToken.username,
           role: decodedRefreshToken.role,
         };
-        
+
         res.cookie('accessToken', newAccessToken, {
           httpOnly: true,
         });
         res.status(200).json({
           message: '새로운 엑세스 토큰이 발급되었습니다.',
         });
-        next();
-      } catch (err: unknown) {
+
+      } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
           res.clearCookie('refreshToken');
           return next(
