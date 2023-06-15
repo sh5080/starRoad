@@ -60,7 +60,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     res.cookie('token', token, {
       httpOnly: true,
       // secure: true, // HTTPS시에
-      maxAge: 7200000, // 쿠키의 유효 시간 설정(예: 2 hours)
+      maxAge: 3600000, // 쿠키의 유효 시간 설정(예: 2 hours)
       // sameSite: 'none', // SameSite 옵션 설정
       // 필요에 따라 쿠키 설정을 추가할 수 있습니다.
     });
