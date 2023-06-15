@@ -31,7 +31,7 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
       await Promise.all(promises);
     }
 
-    const { title, content, image, ...extraFields } = req.body;
+    const { title, content } = req.body;
 
     const { planId } = req.params;
     const username = req.user?.username;
@@ -41,10 +41,6 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
     }
     if (!title || !content) {
       throw new AppError(CommonError.INVALID_INPUT, '제목, 본문은 필수 입력 항목입니다.', 400);
-    }
-
-    if (Object.keys(extraFields).length > 0) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
 
     const diary = await diaryService.createDiary(
@@ -109,14 +105,11 @@ export const getOneDiaryByDiaryId = async (req: Request, res: Response, next: Ne
 export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diaryId = parseInt(String(req.params.diaryId), 10);
-    const { title, content, ...extraFields } = req.body;
+    const { title, content } = req.body;
     const username = req.user?.username;
 
     if (!username) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
-    }
-    if (Object.keys(extraFields).length > 0) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
     if (!title || !content) {
       throw new AppError(CommonError.INVALID_INPUT, '제목과 본문은 필수 입력 항목입니다.', 400);

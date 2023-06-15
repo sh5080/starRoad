@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { validateToken } from '../middlewares/jwt';
+import { validateRequestBody } from '../middlewares/validateRequestBody';
 import { ensureAdmin } from '../middlewares/admin';
 import * as adminController from '../../controllers/adminController';
 import { processImage } from '../middlewares/multer';
@@ -37,7 +38,7 @@ router.get('/users/:username/diary', validateToken, ensureAdmin, adminController
 router.get('/users/:username/comments', validateToken, ensureAdmin, adminController.getAllCommentsByUsername);
 
 /** [관리자] 회원 정보 수정하기 */
-router.put('/users/:id', validateToken, ensureAdmin, adminController.updateUser);
+router.put('/users/:id', validateToken, ensureAdmin, validateRequestBody(['username','name','email','role']),adminController.updateUser);
 
 /** [관리자] 회원 정보 삭제하기 */
 router.delete('/users/:id', validateToken, ensureAdmin, adminController.deleteUser);
@@ -45,11 +46,11 @@ router.delete('/users/:id', validateToken, ensureAdmin, adminController.deleteUs
 /** [관리자] 모든 회원 조회하기 */
 router.get('/users', validateToken, ensureAdmin, adminController.getAllUsers);
 
-/** [관리자] 관광지 추가하기 */
-router.post('/locations', validateToken, ensureAdmin, processImage, adminController.addTouristDestination);
+/** [관리자] 관광지 추가하기 */ 
+router.post('/locations', validateToken, ensureAdmin, processImage, validateRequestBody(['nameEn', 'nameKo', 'introduction', 'latitude', 'longitude']), adminController.addTouristDestination);
 
-/** [관리자] 관광지 수정하기 */
-router.put('/locations/:locationId', validateToken, ensureAdmin, adminController.updateTouristDestination);
+/** [관리자] 관광지 수정하기 */  
+router.put('/locations/:locationId', validateToken, ensureAdmin,validateRequestBody(['nameEn', 'nameKo', 'image', 'introduction']) ,adminController.updateTouristDestination);
 
 /** [관리자] 관광지 삭제하기 */
 router.delete('/locations/:locationId', validateToken, ensureAdmin, adminController.deleteTouristDestination);

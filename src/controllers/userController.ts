@@ -9,7 +9,7 @@ interface CustomRequest extends Request {
 /** 회원가입 */
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, username, password, email, ...extraFields } = req.body;
+    const { name, username, password, email } = req.body;
     const userData = { name, username, email, password };
     const exceptPassword = { name, username, email };
     if (!username || !password || !email || !name) {
@@ -27,9 +27,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         400
       );
     }
-    if (Object.keys(extraFields).length > 0) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
-    }
+
     await userService.signupUser(userData);
     res.status(201).json(exceptPassword);
   } catch (error) {
@@ -41,14 +39,12 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 /** 로그인 */
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { username, password, ...extraFields }: UserType = req.body;
+    const { username, password }: UserType = req.body;
 
     if (!username || !password) {
       throw new AppError(CommonError.INVALID_INPUT, '로그인에 필요한 정보가 제공되지 않았습니다.', 400);
     }
-    if (Object.keys(extraFields).length > 0) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
-    }
+
     const userData = await userService.getUser(username);
 
     if (!userData.activated) {

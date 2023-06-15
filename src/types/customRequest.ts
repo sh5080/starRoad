@@ -18,6 +18,8 @@ export interface CustomRequest extends Request {
     longitude?: number;
     id?: number;
     username: string;
+    name: string;
+    email: string;
     diaryId?: number; // Add this if diaryId comes from body
     comment?: string;
     title?: string;

@@ -26,7 +26,8 @@ export const getAllUsers = async (req: CustomRequest, res: Response, next: NextF
 export const updateUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const userInfo = req.body;
+    const { username, name, email, role } = req.body;
+    const userInfo = { username, name, email, role }
     const data = await adminService.updateUser(Number(id), userInfo);
     res.status(200).json({ data, message: '회원 정보 수정을 완료했습니다.' });
   } catch (error) {

@@ -12,15 +12,11 @@ export const createTravelPlan = async (req: CustomRequest, res: Response, next: 
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
     }
 
-    const { dates, startDate, endDate, destination, ...extraFields } = req.body;
+    const { dates, startDate, endDate, destination } = req.body;
     const { username } = req.user;
 
     if (!startDate || !endDate || !destination || !dates) {
       throw new AppError(CommonError.INVALID_INPUT, '필수 입력값이 없습니다.', 400);
-    }
-
-    if (Object.keys(extraFields).length > 0) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
     }
 
     const start: Date | string | undefined = startDate ? new Date(startDate) : undefined;
@@ -162,13 +158,8 @@ export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Respo
 
     const { planId } = req.params;
     // const { dates, startDate, endDate, destination, ...extraFields } = req.body;
-    const { dates, ...extraFields } = req.body;
-
+    const { dates } = req.body;
     const { username } = req.user;
-
-    if (Object.keys(extraFields).length > 0) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
-    }
 
     // 각 날짜별 장소 수정
     if (dates) {

@@ -7,7 +7,7 @@ import { CustomRequest } from '../types/customRequest';
 /** 댓글 생성 */
 export const createComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { diaryId, comment, ...extraFields } = req.body;
+    const { diaryId, comment } = req.body;
 
     const loggedInUsername = req.user?.username;
     if (!loggedInUsername) {
@@ -23,9 +23,7 @@ export const createComment = async (req: CustomRequest, res: Response, next: Nex
       diaryId,
       comment,
     });
-    if (Object.keys(extraFields).length > 0) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
-    }
+
     res.status(201).json({ diaryId, comment });
   } catch (error) {
     console.error(error);
@@ -54,15 +52,11 @@ export const getCommentsByDiary = async (req: CustomRequest, res: Response, next
 export const updateComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { commentId } = req.params;
-    const { comment, ...extraFields } = req.body;
+    const { comment } = req.body;
     const username = req.user?.username;
     if (!comment) {
       throw new AppError(CommonError.INVALID_INPUT, '댓글을 입력해 주세요.', 400);
     }
-    if (Object.keys(extraFields).length > 0) {
-      throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 입력입니다.', 400);
-    }
-
     await commentService.updateComment({ comment }, Number(commentId), username as string);
     res.status(200).json({ message: comment });
   } catch (error) {
