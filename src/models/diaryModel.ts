@@ -2,6 +2,7 @@ import { db } from '../loaders/dbLoader';
 import { Diary } from '../types/diary';
 import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
+import { toCamelCase } from '../util/toCamelCase';
 
 /**
  * 여행기 생성
@@ -26,14 +27,21 @@ export const createDiary = async (diary: Diary, plan: Diary): Promise<void> => {
  */
 export const getPlan = async (planId: number, username: string): Promise<TravelPlan | null> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?', [
-      planId,
-      username,
-    ]);
+    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?', [planId, username]);
 
     if (Array.isArray(rows) && rows.length > 0) {
-      const plan = rows[0] as TravelPlan;
-      return plan;
+      const rawPlan = rows[0];
+      const plan: any = {};
+
+      if (typeof rawPlan === 'object' && rawPlan !== null && 'plan_id' in rawPlan && 'username' in rawPlan) {
+        for (const key in rawPlan) {
+          if (rawPlan.hasOwnProperty(key)) {
+            plan[toCamelCase(key)] = rawPlan[key];
+          }
+        }
+      }
+
+      return plan as TravelPlan;
     }
 
     return null;
@@ -94,7 +102,7 @@ export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | nul
 };
 
 /**
- * 여행기 업데이트
+ * 여행기 수정
  */
 export const updateDiaryByUsername = async (diary: Omit<Diary, 'id'>, diary_id: number): Promise<void> => {
   try {

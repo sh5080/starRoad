@@ -93,7 +93,6 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
     }
 
     for (const plan of travelPlanData) {
-      // plan_id가 정의되어 있으면 해당 장소 정보를 조회합니다.
       if (plan.planId !== undefined) {
         const locations = await travelService.getTravelLocationsByPlanId(plan.planId);
         plan.dates = locations.reduce((dates: TravelDate[], location: TravelLocation) => {
@@ -128,7 +127,6 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
     }
 
-    // plan_id가 정의되어 있으면 해당 장소 정보를 조회합니다.
     if (travelPlanData.planId !== undefined) {
       const locations = await travelService.getTravelLocationsByPlanId(travelPlanData.planId);
       travelPlanData.dates = locations.reduce((dates: TravelDate[], location: TravelLocation) => {

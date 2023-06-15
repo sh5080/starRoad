@@ -5,11 +5,7 @@ import { AppError, CommonError } from '../types/AppError';
 /**
  * 여행기 생성
  */
-export const createDiary = async (
-  diary: Diary,
-  username: string,
-  planId: number
-) => {
+export const createDiary = async (diary: Diary, username: string, planId: number) => {
   const plan = await diaryModel.getPlan(planId, username);
 
   if (!plan) {
@@ -18,11 +14,8 @@ export const createDiary = async (
 
   const { destination } = plan;
   diary.destination = destination;
-
-  const { title, content, image } = diary;
-  diary.title = title;
-  diary.content = content;
-  diary.image = image;
+  console.log(diary);
+  console.log(plan);
 
   await diaryModel.createDiary(diary, plan);
 
@@ -71,11 +64,7 @@ export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | nul
 /**
  * 여행기 수정
  */
-export const updateDiary = async (
-  newDiary: Diary,
-  diaryId: number,
-  username: string
-) => {
+export const updateDiary = async (newDiary: Diary, diaryId: number, username: string) => {
   const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
   if (!diary) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);

@@ -16,8 +16,8 @@ router.get('/diaries', validateToken, diaryController.getMyDiaries);
 /** [사용자] 회원정보 조회 */
 router.get('/', validateToken, userController.getUserInfo);
 
-/** [다이어리] 다이어리 수정 */
-router.put('/diary/:diaryId', validateToken, processImage, diaryController.updateDiary);
+/** [다이어리] 여행기 수정 */
+router.put('/diaries/:diaryId', validateToken, processImage, diaryController.updateDiary);
 
 /** [사용자] 회원정보 수정 */
 router.put('/', validateToken, userController.updateUserInfo);
