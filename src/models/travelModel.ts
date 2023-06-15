@@ -60,7 +60,9 @@ export const getTravelPlansByUsername = async (username: string): Promise<Travel
  */
 export const getTravelLocationsByPlanId = async (plan_id: number): Promise<TravelLocation[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
+    const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ? ORDER BY date ASC, `order` ASC', [
+      plan_id,
+    ]);
     return rows as TravelLocation[];
   } catch (error) {
     console.error(error);
