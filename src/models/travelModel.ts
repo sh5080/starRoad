@@ -23,12 +23,12 @@ export const createTravelPlan = async (travelPlan: TravelPlan) => {
 /**
  * 여행 장소 생성
  */
-export const createTravelLocation = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
+export const createTravelLocation = async (travelLocation: TravelLocation, planId: number): Promise<void> => {
   try {
     await db.execute(
       'INSERT INTO travel_location (plan_id, date, location, `order`, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
       [
-        plan_id,
+        planId,
         travelLocation.date,
         travelLocation.location,
         travelLocation.order,
@@ -58,10 +58,10 @@ export const getTravelPlansByUsername = async (username: string): Promise<Travel
 /**
  * 특정 여행 일정의 모든 장소 조회
  */
-export const getTravelLocationsByPlanId = async (plan_id: number): Promise<TravelLocation[]> => {
+export const getTravelLocationsByPlanId = async (planId: number): Promise<TravelLocation[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ? ORDER BY date ASC, `order` ASC', [
-      plan_id,
+      planId,
     ]);
     return rows as TravelLocation[];
   } catch (error) {
@@ -73,9 +73,9 @@ export const getTravelLocationsByPlanId = async (plan_id: number): Promise<Trave
 /**
  * 특정 여행 일정 조회
  */
-export const getTravelPlanByPlanId = async (plan_id: string): Promise<TravelPlan> => {
+export const getTravelPlanByPlanId = async (planId: string): Promise<TravelPlan> => {
   try {
-    const [rows] = await db.execute<RowDataPacket[]>('SELECT * FROM travel_plan WHERE plan_id = ?', [plan_id]);
+    const [rows] = await db.execute<RowDataPacket[]>('SELECT * FROM travel_plan WHERE plan_id = ?', [planId]);
     return rows[0] as unknown as TravelPlan;
   } catch (error) {
     console.error(error);
