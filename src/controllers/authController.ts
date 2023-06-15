@@ -1,7 +1,7 @@
 import * as authService from '../services/authService';
 import { NextFunction, Request, Response } from 'express';
 import config from '../config/index';
-import { AppError, CommonError } from '../types/AppError';
+import qs from 'qs'
 import axios from 'axios';
 import { JwtPayload } from 'jsonwebtoken';
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = config.google;
@@ -24,32 +24,38 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
     const code = req.query.code;
 
     // 카카오 OAuth 토큰 요청
-    const response = await axios.post('https://kauth.kakao.com/oauth/token', {
-      grant_type: 'authorization_code',
-      client_id: KAKAO_CLIENT_ID,
-      redirect_uri: KAKAO_REDIRECT_URI,
-      code,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-      },
-    });
+    const response = await axios.post(
+      'https://kauth.kakao.com/oauth/token',
+      qs.stringify({
+        grant_type: 'authorization_code',
+        client_id: KAKAO_CLIENT_ID,
+        redirect_uri: KAKAO_REDIRECT_URI,
+        code,
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        },
+      }
+    );
 
     const accessToken = response.data.access_token;
 
     // 카카오 사용자 정보 요청
-    const kakaoInfo = await axios.get('https://kauth.kakao.com/oauth/authorize', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const kakaoInfo = await axios.get('https://kapi.kakao.com/v2/user/me', {
+  headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+});
     const kakaoUserInfo = kakaoInfo.data;
 
     // 카카오 사용자 정보에서 이메일을 가져옵니다.
     const kakaoEmail = kakaoUserInfo.kakao_account.email;
+   // console.log(kakaoEmail)
     // 이메일을 기준으로 기존에 회원 가입되어 있는지 확인
     const existingInfo = await authService.getUserForOauth(kakaoEmail);
 
-    if (existingInfo) {
+    if (existingInfo !== null) {
       // 기존에 회원 가입되어 있는 경우, 해당 유저로 로그인
       const token = await authService.OauthLoginUser(existingInfo.username || '');
 
@@ -67,7 +73,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
           email: kakaoEmail,
           oauthProvider: 'kakao',
         });
-        res.status(200).json({ message: '카카오로 로그인되었습니다.', user: newInfo });
+        res.status(200).json({ message: '카카오 회원가입이 완료되었습니다.', user: newInfo });
       } catch (error) {
         console.error(error);
         next(error);
@@ -122,7 +128,7 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
           email: googleEmail,
           oauthProvider: 'google',
         });
-        res.status(200).json({ message: '회원가입되었습니다.', user: newInfo.username });
+        res.status(200).json({ message: '구글 회원가입이 완료되었습니다.', user: newInfo.username });
       } catch (error) {
         console.error(error);
         next(error);

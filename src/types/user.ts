@@ -13,6 +13,6 @@ export interface OauthUser extends UserType{
   username: string;
   email: string;
   activated?: number;
-  oauthProvider: 'kakao' | 'google';
+  oauthProvider?: 'kakao' | 'google' | 'origin';
 
 }

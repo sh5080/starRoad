@@ -6,7 +6,7 @@ import * as User from '../types/user';
 export const saveOauthUser = async (user: User.OauthUser): Promise<User.OauthUser> => {
   const query = 'INSERT INTO user (username, name, email, oauth_provider, password) VALUES (?, ?, ?, ?, ?)';
   const values = [user.username, user.username, user.email, user.oauthProvider, null];
-
+console.log(values)
   const [result] = await db.execute<ResultSetHeader>(query, values);
   const insertId = result.insertId;
 
@@ -36,13 +36,15 @@ export const getUserByUsername = async (username?: string): Promise<User.UserTyp
 };
 
 export const getUserByEmail = async (email?: string): Promise<User.OauthUser | null> => {
+  //console.log(email)
   try {
     const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
     if (Array.isArray(rows) && rows.length > 0) {
       const userData = rows[0] as User.OauthUser;
+
       if (userData.oauthProvider === undefined) {
         const query = `UPDATE user SET oauth_provider = ? WHERE email = ?`;
-        const oauthProvider = 'google';
+        const oauthProvider = 'google' ;
         await db.query(query, [oauthProvider, email]);
         userData.oauthProvider = oauthProvider;
       }
@@ -54,3 +56,4 @@ export const getUserByEmail = async (email?: string): Promise<User.OauthUser | n
     throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
   }
 };
+

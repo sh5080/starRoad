@@ -36,6 +36,7 @@ export const OauthSignupUser = async (user: User.OauthUser) => {
     const randomSuffix = Math.floor(Math.random() * 10000);
     return `${username.replace(' ', '')}_${randomSuffix}`;
   };
+  
   export const OauthLoginUser = async (username: string): Promise<object> => {
     const user = await authModel.getUserByUsername(username);
   
@@ -61,13 +62,7 @@ export const OauthSignupUser = async (user: User.OauthUser) => {
   export const getUserForOauth = async (email: string) => {
     const user = await authModel.getUserByEmail(email);
   
-    if (!user) {
-     // throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
-    return (user)
-    }
-    const { ...userData } = user;
-    //console.log(userData)
-    return userData;
+    return user;
   };
 
   export const generateLoginUrl = (oauthProvider: string): string => {
