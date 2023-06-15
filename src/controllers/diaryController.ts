@@ -33,11 +33,7 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
     const { title, content } = req.body;
 
     const { planId } = req.params;
-    const username = req.user?.username;
-
-    if (!username) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
-    }
+    const username = req.user?.username!;
 
     const diary = await diaryService.createDiary(
       { username, title, content, image: imgNames },
@@ -69,10 +65,7 @@ export const getAllDiaries = async (req: Request, res: Response, next: NextFunct
 /** 내 여행기 조회 */
 export const getMyDiaries = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const username = req.user?.username;
-    if (!username) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
-    }
+    const username = req.user?.username!;
     const diaries = await diaryService.getMyDiaries(username);
     res.status(200).json(diaries);
   } catch (error) {
@@ -102,21 +95,16 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
   try {
     const diaryId = parseInt(String(req.params.diaryId), 10);
     const { title, content } = req.body;
-    const username = req.user?.username;
+    const username = req.user?.usernam!;
 
-    if (!username) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
-    }
     if (!title || !content) {
       throw new AppError(CommonError.INVALID_INPUT, '제목과 본문은 필수 입력 항목입니다.', 400);
     }
-
     // Get existing diary
     const existingDiary = await diaryService.getOneDiaryByDiaryId(diaryId);
     if (!existingDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
     }
-
     if (existingDiary.image) {
       let imageArray: string[];
 
@@ -186,10 +174,8 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
 export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diaryId = parseInt(String(req.params.diaryId), 10);
-    const username = req.user?.username;
-    if (!username) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
-    }
+    const username = req.user?.username!;
+
     const deletedDiary = await diaryService.deleteDiary(diaryId, username);
 
     if (!deletedDiary) {

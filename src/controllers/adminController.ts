@@ -161,10 +161,6 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
 
     const { nameEn, nameKo, introduction, latitude, longitude } = req.body;
 
-    if (!nameEn || !nameKo || !introduction || !latitude || !longitude) {
-      return next(new AppError(CommonError.INVALID_INPUT, '모두 입력해 주세요.', 400));
-    }
-
     const message = await adminService.addTouristDestination(
       String(nameEn),
       String(nameKo),

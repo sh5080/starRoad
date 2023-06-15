@@ -181,11 +181,7 @@ export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Respo
 /** 여행 일정 삭제 */
 export const deleteTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    // 로그인 확인
-    if (!req.user) {
-      return res.status(401).json({ error: '인증이 필요합니다.' });
-    }
-    const { username } = req.user;
+    const { username } = req.user!;
     const { planId } = req.params;
 
     const deletedPlan = await travelService.deletePlan(username, Number(planId));
@@ -193,7 +189,6 @@ export const deleteTravelPlan = async (req: CustomRequest, res: Response, next: 
     if (!deletedPlan.deletedPlan[0] || !deletedPlan.deletedLocations[0]) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 일정입니다.', 400);
     }
-
     res.status(200).json(deletedPlan);
   } catch (error) {
     console.error(error);
