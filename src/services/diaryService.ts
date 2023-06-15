@@ -16,7 +16,7 @@ export const createDiary = async (
     throw new AppError(CommonError.INVALID_INPUT, '나의 일정만 여행기를 등록할 수 있습니다.', 404);
   }
 
-  const { destination } = plan; // 일정의 destination 값
+  const { destination } = plan;
   diary.destination = destination;
 
   const { title, content, image } = diary;
