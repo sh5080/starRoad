@@ -6,7 +6,7 @@ import * as User from '../types/user';
 export const saveOauthUser = async (user: User.OauthUser): Promise<User.OauthUser> => {
   const query = 'INSERT INTO user (username, name, email, oauth_provider, password) VALUES (?, ?, ?, ?, ?)';
   const values = [user.username, user.username, user.email, user.oauthProvider, null];
-console.log(values)
+
   const [result] = await db.execute<ResultSetHeader>(query, values);
   const insertId = result.insertId;
 
