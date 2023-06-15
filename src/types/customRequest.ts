@@ -1,6 +1,7 @@
 import { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
 import { TravelLocation } from '../types/travel';
+
 export interface CustomRequest extends Request {
   user?: JwtPayload & { username: string; role: string };
   params: {
