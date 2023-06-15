@@ -1,9 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { JwtPayload } from 'jsonwebtoken';
+import { Response, NextFunction } from 'express';
+import { CustomRequest } from '../../types/customRequest';
 
-interface CustomRequest extends Request {
-  user?: JwtPayload & { username: string; role: string };
-}
 export const ensureAdmin = (req: CustomRequest, res: Response, next: NextFunction) => {
   if (req.user?.role !== 'ADMIN') {
     console.log(req.user);
@@ -11,3 +8,4 @@ export const ensureAdmin = (req: CustomRequest, res: Response, next: NextFunctio
   }
   next();
 };
+
