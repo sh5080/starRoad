@@ -61,10 +61,11 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
 
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
       res.cookie('token', token, {
-        httpOnly: true,
+        //httpOnly: true,
         maxAge: 7200000,
-      });
-      res.status(200).json({ message: '카카오 로그인 성공!', user: existingInfo.email });
+      });      
+      // res.redirect(`http://localhost:5173?token=${token}`);
+      res.redirect(`http://localhost:5173`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
@@ -73,7 +74,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
           email: kakaoEmail,
           oauthProvider: 'kakao',
         });
-        res.status(200).json({ message: '카카오 회원가입이 완료되었습니다.', user: newInfo });
+        res.status(200).json({ message: '카카오 회원가입이 완료되었습니다.', user: newInfo.username });
       } catch (error) {
         console.error(error);
         next(error);
