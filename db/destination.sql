@@ -4,7 +4,7 @@ CREATE TABLE travel_destination (
   name_ko VARCHAR(255),
   image TEXT,
   introduction TEXT,
-  latitude DECIMAL(9,6),
-  longitude DECIMAL(9,6),
+  latitude DECIMAL(9, 6),
+  longitude DECIMAL(9, 6),
   PRIMARY KEY (id)
 );
