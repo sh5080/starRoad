@@ -91,10 +91,10 @@ export const getMyDiaries = async (req: CustomRequest, res: Response, next: Next
 };
 
 /** 특정 여행기 조회 */
-export const getOneDiary = async (req: Request, res: Response, next: NextFunction) => {
+export const getOneDiaryByDiaryId = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const diaryId = parseInt(req.params.diaryId, 10);
-    const diary = await diaryService.getOneDiary(diaryId);
+    const diary = await diaryService.getOneDiaryByDiaryId(diaryId);
 
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
@@ -124,7 +124,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
     }
 
     // Get existing diary
-    const existingDiary = await diaryService.getOneDiary(diaryId);
+    const existingDiary = await diaryService.getOneDiaryByDiaryId(diaryId);
     if (!existingDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
     }

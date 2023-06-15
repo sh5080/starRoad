@@ -11,6 +11,7 @@ export const getAllUsers = async (): Promise<UserType[]> => {
   try {
     return await adminModel.getAllUsers();
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get all user information', 500);
   }
 };
@@ -21,6 +22,7 @@ export const updateUser = async (id: number, user: Partial<UserType>): Promise<U
     const updatedUser = await adminModel.updateUserById(id, user);
     return updatedUser;
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update user information', 500);
   }
 };
@@ -31,6 +33,7 @@ export const deleteUser = async (id: number): Promise<string> => {
     await adminModel.deleteUserById(id);
     return '회원 정보가 정상적으로 삭제되었습니다.';
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user information', 500);
   }
 };
@@ -41,16 +44,18 @@ export const getAllTravelPlansByUsername = async (username: string): Promise<Tra
     const travelPlans = await adminModel.getAllTravelPlansByUsername(username);
     return travelPlans;
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user travel plans', 500);
   }
 };
 
 // [관리자] 회원이 작성한 여행 장소 날짜 조회하기
-export const getAllLocationsByPlanId = async (plan_id: number): Promise<TravelPlan[]> => {
+export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPlan[]> => {
   try {
-    const travelPlans = await adminModel.getAllLocationsByPlanId(plan_id);
+    const travelPlans = await adminModel.getAllLocationsByPlanId(planId);
     return travelPlans;
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user travel locations', 500);
   }
 };
@@ -61,26 +66,29 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
     const travelDiaries = await adminModel.getAllDiariesByUsername(username);
     return travelDiaries;
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user diaries', 500);
   }
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByUsername = async (username: string, diary_id: number): Promise<string> => {
+export const deleteDiaryByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<string> => {
   try {
-    await adminModel.deleteDiaryByUsername(username, diary_id);
+    await adminModel.deleteDiaryByUsernameAndDiaryId(username, diaryId);
     return '다이어리가 정상적으로 삭제되었습니다.';
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user diary', 500);
   }
 };
 
 // [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기
-export const getAllCommentsByUsernameAndDiaryId = async (username: string, diary_id: number): Promise<Comment[]> => {
+export const getAllCommentsByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<Comment[]> => {
   try {
-    const diaryComments = await adminModel.getAllCommentsByUsernameAndDiaryId(username, diary_id);
+    const diaryComments = await adminModel.getAllCommentsByUsernameAndDiaryId(username, diaryId);
     return diaryComments;
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user diary comments', 500);
   }
 };
@@ -91,6 +99,7 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
     const userComments = await adminModel.getAllCommentsByUsername(username);
     return userComments;
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to get user comments', 500);
   }
 };
@@ -98,30 +107,32 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
 // [관리자] 회원이 작성한 댓글 삭제하기
 export const deleteCommentByUsernameAndDiaryId = async (
   username: string,
-  diary_id: number,
-  comment_id: number
+  diaryId: number,
+  commentId: number
 ): Promise<string> => {
   try {
-    await adminModel.deleteCommentByUsernameAndDiaryId(username, diary_id, comment_id);
+    await adminModel.deleteCommentByUsernameAndDiaryId(username, diaryId, commentId);
     return '댓글이 정상적으로 삭제되었습니다.';
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user comment', 500);
   }
 };
 
 // [관리자] 관광지 추가하기
 export const addTouristDestination = async (
-  name_en: string,
-  name_ko: string,
+  nameEn: string,
+  nameKo: string,
   image: string,
   introduction: string,
   latitude: number,
   longitude: number
 ): Promise<string> => {
   try {
-    await adminModel.addTouristDestination(name_en, name_ko, image, introduction, latitude, longitude);
+    await adminModel.addTouristDestination(nameEn, nameKo, image, introduction, latitude, longitude);
     return '관광지 추가에 성공하였습니다.';
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to add tourist destination', 500);
   }
 };
@@ -135,6 +146,7 @@ export const updateTouristDestination = async (
     await adminModel.updateTouristDestination(id, product);
     return '관광지 수정에 성공하였습니다.';
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update tourist destination', 500);
   }
 };
@@ -155,6 +167,7 @@ export const deleteTouristDestination = async (id: string): Promise<DeletedData>
     const touristDestination = await adminModel.deleteTouristDestination(id);
     return { message: '관광지 삭제에 성공하였습니다.', touristDestination };
   } catch (error) {
+    console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete tourist destination', 500);
   }
 };

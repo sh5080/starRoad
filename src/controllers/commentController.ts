@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as commentService from '../services/commentService';
-import { getOneDiary } from '../services/diaryService';
+import { getOneDiaryByDiaryId } from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
 
@@ -14,7 +14,7 @@ export const createComment = async (req: CustomRequest, res: Response, next: Nex
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
     }
 
-    const diary = await getOneDiary(Number(diaryId));
+    const diary = await getOneDiaryByDiaryId(Number(diaryId));
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '유효하지 않은 여행기입니다.', 404);
     }

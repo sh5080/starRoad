@@ -6,7 +6,7 @@ import { AppError, CommonError } from '../types/AppError';
 /**
  * 여행기 생성
  */
-export const createDiaryByUsername = async (diary: Diary, plan: Diary): Promise<void> => {
+export const createDiary = async (diary: Diary, plan: Diary): Promise<void> => {
   try {
     await db.execute('INSERT INTO travel_diary (plan_id, title, content, image, destination) VALUES (?, ?, ?, ?, ?)', [
       plan.planId,
@@ -79,7 +79,7 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
 /**
  * 특정 여행기 조회
  */
-export const getOneDiaryByUsername = async (diaryId: number): Promise<Diary | null> => {
+export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diaryId]);
     if (Array.isArray(rows) && rows.length > 0) {

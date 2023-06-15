@@ -24,7 +24,7 @@ export const createDiary = async (
   diary.content = content;
   diary.image = image;
 
-  await diaryModel.createDiaryByUsername(diary, plan);
+  await diaryModel.createDiary(diary, plan);
 
   return diary;
 };
@@ -58,9 +58,9 @@ export const getMyDiaries = async (username: string): Promise<Diary[]> => {
 /**
  * 특정 여행기 조회
  */
-export const getOneDiary = async (diary_id: number): Promise<Diary | null> => {
+export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | null> => {
   try {
-    const diary = await diaryModel.getOneDiaryByUsername(diary_id);
+    const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
     return diary;
   } catch (error) {
     console.error(error);
@@ -73,10 +73,10 @@ export const getOneDiary = async (diary_id: number): Promise<Diary | null> => {
  */
 export const updateDiary = async (
   newDiary: Diary,
-  diary_id: number,
+  diaryId: number,
   username: string
 ) => {
-  const diary = await diaryModel.getOneDiaryByUsername(diary_id);
+  const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
   if (!diary) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
   }
@@ -87,16 +87,16 @@ export const updateDiary = async (
   if (plan?.username !== username) {
     throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
   }
-  await diaryModel.updateDiaryByUsername(newDiary, diary_id);
+  await diaryModel.updateDiaryByUsername(newDiary, diaryId);
   return diary;
 };
 
 /**
  * 여행기 삭제
  */
-export const deleteDiary = async (diary_id: number, username: string) => {
+export const deleteDiary = async (diaryId: number, username: string) => {
   try {
-    const diary = await diaryModel.getOneDiaryByUsername(diary_id);
+    const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
 
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기 찾을 수 없습니다.', 404);
@@ -112,7 +112,7 @@ export const deleteDiary = async (diary_id: number, username: string) => {
     if (plan.username !== username) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
-    await diaryModel.deleteDiaryByUsername(diary_id);
+    await diaryModel.deleteDiaryByUsername(diaryId);
     const deletedDiary = { ...diary };
     return deletedDiary;
   } catch (error) {
