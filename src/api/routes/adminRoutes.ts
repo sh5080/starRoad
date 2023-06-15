@@ -19,7 +19,7 @@ router.delete(
 
 /** [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기 */
 router.get(
-  '/users/:username/diary/:diaryId/comments',
+  '/users/:username/diaries/:diaryId/comments',
   validateToken,
   ensureAdmin,
   adminController.getAllCommentsByUsernameAndDiaryId
@@ -32,7 +32,7 @@ router.delete('/users/:username/:diaryId/diary', validateToken, ensureAdmin, adm
 router.get('/users/:username/plans', validateToken, ensureAdmin, adminController.getAllTravelPlansByUsername);
 
 /** [관리자] 회원이 작성한 여행 일정의 모든 일기 조회하기 */
-router.get('/users/:username/diary', validateToken, ensureAdmin, adminController.getAllDiariesByUsername);
+router.get('/users/:username/diaries', validateToken, ensureAdmin, adminController.getAllDiariesByUsername);
 
 /** [관리자] 회원이 작성한 모든 댓글 조회하기 */
 router.get('/users/:username/comments', validateToken, ensureAdmin, adminController.getAllCommentsByUsername);

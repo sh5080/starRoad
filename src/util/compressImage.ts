@@ -1,7 +1,6 @@
 import sharp from 'sharp';
 import path from 'path';
 
-
 export const compressImage = async (
   inputPath: string,
   outputPath: string,
@@ -9,7 +8,7 @@ export const compressImage = async (
   height: number
 ): Promise<void> => {
   try {
-    const format = path.extname(inputPath).slice(1); // Get the file extension
+    const format = path.extname(inputPath).slice(1);
 
     const image = sharp(inputPath).resize(width, height, {
       fit: 'inside',
