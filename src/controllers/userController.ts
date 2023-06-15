@@ -12,9 +12,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     const { name, username, password, email } = req.body;
     const userData = { name, username, email, password };
     const exceptPassword = { name, username, email };
-    if (!username || !password || !email || !name) {
-      throw new AppError(CommonError.INVALID_INPUT, '회원가입에 필요한 정보가 제공되지 않았습니다.', 400);
-    }
     //유효성 검증
     if (username.length < 6 || username.length > 20) {
       throw new AppError(CommonError.INVALID_INPUT, '아이디는 6자 이상 20자 이내로 설정해야 합니다.', 400);
@@ -40,18 +37,12 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, password }: UserType = req.body;
-
-    if (!username || !password) {
-      throw new AppError(CommonError.INVALID_INPUT, '로그인에 필요한 정보가 제공되지 않았습니다.', 400);
-    }
-
     const userData = await userService.getUser(username);
 
     if (!userData.activated) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '탈퇴한 회원입니다.', 400);
     }
-
-    const token = await userService.loginUser(username, password);
+    const token = await userService.loginUser(username!, password!);
 
     res.cookie('token', token, {
       httpOnly: true,
@@ -80,7 +71,6 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
   try {
     const username = req.user?.username;
     const userData = await userService.getUser(username);
-
     if (!userData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '사용자를 찾을 수 없습니다.', 404);
     }
@@ -94,16 +84,8 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
 /** 회원 정보 수정 */
 export const updateUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
-    }
-
-    const { username } = req.user;
+    const { username } = req.user!;
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      throw new AppError(CommonError.INVALID_INPUT, '올바른 이메일과 비밀번호를 입력해주세요.', 400);
-    }
     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{10,20}$/;
     if (!passwordRegex.test(password)) {
       throw new AppError(
@@ -124,11 +106,7 @@ export const updateUserInfo = async (req: CustomRequest, res: Response, next: Ne
 /** 회원 탈퇴 */
 export const deleteUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '비정상적인 로그인입니다.', 401);
-    }
-
-    const { username: currentUser } = req.user;
+    const { username: currentUser } = req.user!;
     const deletedUserData = await userService.deleteUser(currentUser);
 
     if (!deletedUserData) {

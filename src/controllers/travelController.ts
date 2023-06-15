@@ -8,12 +8,8 @@ import { TravelLocation } from '../types/travel';
 /** 여행 일정 작성 */
 export const createTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
-    }
-
     const { dates, startDate, endDate, destination } = req.body;
-    const { username } = req.user;
+    const { username } = req.user!;
 
     if (!startDate || !endDate || !destination || !dates) {
       throw new AppError(CommonError.INVALID_INPUT, '필수 입력값이 없습니다.', 400);
@@ -80,11 +76,7 @@ export const createTravelPlan = async (req: CustomRequest, res: Response, next: 
 /** 모든 여행 일정 조회 */
 export const getTravelPlansByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
-    }
-
-    const { username } = req.user;
+    const { username } = req.user!;
 
     const travelPlanData = await travelService.getTravelPlansByUsername(username); // 여행 일정 데이터
 
@@ -117,9 +109,6 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
 /** 유저의 여행 일정 상세 조회 */
 export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '인증이 필요합니다.', 401);
-    }
     const { planId } = req.params;
 
     const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId)); // 여행 일정 데이터
@@ -150,13 +139,9 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
 /** 여행 일정의 날짜별 장소 수정 */
 export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: '인증이 필요합니다.' });
-    }
-
     const { planId } = req.params;
     const { dates } = req.body;
-    const { username } = req.user;
+    const { username } = req.user!;
 
     
     // 각 날짜별 장소 수정

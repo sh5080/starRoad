@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validateToken } from '../middlewares/jwt';
 import * as commentController from '../../controllers/commentController';
-import { validateRequestBody } from '../middlewares/validateRequestBody';
+import { validateRequestBody } from '../middlewares/validateRequest';
 const router = Router();
 
 /** [댓글] 댓글 생성 */

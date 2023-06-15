@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as travelController from '../../controllers/travelController';
 import { validateToken } from '../middlewares/jwt';
-import { validateRequestBody } from '../middlewares/validateRequestBody';
+import { validateRequestBody } from '../middlewares/validateRequest';
 
 const router = Router();
 

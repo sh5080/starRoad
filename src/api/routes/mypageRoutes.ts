@@ -3,7 +3,7 @@ import * as userController from '../../controllers/userController';
 import * as diaryController from '../../controllers/diaryController';
 import { processImage } from '../middlewares/multer';
 import { validateToken } from '../middlewares/jwt';
-import { validateRequestBody } from '../middlewares/validateRequestBody';
+import { validateRequestBody } from '../middlewares/validateRequest';
 
 const router = Router();
 
@@ -17,10 +17,10 @@ router.get('/diaries', validateToken, diaryController.getMyDiaries);
 router.get('/', validateToken, userController.getUserInfo);
 
 /** [다이어리] 여행기 수정 */
-router.put('/diaries/:diaryId', validateToken, processImage, diaryController.updateDiary);
+router.put('/diaries/:diaryId', validateToken, processImage, validateRequestBody(['title', 'content']),diaryController.updateDiary);
 
 /** [사용자] 회원정보 수정 */
-router.put('/', validateToken, userController.updateUserInfo);
+router.put('/', validateToken,validateRequestBody(['email', 'password']), userController.updateUserInfo);
 
 /** [다이어리] 여행기 삭제 */
 router.delete('/diaries/:diaryId', validateToken, diaryController.deleteDiary);

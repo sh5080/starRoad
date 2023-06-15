@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validateToken } from '../middlewares/jwt';
-import { validateRequestBody } from '../middlewares/validateRequestBody';
+import { validateRequestBody } from '../middlewares/validateRequest';
 import { ensureAdmin } from '../middlewares/admin';
 import * as adminController from '../../controllers/adminController';
 import { processImage } from '../middlewares/multer';

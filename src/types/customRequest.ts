@@ -7,7 +7,7 @@ export interface CustomRequest extends Request {
   params: {
     username?: string;
     id?: string;
-    diaryId?: string; // Add this if diaryId comes from params
+    diaryId?: string; 
     planId?: string;
     date?: string;
     locationId?: string;
@@ -20,7 +20,7 @@ export interface CustomRequest extends Request {
     username: string;
     name: string;
     email: string;
-    diaryId?: number; // Add this if diaryId comes from body
+    diaryId?: number; 
     comment?: string;
     title?: string;
     content?: string;
@@ -48,6 +48,8 @@ export interface CustomRequest extends Request {
       date?: string;
       locations?: TravelLocation[];
     }[];
+   
   };
   file?: Express.Multer.File;
+  
 }

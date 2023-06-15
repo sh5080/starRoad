@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../../types/AppError';
-import { validateRequestBody } from './validateRequestBody';
+import { validateRequestBody } from './validateRequest';
 
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof AppError) {
