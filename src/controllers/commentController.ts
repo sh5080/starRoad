@@ -9,17 +9,13 @@ export const createComment = async (req: CustomRequest, res: Response, next: Nex
   try {
     const { diaryId, comment } = req.body;
 
-    const loggedInUsername = req.user?.username;
-    if (!loggedInUsername) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
-    }
-
+    const username = req.user?.username;
     const diary = await getOneDiaryByDiaryId(Number(diaryId));
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '유효하지 않은 여행기입니다.', 404);
     }
     await commentService.createComment({
-      username: loggedInUsername,
+      username: username,
       diaryId,
       comment,
     });
@@ -69,11 +65,8 @@ export const updateComment = async (req: CustomRequest, res: Response, next: Nex
 export const deleteComment = async (req: CustomRequest, res: Response, next:NextFunction) => {
   try {
     const { commentId } = req.params;
-    const username = req.user?.username;
-
-    if (!username) {
-      throw new AppError(CommonError.AUTHENTICATION_ERROR, '사용자 정보를 찾을 수 없습니다.', 401);
-    }
+    const username = req.user?.username!;
+    
     await commentService.deleteComment(Number(commentId), username);
     res.status(200).json({ message: '댓글 삭제가 완료되었습니다.' });
   } catch (error) {
