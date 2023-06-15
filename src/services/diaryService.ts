@@ -24,7 +24,7 @@ export const createDiary = async (
   diary.content = content;
   diary.image = image;
 
-  await diaryModel.createDiaryByUsername(diary, plan);
+  await diaryModel.createDiary(diary, plan);
 
   return diary;
 };
@@ -58,9 +58,9 @@ export const getMyDiaries = async (username: string): Promise<Diary[]> => {
 /**
  * 특정 여행기 조회
  */
-export const getOneDiary = async (diaryId: number): Promise<Diary | null> => {
+export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | null> => {
   try {
-    const diary = await diaryModel.getOneDiaryByUsername(diaryId);
+    const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
     return diary;
   } catch (error) {
     console.error(error);
@@ -76,7 +76,7 @@ export const updateDiary = async (
   diaryId: number,
   username: string
 ) => {
-  const diary = await diaryModel.getOneDiaryByUsername(diaryId);
+  const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
   if (!diary) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
   }
@@ -96,7 +96,7 @@ export const updateDiary = async (
  */
 export const deleteDiary = async (diaryId: number, username: string) => {
   try {
-    const diary = await diaryModel.getOneDiaryByUsername(diaryId);
+    const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
 
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기 찾을 수 없습니다.', 404);

@@ -72,9 +72,9 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByUsername = async (username: string, diaryId: number): Promise<string> => {
+export const deleteDiaryByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<string> => {
   try {
-    await adminModel.deleteDiaryByUsername(username, diaryId);
+    await adminModel.deleteDiaryByUsernameAndDiaryId(username, diaryId);
     return '다이어리가 정상적으로 삭제되었습니다.';
   } catch (error) {
     console.error(error)

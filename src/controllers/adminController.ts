@@ -89,10 +89,10 @@ export const getAllDiariesByUsername = async (req: CustomRequest, res: Response,
 };
 
 /** [관리자] 회원이 작성한 다이어리 삭제하기 */
-export const deleteDiaryByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteDiaryByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, planId } = req.params;
-    const message = await adminService.deleteDiaryByUsername(String(username), Number(planId));
+    const message = await adminService.deleteDiaryByUsernameAndDiaryId(String(username), Number(planId));
     res.status(200).json({ data: message });
   } catch (error) {
     console.error(error);

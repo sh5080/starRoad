@@ -6,7 +6,7 @@ import { RowDataPacket } from 'mysql2';
 /**
  * 여행 일정 등록
  */
-export const createPlan = async (travelPlan: TravelPlan) => {
+export const createTravelPlan = async (travelPlan: TravelPlan) => {
   if (
     !travelPlan.username?.trim() ||
     !travelPlan.startDate ||
@@ -22,7 +22,7 @@ export const createPlan = async (travelPlan: TravelPlan) => {
 /**
  * 여행 날짜별 장소 등록
  */
-export const createLocation = async (travelLocation: TravelLocation, planId: number): Promise<void> => {
+export const createTravelLocationByPlanId = async (travelLocation: TravelLocation, planId: number): Promise<void> => {
   if (
     !travelLocation.date ||
     !travelLocation.location ||
@@ -34,13 +34,13 @@ export const createLocation = async (travelLocation: TravelLocation, planId: num
     throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
 
-  await travelModel.createTravelLocation(travelLocation, planId);
+  await travelModel.createTravelLocationByPlanId(travelLocation, planId);
 };
 
 /**
  * 여행 일정 모두 조회
  */
-export const getPlans = async (username: string): Promise<TravelPlan[]> => {
+export const getTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   const travelPlans = await travelModel.getTravelPlansByUsername(username);
   return travelPlans;
 };
@@ -48,7 +48,7 @@ export const getPlans = async (username: string): Promise<TravelPlan[]> => {
 /**
  * 여행 날짜별 장소 조회.
  */
-export const getLocations = async (planId: number): Promise<TravelLocation[]> => {
+export const getTravelLocationsByPlanId = async (planId: number): Promise<TravelLocation[]> => {
   const travelLocations = await travelModel.getTravelLocationsByPlanId(planId);
   return travelLocations;
 };
@@ -56,8 +56,8 @@ export const getLocations = async (planId: number): Promise<TravelLocation[]> =>
 /**
  * 여행 일정 상세 조회
  */
-export const getPlan = async (planId: string): Promise<TravelPlan> => {
-  const travelPlan = await travelModel.getTravelPlanByPlanId(planId);
+export const getTravelPlanDetailsByPlanId  = async (planId: string): Promise<TravelPlan> => {
+  const travelPlan = await travelModel.getTravelPlanDetailsByPlanId(planId);
   return travelPlan;
 };
 
