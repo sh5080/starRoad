@@ -6,13 +6,13 @@ import { Comment } from '../types/comment';
 import { TouristDestinationType } from '../types/destination';
 import { AppError, CommonError } from '../types/AppError';
 import { RowDataPacket } from 'mysql2';
-import { toCamelCase } from '../util/rowToCamelCase';
+import { rowToCamelCase } from '../util/rowToCamelCase';
 
 /** [관리자] 모든 회원 정보 불러오기 */
 export const getAllUsers = async (): Promise<UserType[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM user');
-    return rows as UserType[];
+    return (rows as RowDataPacket[]).map(rowToCamelCase) as UserType[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch all user information', 500);
@@ -23,9 +23,9 @@ export const getAllUsers = async (): Promise<UserType[]> => {
 export const updateUserById = async (id: number, user: Partial<UserType>): Promise<UserType> => {
   try {
     await db.query('UPDATE user SET ? WHERE id = ?', [user, id]);
-    const [rows] = await db.execute('SELECT * FROM user WHERE id = ?', [id]);
-    const [updatedUser] = rows as UserType[];
-    return updatedUser;
+    const [rows] = await db.execute<RowDataPacket[]>('SELECT * FROM user WHERE id = ?', [id]);
+    const updatedUser = rows.map(rowToCamelCase) as UserType[];
+    return updatedUser[0];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update user information', 500);
@@ -46,9 +46,7 @@ export const deleteUserById = async (id: number): Promise<void> => {
 export const getAllTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
-    const travelPlans = rows as TravelPlan[];
-
-    return travelPlans;
+    return (rows as RowDataPacket[]).map(rowToCamelCase) as TravelPlan[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel plans', 500);
@@ -59,9 +57,7 @@ export const getAllTravelPlansByUsername = async (username: string): Promise<Tra
 export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPlan[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [planId]);
-    const travelPlans = rows as TravelPlan[];
-
-    return travelPlans;
+    return (rows as RowDataPacket[]).map(rowToCamelCase) as TravelPlan[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel locations', 500);
@@ -72,9 +68,7 @@ export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPla
 export const getAllDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [username]);
-    const travelDiaries = rows as Diary[];
-
-    return travelDiaries;
+    return (rows as RowDataPacket[]).map(rowToCamelCase) as Diary[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel diaries', 500);
@@ -97,9 +91,7 @@ export const deleteDiaryByUsernameAndDiaryId = async (username: string, diaryId:
 export const getAllCommentsByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<Comment[]> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE diary_id = ? AND username = ?', [diaryId, username]);
-    const diaryComments = rows as Comment[];
-
-    return diaryComments;
+    return (rows as RowDataPacket[]).map(rowToCamelCase) as Comment[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user diary comments', 500);
@@ -112,19 +104,16 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
     const [rows] = await db.execute(
       'SELECT comment.*, travel_diary.title ' +
         'FROM comment ' +
-        'LEFT JOIN travel_diary ON comment.diary_id = travel_diary.diary_id ' +
+        'LEFT JOIN travel_diary ON comment.diary_id = travel_diary.id ' +
         'WHERE comment.username = ?',
       [username]
     );
-    const userComments = rows as Comment[];
-
-    return userComments;
+    return (rows as RowDataPacket[]).map(rowToCamelCase) as Comment[];
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user comments', 500);
   }
 };
-
 
 /** [관리자] 특정 회원이 작성한 댓글 삭제하기 */
 export const deleteCommentByUsernameAndDiaryId = async (
@@ -133,7 +122,7 @@ export const deleteCommentByUsernameAndDiaryId = async (
   commentId: number
 ): Promise<void> => {
   try {
-    await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND comment_id = ?', [
+    await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND id = ?', [
       username,
       diaryId,
       commentId,
@@ -191,7 +180,7 @@ export const updateTouristDestination = async (id: string, product: Partial<Tour
 export const deleteTouristDestination = async (id: string): Promise<object> => {
   try {
     const [rows] = await db.execute('SELECT * FROM travel_destination WHERE id = ?', [id]);
-    const touristDestination = (rows as RowDataPacket[])[0];
+    const touristDestination = rowToCamelCase((rows as RowDataPacket[])[0]);
 
     await db.execute('DELETE FROM travel_destination WHERE id = ?', [id]);
 

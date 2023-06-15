@@ -122,7 +122,8 @@ export const getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res
 export const getAllCommentsByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
-
+    console.log(username);
+    
     const userAllComments = await adminService.getAllCommentsByUsername(String(username));
 
     res.status(200).json({ data: userAllComments, message: '회원이 작성한 모든 댓글을 조회했습니다.' });
