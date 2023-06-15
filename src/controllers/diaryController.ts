@@ -3,7 +3,7 @@ import * as diaryService from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs/promises';
-import { compressImage } from '../api/middlewares/sharp';
+import { compressImage } from '../util/compressImage';
 import config from '../config';
 import path from 'node:path';
 const IMG_PATH = config.server.IMG_PATH;
@@ -12,6 +12,7 @@ const IMG_PATH = config.server.IMG_PATH;
 export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     let imgNames: string[] = [];
+
 
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
@@ -31,7 +32,7 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
       await Promise.all(promises);
     }
 
-    const { title, content, image, ...extraFields } = req.body;
+    const { title, content, ...extraFields } = req.body;
 
     const { planId } = req.params;
     const username = req.user?.username;

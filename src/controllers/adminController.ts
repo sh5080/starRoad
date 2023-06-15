@@ -3,7 +3,7 @@ import { AppError, CommonError } from '../types/AppError';
 import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs/promises';
-import { compressImage } from '../api/middlewares/sharp';
+import { compressImage } from '../util/compressImage';
 import config from '../config';
 import path from 'node:path';
 
