@@ -11,14 +11,9 @@ export const createTravelPlan = async (req: CustomRequest, res: Response, next: 
     const { dates, startDate, endDate, destination } = req.body;
     const { username } = req.user!;
 
-    if (!startDate || !endDate || !destination || !dates) {
-      throw new AppError(CommonError.INVALID_INPUT, '필수 입력값이 없습니다.', 400);
-    }
+    const start: Date | string | undefined = startDate ? new Date(startDate) : undefined;
+    const end: Date | string | undefined = endDate ? new Date(endDate) : undefined;
 
-    // const start: Date | string | undefined = startDate ? new Date(startDate) : undefined;
-    // const end: Date | string | undefined = endDate ? new Date(endDate) : undefined;
-    const start = startDate;
-    const end = endDate;
     if ((start && start.toString() === 'Invalid Date') || (end && end.toString() === 'Invalid Date')) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
     }

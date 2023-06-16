@@ -5,6 +5,15 @@ import { Diary } from '../types/diary';
 import { Comment } from '../types/comment';
 import { AppError, CommonError } from '../types/AppError';
 import { TouristDestinationType } from '../types/destination';
+interface TouristDestination {
+  [key: string]: any;
+  // add other properties if necessary
+}
+interface DeletedData {
+  touristDestination: TouristDestination;
+  message: string;
+  [key: string]: any; // Optionally allow other string properties
+}
 
 // [관리자] 모든 회원 정보 불러오기
 export const getAllUsers = async (): Promise<UserType[]> => {
@@ -150,16 +159,6 @@ export const updateTouristDestination = async (
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update tourist destination', 500);
   }
 };
-
-interface TouristDestination {
-  [key: string]: any;
-  // add other properties if necessary
-}
-interface DeletedData {
-  touristDestination: TouristDestination;
-  message: string;
-  [key: string]: any; // Optionally allow other string properties
-}
 
 // [관리자] 관광지 삭제하기
 export const deleteTouristDestination = async (id: string): Promise<DeletedData> => {

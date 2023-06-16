@@ -1,7 +1,6 @@
 import { TravelPlan, TravelLocation } from '../types/travel';
 import * as travelModel from '../models/travelModel';
 import { AppError, CommonError } from '../types/AppError';
-import { RowDataPacket } from 'mysql2';
 import { toCamelCase } from '../util/rowToCamelCase';
 
 function rowToCamelCase(row: any): any {
@@ -17,9 +16,6 @@ function rowToCamelCase(row: any): any {
  * 여행 일정 등록
  */
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
-  if (!travelPlan.username?.trim() || !travelPlan.startDate || !travelPlan.endDate || !travelPlan.destination?.trim()) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 계획에 필요한 정보가 제공되지 않았습니다.', 400);
-  }
   const planId = await travelModel.createTravelPlan(travelPlan);
   return planId;
 };
@@ -38,7 +34,6 @@ export const createTravelLocationByPlanId = async (travelLocation: TravelLocatio
   ) {
     throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
   }
-
   await travelModel.createTravelLocationByPlanId(travelLocation, planId);
 };
 

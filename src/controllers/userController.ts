@@ -115,7 +115,7 @@ export const deleteUserInfo = async (req: CustomRequest, res: Response, next: Ne
 
     const { name, username, email } = deletedUserData;
     const responseData = { name, username, email };
-
+    res.clearCookie('token');
     res.status(200).json(responseData);
   } catch (err) {
     console.error(err);

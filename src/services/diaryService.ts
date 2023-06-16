@@ -63,19 +63,23 @@ export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | nul
  * 여행기 수정
  */
 export const updateDiary = async (newDiary: Diary, diaryId: number, username: string) => {
-  const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
-  if (!diary) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
+  try {
+    const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
+    if (!diary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
+    }
+    if (typeof diary.planId === 'undefined') {
+      throw new AppError(CommonError.INVALID_INPUT, '여행기의 일정 정보가 없습니다.', 400);
+    }
+    const plan = await diaryModel.getPlan(diary.planId, username);
+    if (plan?.username !== username) {
+      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
+    }
+    await diaryModel.updateDiaryByUsername(newDiary, diaryId);
+    return diary;
+  } catch (error) {
+    console.error(error);
   }
-  if (typeof diary.planId === 'undefined') {
-    throw new AppError(CommonError.INVALID_INPUT, '여행기의 일정 정보가 없습니다.', 400);
-  }
-  const plan = await diaryModel.getPlan(diary.planId, username);
-  if (plan?.username !== username) {
-    throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
-  }
-  await diaryModel.updateDiaryByUsername(newDiary, diaryId);
-  return diary;
 };
 
 /**

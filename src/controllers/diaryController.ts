@@ -95,12 +95,8 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
   try {
     const diaryId = parseInt(String(req.params.diaryId), 10);
     const { title, content } = req.body;
-    const username = req.user?.usernam!;
+    const username = req.user?.username!;
 
-    if (!title || !content) {
-      throw new AppError(CommonError.INVALID_INPUT, '제목과 본문은 필수 입력 항목입니다.', 400);
-    }
-    // Get existing diary
     const existingDiary = await diaryService.getOneDiaryByDiaryId(diaryId);
     if (!existingDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
