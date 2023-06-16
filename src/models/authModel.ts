@@ -41,7 +41,7 @@ export const getUserByEmail = async (email?: string): Promise<User.OauthUser | n
     const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
     if (Array.isArray(rows) && rows.length > 0) {
       const userData = rows[0] as User.OauthUser;
-      console.log(userData)
+
       if (userData.oauthProvider === undefined) {
         const query = `UPDATE user SET oauth_provider = ? WHERE email = ?`;
         const oauthProvider = 'kakao' || 'google';
