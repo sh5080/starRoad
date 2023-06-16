@@ -15,9 +15,10 @@ export const createTravelPlan = async (req: CustomRequest, res: Response, next: 
       throw new AppError(CommonError.INVALID_INPUT, '필수 입력값이 없습니다.', 400);
     }
 
-    const start: Date | string | undefined = startDate ? new Date(startDate) : undefined;
-    const end: Date | string | undefined = endDate ? new Date(endDate) : undefined;
-
+    // const start: Date | string | undefined = startDate ? new Date(startDate) : undefined;
+    // const end: Date | string | undefined = endDate ? new Date(endDate) : undefined;
+    const start = startDate;
+    const end = endDate;
     if ((start && start.toString() === 'Invalid Date') || (end && end.toString() === 'Invalid Date')) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
     }
@@ -80,6 +81,8 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
 
     const travelPlanData = await travelService.getTravelPlansByUsername(username); // 여행 일정 데이터
 
+    console.log(travelPlanData);
+
     if (!travelPlanData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
     }
@@ -110,24 +113,35 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
 export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { planId } = req.params;
-
     const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId)); // 여행 일정 데이터
+
+    console.log(travelPlanData);
+
     if (!travelPlanData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
     }
 
     if (travelPlanData.planId !== undefined) {
       const locations = await travelService.getTravelLocationsByPlanId(travelPlanData.planId);
-      travelPlanData.dates = locations.reduce((dates: TravelDate[], location: TravelLocation) => {
-        let date = dates.find((date) => date.date === location.date);
-        if (!date) {
-          date = { date: location.date, locations: [] };
-          dates.push(date);
+
+      // Create a map where the key is the date and the value is an array of locations for that date
+      const datesMap: { [date: string]: TravelLocation[] } = {};
+
+      locations.forEach((location: TravelLocation) => {
+        const date = location.date;
+        if (datesMap[String(date)]) {
+          datesMap[String(date)].push(location);
+        } else {
+          datesMap[String(date)] = [location];
         }
-        date.locations?.push(location);
-        return dates;
-      }, []);
+      });
+      // Convert the map into an array of TravelDate objects
+      travelPlanData.dates = Object.keys(datesMap).map((date: string) => ({
+        date,
+        locations: datesMap[date],
+      }));
     }
+    console.log(travelPlanData);
 
     res.status(200).json({ travelPlanData });
   } catch (error) {
@@ -143,7 +157,6 @@ export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Respo
     const { dates } = req.body;
     const { username } = req.user!;
 
-    
     // 각 날짜별 장소 수정
     if (dates) {
       for (const dateInfo of dates) {
@@ -195,4 +208,3 @@ export const deleteTravelPlan = async (req: CustomRequest, res: Response, next: 
     next(error);
   }
 };
-
