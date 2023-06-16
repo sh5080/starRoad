@@ -150,6 +150,7 @@ export const deleteCommentByUsernameAndDiaryId = async (req: CustomRequest, res:
   }
 };
 
+/** [관리자] 관광지 추가 */
 export const addTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     let imgName = '';
@@ -159,7 +160,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
       const encodedFilename = encodeURIComponent(files[0].filename);
-      imgName = files.length > 0 ? path.join(IMG_PATH, encodedFilename) : '';
+      imgName = files.length > 0 ? `${IMG_PATH}/${encodedFilename}` : '';
       inputPath = files.length > 0 ? path.join(__dirname, '../public', encodedFilename) : '';
       compressed = files.length > 0 ? path.join(__dirname, '../public/compressed', encodedFilename) : '';
     }
