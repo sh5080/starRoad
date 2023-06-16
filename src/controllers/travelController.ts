@@ -76,7 +76,6 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
 
     const travelPlanData = await travelService.getTravelPlansByUsername(username); // 여행 일정 데이터
 
-    console.log(travelPlanData);
 
     if (!travelPlanData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
@@ -110,7 +109,6 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
     const { planId } = req.params;
     const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId)); // 여행 일정 데이터
 
-    console.log(travelPlanData);
 
     if (!travelPlanData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
@@ -136,7 +134,6 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
         locations: datesMap[date],
       }));
     }
-    console.log(travelPlanData);
 
     res.status(200).json({ travelPlanData });
   } catch (error) {
