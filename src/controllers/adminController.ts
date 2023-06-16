@@ -26,7 +26,7 @@ export const updateUser = async (req: CustomRequest, res: Response, next: NextFu
   try {
     const { id } = req.params;
     const { username, name, email, role } = req.body;
-    const userInfo = { username, name, email, role }
+    const userInfo = { username, name, email, role };
     const data = await adminService.updateUser(Number(id), userInfo);
     res.status(200).json({ data, message: '회원 정보 수정을 완료했습니다.' });
   } catch (error) {
@@ -100,12 +100,15 @@ export const deleteDiaryByUsernameAndDiaryId = async (req: CustomRequest, res: R
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리의 댓글 모두 조회하기 */ 
+/** [관리자] 회원이 작성한 다이어리의 댓글 모두 조회하기 */
 export const getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diaryId } = req.params;
 
-    const userTravelDiaryCommentInfos = await adminService.getAllCommentsByUsernameAndDiaryId(String(username), Number(diaryId));
+    const userTravelDiaryCommentInfos = await adminService.getAllCommentsByUsernameAndDiaryId(
+      String(username),
+      Number(diaryId)
+    );
 
     res
       .status(200)
@@ -121,7 +124,7 @@ export const getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res
 export const getAllCommentsByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
-    
+
     const userAllComments = await adminService.getAllCommentsByUsername(String(username));
 
     res.status(200).json({ data: userAllComments, message: '회원이 작성한 모든 댓글을 조회했습니다.' });
@@ -135,7 +138,11 @@ export const getAllCommentsByUsername = async (req: CustomRequest, res: Response
 export const deleteCommentByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diaryId, commentId } = req.params;
-    const message = await adminService.deleteCommentByUsernameAndDiaryId(String(username), Number(diaryId), Number(commentId));
+    const message = await adminService.deleteCommentByUsernameAndDiaryId(
+      String(username),
+      Number(diaryId),
+      Number(commentId)
+    );
     res.status(200).json({ data: message });
   } catch (error) {
     console.error(error);
@@ -168,12 +175,15 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
       Number(longitude)
     );
 
+    let encodedImage = '';
     if (inputPath && compressed) {
       await compressImage(inputPath, compressed, 600, 600);
+      const imgData = await fs.readFile(compressed);
+      encodedImage = `data:image/jpeg;base64,${imgData.toString('base64')}`;
       fs.unlink(inputPath);
     }
 
-    res.status(200).json({ message });
+    res.status(200).json({ message, encodedImage });
   } catch (error) {
     console.error(error);
     next(error);
