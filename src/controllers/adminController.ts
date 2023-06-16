@@ -160,8 +160,8 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
       imgName = files.length > 0 ? path.join(IMG_PATH, files[0].filename) : '';
-      inputPath = files.length > 0 ? path.join(__dirname, '../../public', files[0].filename) : '';
-      compressed = files.length > 0 ? path.join(__dirname, '../../public/compressed', files[0].filename) : '';
+      inputPath = files.length > 0 ? path.join(__dirname, '../public', files[0].filename) : '';
+      compressed = files.length > 0 ? path.join(__dirname, '../public/compressed', files[0].filename) : '';
     }
 
     const { nameEn, nameKo, introduction, latitude, longitude } = req.body;
@@ -219,7 +219,7 @@ export const deleteTouristDestination = async (req: CustomRequest, res: Response
     if (deletedData) {
       const imgName = deletedData.touristDestination.image.split('/compressed')[1];
 
-      const filePath = path.join(__dirname, '../../public/compressed', imgName);
+      const filePath = path.join(__dirname, '../public/compressed', imgName);
 
       await fs.unlink(filePath);
     }

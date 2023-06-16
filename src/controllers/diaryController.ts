@@ -16,16 +16,18 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
     if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
 
+
+      // 개발 시에 "경로 다시 설정 할 것"
       const promises = files.map(async (file) => {
-        const inputPath = path.join(__dirname, '../../public', file.filename);
-        const compressedPath = path.join(__dirname, '../../public/compressed', file.filename);
+        const inputPath = path.join(__dirname, '../public', file.filename);
+        const compressedPath = path.join(__dirname, '../public/compressed', file.filename);
         await compressImage(inputPath, compressedPath, 600, 600);
 
         const compressedFilename = path.basename(compressedPath);
         const encodedFilename = encodeURIComponent(compressedFilename);
         imgNames.push(`${IMG_PATH}/${encodedFilename}`);
 
-        await fs.unlink(path.join(__dirname, '../../public', file.filename));
+        await fs.unlink(path.join(__dirname, '../public', file.filename));
       });
       await Promise.all(promises);
     }
@@ -120,7 +122,8 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
       for (const imageName of imageArray) {
         const url = new URL(imageName);
         const pathname = url.pathname;
-        const baseDir = '/static/compressed/';
+        // 개발시에 경로 다시 설정 할 것 ("static/compressed")
+        const baseDir = '/public/compressed/';
         const start = pathname.indexOf(baseDir);
         if (start === -1) {
           throw new AppError(CommonError.UNEXPECTED_ERROR, 'Unexpected file path', 500);
@@ -130,7 +133,7 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
 
         if (filename) {
           try {
-            await fs.unlink(path.join(__dirname, '../../public/compressed', filename));
+            await fs.unlink(path.join(__dirname, '../public/compressed', filename));
           } catch (err) {
             console.error(`Failed to delete image at ${imageName}: `, err);
             throw new AppError(CommonError.UNEXPECTED_ERROR, 'Failed to delete image', 500);
@@ -145,8 +148,8 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
       const files = req.files as Express.Multer.File[];
 
       const promises = files.map(async (file) => {
-        const inputPath = path.join(__dirname, '../../public', file.filename);
-        const compressedPath = path.join(__dirname, '../../public/compressed', file.filename);
+        const inputPath = path.join(__dirname, '../public', file.filename);
+        const compressedPath = path.join(__dirname, '../public/compressed', file.filename);
         await compressImage(inputPath, compressedPath, 600, 600);
         const compressedFilename = path.basename(compressedPath);
         imgNames.push(`${IMG_PATH}/${compressedFilename}`);
@@ -184,7 +187,7 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
       const promises = imgURLs.map(async (url: string) => {
         const imgName = url.split('/compressed')[1];
 
-        const filePath = path.join(__dirname, '../../public/compressed', imgName);
+        const filePath = path.join(__dirname, '../public/compressed', imgName);
         return await fs.unlink(filePath);
       });
 
