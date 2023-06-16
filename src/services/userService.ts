@@ -14,7 +14,7 @@ const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 /**
  * 사용자 회원가입
  */
-export const signupUser = async (user: User.UserType): Promise<string> => {
+export const signupUser = async (user: User.UserType)=> {
   const hashedPassword = await bcrypt.hash(String(user.password), saltRounds);
 
   const foundUserId = await userModel.getUserByUsername(String(user.username));
@@ -23,8 +23,6 @@ export const signupUser = async (user: User.UserType): Promise<string> => {
   }
 
   await userModel.createUser({ ...user, password: hashedPassword });
-
-  return '회원가입이 정상적으로 완료되었습니다.';
 };
 
 /**
@@ -88,7 +86,7 @@ export const updateUser = async (username: string, updateData: Partial<User.User
 
   if (updateData.password) {
     // 비밀번호가 변경되었는지 확인
-    const isSamePassword = await bcrypt.compare(updateData.password, existingUser.password || '');
+    const isSamePassword = await bcrypt.compare(updateData.password, existingUser.password ?? '');
     if (isSamePassword) {
       throw new AppError(CommonError.INVALID_INPUT, '새로운 비밀번호를 입력해주세요.', 400);
     }

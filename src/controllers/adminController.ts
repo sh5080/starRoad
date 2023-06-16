@@ -1,5 +1,4 @@
 import { Response, NextFunction } from 'express';
-import { AppError, CommonError } from '../types/AppError';
 import * as adminService from '../services/adminService';
 import { CustomRequest } from '../types/customRequest';
 import * as fs from 'node:fs/promises';
@@ -122,7 +121,6 @@ export const getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res
 export const getAllCommentsByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
-    console.log(username);
     
     const userAllComments = await adminService.getAllCommentsByUsername(String(username));
 
