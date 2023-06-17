@@ -71,7 +71,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
         maxAge: 7200000,
       });
 
-      res.redirect(`${SERVER_URL}/`);
+      res.redirect(`https://www.starroad.site`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
@@ -80,7 +80,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
           email: kakaoEmail,
           oauthProvider: 'kakao',
         });
-        res.redirect(`${SERVER_URL}/`);
+        res.redirect(`https://www.starroad.site`);
       } catch (error) {
         console.error(error);
         next(error);
@@ -129,7 +129,7 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
         maxAge: 7200000,
       });
 
-      res.redirect(`${SERVER_URL}/`);
+      res.redirect(`https://www.starroad.site`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
@@ -138,7 +138,7 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
           email: googleEmail,
           oauthProvider: 'google',
         });
-        res.redirect(`${SERVER_URL}/`);
+        res.redirect(`https://www.starroad.site`);
       } catch (error) {
         console.error(error);
         next(error);
