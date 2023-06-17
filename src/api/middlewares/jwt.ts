@@ -69,11 +69,11 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
 
         res.cookie('accessToken', newAccessToken, {
           httpOnly: true,
+          secure: true,
         });
         res.status(200).json({
           message: '새로운 엑세스 토큰이 발급되었습니다.',
         });
-
       } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
           res.clearCookie('refreshToken');

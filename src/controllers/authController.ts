@@ -68,10 +68,12 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
       res.cookie('token', token, {
         // httpOnly: true,
+        secure: true,
         maxAge: 7200000,
       });
 
-      res.redirect(`https://www.starroad.site`);
+      res.redirect(`http://localhost:5173`);
+      // res.redirect(`https://www.starroad.site`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
@@ -80,7 +82,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
           email: kakaoEmail,
           oauthProvider: 'kakao',
         });
-        res.redirect(`https://www.starroad.site`);
+        res.redirect(`http://localhost:5173`);
       } catch (error) {
         console.error(error);
         next(error);
@@ -127,9 +129,11 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
       res.cookie('token', token, {
         maxAge: 7200000,
+        httpOnly: true,
       });
 
-      res.redirect(`https://www.starroad.site`);
+      // res.redirect(`http://localhot:5173`);
+      res.redirect(`http://localhost:5173`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
@@ -138,7 +142,7 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
           email: googleEmail,
           oauthProvider: 'google',
         });
-        res.redirect(`https://www.starroad.site`);
+        res.redirect(`http://localhost:5173`);
       } catch (error) {
         console.error(error);
         next(error);
