@@ -80,7 +80,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
         const newInfo = await authService.OauthSignupUser({
           username: kakaoEmail,
           email: kakaoEmail,
-          oauthProvider: 'kakao',
+          oauthProvider: 'KAKAO',
         });
         res.redirect(`http://localhost:5173`);
       } catch (error) {
@@ -140,7 +140,7 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
         const newInfo = await authService.OauthSignupUser({
           username: googleEmail,
           email: googleEmail,
-          oauthProvider: 'google',
+          oauthProvider: 'GOOGLE',
         });
         res.redirect(`http://localhost:5173`);
       } catch (error) {

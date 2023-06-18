@@ -44,7 +44,7 @@ export const getUserByEmail = async (email?: string): Promise<User.OauthUser | n
 
       if (userData.oauthProvider === undefined) {
         const query = `UPDATE user SET oauth_provider = ? WHERE email = ?`;
-        const oauthProvider = 'kakao' || 'google';
+        const oauthProvider = 'KAKAO' || 'GOOGLE';
         await db.query(query, [oauthProvider, email]);
         userData.oauthProvider = oauthProvider;
       }

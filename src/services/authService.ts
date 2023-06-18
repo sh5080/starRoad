@@ -77,18 +77,18 @@ export const getUserForOauth = async (email: string) => {
  * OAuth 로그인 URL 생성
  */
 export const generateLoginUrl = (oauthProvider: string): string => {
-  const clientId = process.env[`${oauthProvider.toUpperCase()}_CLIENT_ID`] as string;
-  const redirectUri = process.env[`${oauthProvider.toUpperCase()}_REDIRECT_URI`] as string;
+  const clientId = process.env[`${oauthProvider}_CLIENT_ID`] as string;
+  const redirectUri = process.env[`${oauthProvider}_REDIRECT_URI`] as string;
   let params: Record<string, string> = {};
 
-  if (oauthProvider === 'kakao') {
+  if (oauthProvider === 'KAKAO') {
     const responseType = 'code';
     params = {
       client_id: clientId,
       redirect_uri: redirectUri,
       response_type: responseType,
     };
-  } else if (oauthProvider === 'google') {
+  } else if (oauthProvider === 'GOOGLE') {
     const scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
     const responseType = 'code';
     params = {
@@ -102,5 +102,5 @@ export const generateLoginUrl = (oauthProvider: string): string => {
   }
 
   const queryString = qs.stringify(params);
-  return `https://${oauthProvider === 'kakao' ? 'kauth.kakao.com' : 'accounts.google.com'}/oauth/authorize?${queryString}`;
+  return `https://${oauthProvider === 'KAKAO' ? 'kauth.kakao.com' : 'accounts.google.com'}/oauth/authorize?${queryString}`;
 };
