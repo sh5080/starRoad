@@ -7,6 +7,9 @@ import * as crypto from 'node:crypto';
 if (!fs.existsSync('public')) {
   fs.mkdirSync('public');
 }
+if (!fs.existsSync('public/compressed')) {
+  fs.mkdirSync('public/compressed');
+}
 
 const storage = multer.diskStorage({
   destination: function (
@@ -27,7 +30,9 @@ export const processImage = (req: Request, res: Response, next: NextFunction) =>
   upload.array('image', 4)(req, res, (err) => {
     // upload.array 사용
     if (err) {
+      console.error(err)
       return next(new AppError(CommonError.RESOURCE_NOT_FOUND, '업로드중 에러 발생', 400));
+      
     } else {
       next();
     }
