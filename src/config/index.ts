@@ -83,14 +83,14 @@ const config: Config = {
     /** [Google] 클라이언트 시크릿 */
     GOOGLE_CLIENT_SECRET: getEnv('GOOGLE_CLIENT_SECRET'),
     /** [Google] 리디렉션 URI */
-    GOOGLE_REDIRECT_URI: getEnv('GOOGLE_REDIRECT_URI'),
+    GOOGLE_REDIRECT_URI: getEnv(process.env.SERVER_MODE === 'PRO' ? 'PRO_GOOGLE_REDIRECT_URI' : 'DEV_GOOGLE_REDIRECT_URI'),
   },
 
   kakao: {
     /** [Kakao] 클라이언트 ID */
     KAKAO_CLIENT_ID: getEnv('KAKAO_CLIENT_ID'),
     /** [Kakao] 리디렉션 URI */
-    KAKAO_REDIRECT_URI: getEnv('KAKAO_REDIRECT_URI'),
+    KAKAO_REDIRECT_URI: getEnv(process.env.SERVER_MODE === 'PRO' ? 'PRO_KAKAO_REDIRECT_URI' : 'DEV_KAKAO_REDIRECT_URI'),
   },
 };
 

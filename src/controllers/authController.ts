@@ -1,15 +1,12 @@
 import * as authService from '../services/authService';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import config from '../config/index';
 import qs from 'qs';
+import { CustomRequest } from '../types/customRequest';
 import axios from 'axios';
-import { JwtPayload } from 'jsonwebtoken';
+
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = config.google;
 const { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } = config.kakao;
-
-interface CustomRequest extends Request {
-  user?: JwtPayload & { username: string };
-}
 const SERVER_URL = config.server.SERVER_URL;
 
 /** 카카오 로그인 */
@@ -38,6 +35,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
         redirect_uri: KAKAO_REDIRECT_URI,
         code,
       }),
+
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -72,8 +70,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
         maxAge: 7200000,
       });
 
-      res.redirect(`http://localhost:5173`);
-      // res.redirect(`https://www.starroad.site`);
+      res.redirect(`${SERVER_URL}`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
@@ -82,7 +79,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
           email: kakaoEmail,
           oauthProvider: 'KAKAO',
         });
-        res.redirect(`http://localhost:5173`);
+        res.redirect(`${SERVER_URL}`);
       } catch (error) {
         console.error(error);
         next(error);
@@ -129,11 +126,10 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
       res.cookie('token', token, {
         maxAge: 7200000,
-        httpOnly: true,
+        httpOnly: false,
       });
 
-      // res.redirect(`http://localhot:5173`);
-      res.redirect(`http://localhost:5173`);
+      res.redirect(`${SERVER_URL}`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
@@ -142,7 +138,7 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
           email: googleEmail,
           oauthProvider: 'GOOGLE',
         });
-        res.redirect(`http://localhost:5173`);
+        res.redirect(`${SERVER_URL}`);
       } catch (error) {
         console.error(error);
         next(error);
