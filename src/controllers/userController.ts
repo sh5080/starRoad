@@ -44,13 +44,14 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
     const token = await userService.loginUser(username!, password!);
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: true,
-      maxAge: 3600000,
-    });
-
-    res.status(200).json({ message: '로그인 성공', user: userData });
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 3600000,
+      })
+      .status(200)
+      .json({ message: '로그인 성공', user: userData });
   } catch (error) {
     console.error(error);
     next(error);
@@ -59,8 +60,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 /** 로그아웃 */
 export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    res.clearCookie('token');
-    res.status(200).json({ message: '로그아웃 되었습니다.' });
+    res.clearCookie('token').status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (error) {
     console.error(error);
     next(error);
@@ -116,8 +116,7 @@ export const deleteUserInfo = async (req: CustomRequest, res: Response, next: Ne
 
     const { name, username, email } = deletedUserData;
     const responseData = { name, username, email };
-    res.clearCookie('token');
-    res.status(200).json(responseData);
+    res.clearCookie('token').status(200).json(responseData);
   } catch (err) {
     console.error(err);
     next(err);

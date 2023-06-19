@@ -64,13 +64,13 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
       const token = await authService.OauthLoginUser(existingInfo.username || '');
 
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
-      res.cookie('token', token, {
-        // httpOnly: true,
-        secure: true,
-        maxAge: 7200000,
-      });
-
-      res.redirect(`${SERVER_URL}`);
+      res
+        .cookie('token', token, {
+          // httpOnly: true,
+          secure: true,
+          maxAge: 7200000,
+        })
+        .redirect(`${SERVER_URL}`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
@@ -124,12 +124,12 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
       const token = await authService.OauthLoginUser(existingInfo.username || '');
 
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
-      res.cookie('token', token, {
-        maxAge: 7200000,
-        httpOnly: false,
-      });
-
-      res.redirect(`${SERVER_URL}`);
+      res
+        .cookie('token', token, {
+          maxAge: 7200000,
+          httpOnly: false,
+        })
+        .redirect(`${SERVER_URL}`);
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {

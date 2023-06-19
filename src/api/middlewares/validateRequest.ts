@@ -32,7 +32,6 @@ export const validateRequestBody = (requiredFields: string[]) => {
       );
     }
     
-
     next();
   };
 };

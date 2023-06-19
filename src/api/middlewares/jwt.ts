@@ -67,13 +67,11 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
           role: decodedRefreshToken.role,
         };
 
-        res.cookie('accessToken', newAccessToken, {
-          httpOnly: true,
-          secure: true,
-        });
-        res.status(200).json({
-          message: '새로운 엑세스 토큰이 발급되었습니다.',
-        });
+        res
+          .cookie('accessToken', newAccessToken, { httpOnly: true, secure: true })
+          .status(200)
+          .json({ message: '새로운 엑세스 토큰이 발급되었습니다.' });
+          
       } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
           res.clearCookie('refreshToken');
