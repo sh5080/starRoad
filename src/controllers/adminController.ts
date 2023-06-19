@@ -200,6 +200,9 @@ export const updateTouristDestination = async (req: CustomRequest, res: Response
     const { locationId } = req.params;
     const { nameEn, nameKo, image, introduction } = req.body;
 
+    if (!locationId) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '관광지를 찾을 수 없습니다.', 400);
+    }
     const product = {
       nameEn: String(nameEn),
       nameKo: String(nameKo),

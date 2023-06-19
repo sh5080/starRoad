@@ -149,6 +149,9 @@ export const updateTouristDestination = async (
   product: Partial<TouristDestinationType>
 ) => {
   try {
+    if (!id) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '관광지를 찾을 수 없습니다.', 400);
+    }
     await adminModel.updateTouristDestination(id, product);
   } catch (error) {
     console.error(error)
