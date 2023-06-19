@@ -28,12 +28,12 @@ export const createComment = async (req: CustomRequest, res: Response, next: Nex
 };
 
 /** 여행기에 대한 댓글 조회 */
-export const getCommentsByDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getCommentsByDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diaryId } = req.params;
     const { page } = req.query;
     const limit = 10;
-    const comments = await commentService.getCommentsByDiary(Number(diaryId), Number(page), Number(limit));
+    const comments = await commentService.getCommentsByDiaryId(Number(diaryId), Number(page), Number(limit));
     if (comments[0] === undefined) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '댓글을 찾을 수 없습니다.', 404);
     }
@@ -50,9 +50,7 @@ export const updateComment = async (req: CustomRequest, res: Response, next: Nex
     const { commentId } = req.params;
     const { comment } = req.body;
     const username = req.user?.username;
-    if (!comment) {
-      throw new AppError(CommonError.INVALID_INPUT, '댓글을 입력해 주세요.', 400);
-    }
+
     await commentService.updateComment({ comment }, Number(commentId), username as string);
     res.status(200).json({ message: comment });
   } catch (error) {

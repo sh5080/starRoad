@@ -8,7 +8,7 @@ const router = Router();
 router.post('/', validateToken, validateRequestBody(['diaryId', 'comment']),commentController.createComment);
 
 /** [댓글] 여행기별 댓글 조회 */
-router.get('/diaries/:diaryId', commentController.getCommentsByDiary); 
+router.get('/diaries/:diaryId', commentController.getCommentsByDiaryId); 
 
 /** [댓글] 댓글 수정 */
 router.put('/:commentId', validateToken, validateRequestBody(['comment']),commentController.updateComment); 

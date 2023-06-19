@@ -38,11 +38,14 @@ export const getAllDiaries = async (): Promise<Diary[]> => {
  */
 export const getMyDiaries = async (username: string): Promise<Diary[]> => {
   try {
-    const diary = await diaryModel.getMyDiariesByUsername(username);
-    return diary;
+    const diaries = await diaryModel.getMyDiariesByUsername(username);
+    if (!diaries) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
+    }
+    return diaries;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '내 다이어리 조회에 실패했습니다.', 500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기 조회에 실패했습니다.', 500);
   }
 };
 
@@ -52,6 +55,9 @@ export const getMyDiaries = async (username: string): Promise<Diary[]> => {
 export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | null> => {
   try {
     const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
+    if (!diary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기를 찾을 수 없습니다.', 404);
+    }
     return diary;
   } catch (error) {
     console.error(error);
@@ -79,6 +85,7 @@ export const updateDiary = async (newDiary: Diary, diaryId: number, username: st
     return diary;
   } catch (error) {
     console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 수정에 실패했습니다.', 500);
   }
 };
 
@@ -108,5 +115,6 @@ export const deleteDiary = async (diaryId: number, username: string) => {
     return deletedDiary;
   } catch (error) {
     console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);
   }
 };

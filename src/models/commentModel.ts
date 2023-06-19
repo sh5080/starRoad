@@ -21,9 +21,9 @@ export const createComment = async (comment: Comment): Promise<void> => {
 };
 
 /**
- * 특정 다이어리의 댓글 조회
+ * 특정 여행기의 댓글 조회
  */
-export const getCommentsByDiary = async (diaryId: number, page: number, limit: number): Promise<Comment[]> => {
+export const getCommentsByDiaryId = async (diaryId: number, page: number, limit: number): Promise<Comment[]> => {
   try {
     const offset = Math.floor(page - 1) * limit;
 
@@ -54,7 +54,7 @@ export const updateComment = async (id: number, comment: Comment) => {
 /**
  * 댓글 조회
  */
-export const getComment = async (id: number): Promise<Comment | null> => {
+export const getOneComment = async (id: number): Promise<Comment | null> => {
   try {
     const [rows] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
     if (Array.isArray(rows) && rows.length > 0) {

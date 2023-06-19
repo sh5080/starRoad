@@ -220,6 +220,9 @@ export const deleteTouristDestination = async (req: CustomRequest, res: Response
     const { locationId } = req.params;
     const deletedData = await adminService.deleteTouristDestination(String(locationId));
 
+    if (!locationId) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '관광지를 찾을 수 없습니다.', 400);
+    }
     if (deletedData) {
       const imgName = deletedData.touristDestination.image.split('/compressed')[1];
 

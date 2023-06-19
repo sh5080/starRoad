@@ -18,12 +18,12 @@ export const createComment = async (comment: Comment): Promise<void> => {
 /**
  * 게시물별 댓글 조회
  */
-export const getCommentsByDiary = async (
+export const getCommentsByDiaryId = async (
   diaryId: number,
   page: number,
   limit: number
 ): Promise<Comment[]> => {
-  const comments = await commentModel.getCommentsByDiary(diaryId, page, limit); // pagination 적용
+  const comments = await commentModel.getCommentsByDiaryId(diaryId, page, limit); // pagination 적용
   return comments;
 };
 
@@ -31,24 +31,24 @@ export const getCommentsByDiary = async (
  * 댓글 수정
  */
 export const updateComment = async (newComment: Comment, id: number, username: string) => {
-  const existingComment = await commentModel.getComment(id);
-  if (!existingComment) {
+  const commentsInfo = await commentModel.getOneComment(id);
+  if (!commentsInfo) {
     throw new AppError(CommonError.INVALID_INPUT, '존재하지 않는 댓글입니다.', 404);
   }
 
-  if (existingComment.username !== username) {
+  if (commentsInfo.username !== username) {
     throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '댓글을 수정할 권한이 없습니다.', 403);
   }
 
   await commentModel.updateComment(id, newComment);
-  return existingComment;
+  return commentsInfo;
 };
 
 /**
  * 댓글 삭제
  */
 export const deleteComment = async (id: number, username: string) => {
-  const comment = await commentModel.getComment(id);
+  const comment = await commentModel.getOneComment(id);
   if (!comment) {
     throw new AppError(CommonError.RESOURCE_NOT_FOUND, '댓글을 찾을 수 없습니다.', 404);
   }
