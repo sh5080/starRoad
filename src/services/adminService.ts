@@ -37,10 +37,9 @@ export const updateUser = async (id: number, user: Partial<UserType>): Promise<U
 };
 
 // [관리자] 회원 정보 삭제
-export const deleteUser = async (id: number): Promise<string> => {
+export const deleteUser = async (id: number)=> {
   try {
     await adminModel.deleteUserById(id);
-    return '회원 정보가 정상적으로 삭제되었습니다.';
   } catch (error) {
     console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user information', 500);
@@ -81,10 +80,10 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<string> => {
+export const deleteDiaryByUsernameAndDiaryId = async (username: string, diaryId: number) => {
   try {
     await adminModel.deleteDiaryByUsernameAndDiaryId(username, diaryId);
-    return '다이어리가 정상적으로 삭제되었습니다.';
+    
   } catch (error) {
     console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user diary', 500);
@@ -118,10 +117,9 @@ export const deleteCommentByUsernameAndDiaryId = async (
   username: string,
   diaryId: number,
   commentId: number
-): Promise<string> => {
+) => {
   try {
     await adminModel.deleteCommentByUsernameAndDiaryId(username, diaryId, commentId);
-    return '댓글이 정상적으로 삭제되었습니다.';
   } catch (error) {
     console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user comment', 500);
@@ -136,10 +134,9 @@ export const addTouristDestination = async (
   introduction: string,
   latitude: number,
   longitude: number
-): Promise<string> => {
+) => {
   try {
     await adminModel.addTouristDestination(nameEn, nameKo, image, introduction, latitude, longitude);
-    return '관광지 추가에 성공하였습니다.';
   } catch (error) {
     console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to add tourist destination', 500);
@@ -150,10 +147,9 @@ export const addTouristDestination = async (
 export const updateTouristDestination = async (
   id: string,
   product: Partial<TouristDestinationType>
-): Promise<string> => {
+) => {
   try {
     await adminModel.updateTouristDestination(id, product);
-    return '관광지 수정에 성공하였습니다.';
   } catch (error) {
     console.error(error)
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update tourist destination', 500);

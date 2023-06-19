@@ -5,6 +5,7 @@ import * as fs from 'node:fs/promises';
 import { compressImage } from '../util/compressImage';
 import config from '../config';
 import path from 'node:path';
+import { AppError, CommonError } from '../types/AppError';
 
 const IMG_PATH = config.server.IMG_PATH;
 
@@ -12,8 +13,10 @@ const IMG_PATH = config.server.IMG_PATH;
 export const getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const users = await adminService.getAllUsers();
+    if(!users){
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND,'불러올 유저정보가 없습니다.',400)
+    }
     const userCount: number = users.length;
-
     res.status(200).json({ data: { users, userCount, message: '모든 회원을 불러왔습니다.' } });
   } catch (error) {
     console.error(error);

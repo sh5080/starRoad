@@ -62,7 +62,7 @@ export const getUser = async (username?: string) => {
   const user = await userModel.getUserByUsername(username);
 
   if (!user) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '로그인 후 이용가능합니다.', 404);
   }
   const { id, password, ...userData } = user;
 
