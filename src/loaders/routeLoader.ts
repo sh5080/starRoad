@@ -13,16 +13,11 @@ const routeLoader = (app: Application): Application => {
     res.send('hello world');
   });
 
-
-
-  app.get('/auth/google/callback', authRouter);
-  app.get('/auth/kakao/callback', authRouter);
-
   /** 정적 파일 경로 */
   app.use('/static', express.static('public'));
 
   /** 라우팅 */
-  app.use('/users', authRouter);
+  app.use('/auth', authRouter);
   app.use('/users', userRouter);
   app.use('/mypage', mypageRouter);
   app.use('/travels', travelRouter);
