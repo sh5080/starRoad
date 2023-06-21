@@ -5,19 +5,26 @@ import { AppError, CommonError } from '../types/AppError';
 /**
  * 여행기 생성
  */
-export const createDiary = async (diary: Diary, username: string, planId: number) => {
-  const plan = await diaryModel.getPlan(planId, username);
+export const createDiary = async (diary: Diary, plan: Diary) => {
+  try {
+    const { destination } = plan;
+    diary.destination = destination;
 
-  if (!plan) {
-    throw new AppError(CommonError.INVALID_INPUT, '나의 일정만 여행기를 등록할 수 있습니다.', 404);
+    await diaryModel.createDiary(diary, plan);
+    return diary;
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 생성에 실패했습니다.', 500);
   }
-
-  const { destination } = plan;
-  diary.destination = destination;
-
-  await diaryModel.createDiary(diary, plan);
-
-  return diary;
+};
+export const getPlanByIdAndUsername = async (planId: number, username: string) => {
+  try {
+    const plan = await diaryModel.getPlan(planId, username);
+    return plan;
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 정보를 가져오는데 실패했습니다.', 500);
+  }
 };
 
 /**
