@@ -11,7 +11,7 @@ router.get('/users/:planId/locations', validateToken, ensureAdmin, adminControll
 
 /** [관리자] 회원이 작성한 댓글 삭제하기 */
 router.delete(
-  '/users/:username/:diaryId/:commentId/comments',
+  '/users/:username/diaries/:diaryId/:commentId/comments',
   validateToken,
   ensureAdmin,
   adminController.deleteCommentByUsernameAndDiaryId
@@ -26,7 +26,7 @@ router.get(
 );
 
 /** [관리자] 회원이 작성한 다이어리 삭제하기 */
-router.delete('/users/:username/:diaryId/diary', validateToken, ensureAdmin, adminController.deleteDiaryByUsernameAndDiaryId);
+router.delete('/users/:username/diaries/:diaryId', validateToken, ensureAdmin, adminController.deleteDiaryByUsernameAndDiaryId);
 
 /** [관리자] 회원이 작성한 여행 일정 조회하기 */
 router.get('/users/:username/plans', validateToken, ensureAdmin, adminController.getAllTravelPlansByUsername);
