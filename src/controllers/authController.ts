@@ -10,16 +10,16 @@ const { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } = config.kakao;
 const SERVER_URL = config.server.SERVER_URL;
 
 /** 카카오 로그인 */
-export const kakaoLogin = (req: CustomRequest, res: Response) => {
-  const loginUrl = authService.generateLoginUrl('KAKAO');
-  res.redirect(loginUrl);
-};
+// export const kakaoLogin = (req: CustomRequest, res: Response) => {
+//   const loginUrl = authService.generateLoginUrl('KAKAO');
+//   res.redirect(loginUrl);
+// };
 
-/** 구글 로그인 */
-export const googleLogin = (req: CustomRequest, res: Response) => {
-  const loginUrl = authService.generateLoginUrl('GOOGLE');
-  res.redirect(loginUrl);
-};
+// /** 구글 로그인 */
+// export const googleLogin = (req: CustomRequest, res: Response) => {
+//   const loginUrl = authService.generateLoginUrl('GOOGLE');
+//   res.redirect(loginUrl);
+// };
 
 /** 카카오 로그인 콜백 */
 export const kakaoCallback = async (req: CustomRequest, res: Response, next: NextFunction) => {
