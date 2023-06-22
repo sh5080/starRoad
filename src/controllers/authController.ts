@@ -74,11 +74,11 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
-        const newInfo = await authService.OauthSignupUser({
-          username: kakaoEmail,
-          email: kakaoEmail,
-          oauthProvider: 'KAKAO',
-        });
+        // const newInfo = await authService.OauthSignupUser({
+        //   username: kakaoEmail,
+        //   email: kakaoEmail,
+        //   oauthProvider: 'KAKAO',
+        // });
         res.redirect(`${SERVER_URL}`);
       } catch (error) {
         console.error(error);
@@ -133,11 +133,11 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
     } else {
       // 기존에 회원 가입되어 있지 않은 경우, 회원 가입 처리 또는 에러 처리를 수행
       try {
-        const newInfo = await authService.OauthSignupUser({
-          username: googleEmail,
-          email: googleEmail,
-          oauthProvider: 'GOOGLE',
-        });
+        // const newInfo = await authService.OauthSignupUser({
+        //   username: googleEmail,
+        //   email: googleEmail,
+        //   oauthProvider: 'GOOGLE',
+        // });
         res.redirect(`${SERVER_URL}`);
       } catch (error) {
         console.error(error);
