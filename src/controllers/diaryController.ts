@@ -35,16 +35,8 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
       });
       await Promise.all(promises);
     }
-    // 오류 발생 여부 상관없이 미들웨어에서 이미지 생성, 생성된 파일 삭제
-    // 미들웨어에서 에러발생시 이미지 생성 하지 않는 로직 필요?
     const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
     if (plan?.username === undefined) {
-      const deletePromises = imgNames.map(async (imgName) => {
-        const decodedFilename = decodeURIComponent(path.basename(imgName));
-        const compressedPath = path.join(__dirname, '../../public/compressed', decodedFilename);
-        await fs.unlink(compressedPath);
-      });
-      await Promise.all(deletePromises);
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '사용자에게 권한이 없습니다.', 403);
     }
     const diary = await diaryService.createDiary({ username, title, content, image: imgNames }, plan);
