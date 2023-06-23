@@ -121,8 +121,12 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
         // 개발시에 경로 다시 설정 할 것 ("static/compressed")
         const baseDir = '/public/compressed/';
         const start = pathname.indexOf(baseDir);
+        // if (start === -1) {
+        //   throw new AppError(CommonError.UNEXPECTED_ERROR, 'Unexpected file path', 500);
+        // }
         if (start === -1) {
-          throw new AppError(CommonError.UNEXPECTED_ERROR, 'Unexpected file path', 500);
+          console.log('Failed to detect image:', imageName);
+          continue;
         }
         const encodedFilename = pathname.substring(start + baseDir.length);
         const filename = decodeURIComponent(encodedFilename);
