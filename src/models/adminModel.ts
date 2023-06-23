@@ -22,7 +22,7 @@ export const getAllUsers = async (): Promise<UserType[]> => {
 /** [관리자] 회원 정보 업데이트 */
 export const updateUserById = async (id: number, user: Partial<UserType>): Promise<UserType> => {
   try {
-    await db.query('UPDATE user SET ? WHERE id = ?', [user, id]);
+    await db.execute('UPDATE user SET ? WHERE id = ?', [user, id]);
     const [rows] = await db.execute<RowDataPacket[]>('SELECT * FROM user WHERE id = ?', [id]);
     const updatedUser = rows.map(rowToCamelCase) as UserType[];
     return updatedUser[0];
