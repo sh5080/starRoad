@@ -7,8 +7,8 @@ import diaryRouter from '../api/routes/diaryRoutes';
 import commentRouter from '../api/routes/commentRoutes';
 import adminRouter from '../api/routes/adminRoutes';
 import destinationRouter from '../api/routes/destinationRoutes';
-const routeLoader = (app: Application): Application => {
 
+const routeLoader = (app: Application): Application => {
   app.get('/', (req: Request, res: Response) => {
     res.send('hello world');
   });

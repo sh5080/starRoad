@@ -18,12 +18,9 @@ export const createComment = async (comment: Comment): Promise<void> => {
 /**
  * 게시물별 댓글 조회
  */
-export const getCommentsByDiaryId = async (
-  diaryId: number,
-  page: number,
-  limit: number
-): Promise<Comment[]> => {
-  const comments = await commentModel.getCommentsByDiaryId(diaryId, page, limit); // pagination 적용
+export const getCommentsByDiaryId = async (diaryId: number, page: number, limit: number): Promise<Comment[]> => {
+  // pagination 적용
+  const comments = await commentModel.getCommentsByDiaryId(diaryId, page, limit);
   return comments;
 };
 
