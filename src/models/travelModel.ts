@@ -94,8 +94,13 @@ export const updateTravelLocation = async (
   username: string,
   travelLocation: TravelLocation
 ): Promise<TravelLocation> => {
+  let conn;
   try {
-    await db.execute(
+    conn = await db.getConnection();
+
+    await conn.beginTransaction();
+
+    await conn.execute(
       'UPDATE travel_location SET location = ?, date = ?, `order` = ?, latitude = ?, longitude = ? WHERE plan_id = ? AND location_id = ?',
       [
         travelLocation.location,
@@ -108,14 +113,14 @@ export const updateTravelLocation = async (
       ]
     );
 
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(
       'SELECT * FROM travel_location WHERE location_id = ?',
       [travelLocation.locationId]
     );
 
     let updatedLocation: TravelLocation = {
-      locationId: rows[0].locationId,
-      planId: rows[0].planId,
+      locationId: rows[0].location_id,
+      planId: rows[0].plan_id,
       location: rows[0].location,
       newDate: rows[0].date,
       order: rows[0].order,
@@ -123,10 +128,16 @@ export const updateTravelLocation = async (
       longitude: rows[0].longitude,
     };
 
+    await conn.commit();
+
     return updatedLocation;
   } catch (error) {
+    if (conn) await conn.rollback();
+
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜별 장소 수정에 실패했습니다.', 500);
+  } finally {
+    if (conn) conn.release();
   }
 };
 
