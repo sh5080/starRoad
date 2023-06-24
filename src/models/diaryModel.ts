@@ -85,7 +85,7 @@ export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | nul
       diaryId,
     ]);
     if (rows.length > 0) {
-      return rowToCamelCase(rows[0]) as Diary;
+      return rowToCamelCase(rows[0]);
     }
     return null;
   } catch (error) {

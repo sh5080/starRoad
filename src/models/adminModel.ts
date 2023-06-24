@@ -75,7 +75,7 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [
       username,
     ]);
-    return rows.map(rowToCamelCase) as Diary[];
+    return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel diaries', 500);
