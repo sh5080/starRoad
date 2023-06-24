@@ -101,14 +101,14 @@ export const getAllCommentsByUsernameAndDiaryId = async (username: string, diary
       'SELECT * FROM comment WHERE diary_id = ? AND username = ?',
       [diaryId, username]
     );
-    return rows.map(rowToCamelCase) as Comment[];
+    return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user diary comments', 500);
   }
 };
 
-/** [관리자] 특정 회원이 작성한 모든 댓글 조회하기 ( LEFT JOIN을 통해서 다이어리 제목도 함께 조회 ) */
+/** [관리자] 특정 회원이 작성한 모든 댓글 조회하기 */
 export const getAllCommentsByUsername = async (username: string): Promise<Comment[]> => {
   try {
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
@@ -118,7 +118,7 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
       WHERE comment.username = ?`,
       [username]
     );
-    return rows.map(rowToCamelCase) as Comment[];
+    return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user comments', 500);
