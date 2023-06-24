@@ -1,13 +1,14 @@
 import { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
 import { TravelLocation } from '../types/travel';
+import { SpawnSyncOptionsWithBufferEncoding } from 'child_process';
 
 export interface CustomRequest extends Request {
   user?: JwtPayload & { username: string; role: string };
   params: {
     username?: string;
     id?: string;
-    diaryId?: string; 
+    diaryId?: string;
     planId?: string;
     date?: string;
     locationId?: string;
@@ -18,9 +19,10 @@ export interface CustomRequest extends Request {
     longitude?: number;
     id?: number;
     username: string;
+    password: string;
     name: string;
     email: string;
-    diaryId?: number; 
+    diaryId?: number;
     comment?: string;
     title?: string;
     content?: string;
@@ -48,8 +50,6 @@ export interface CustomRequest extends Request {
       date?: string;
       locations?: TravelLocation[];
     }[];
-   
   };
   file?: Express.Multer.File;
-  
 }

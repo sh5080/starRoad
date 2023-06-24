@@ -2,7 +2,7 @@ import { db } from '../loaders/dbLoader';
 import { Diary } from '../types/diary';
 import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
-import { RowDataPacket } from 'mysql2';
+import { Field, FieldPacket, RowDataPacket } from 'mysql2';
 import { rowToCamelCase } from '../util/rowToCamelCase';
 
 /**
@@ -28,10 +28,13 @@ export const createDiary = async (diary: Diary, plan: Diary): Promise<void> => {
  */
 export const getPlan = async (planId: number, username: string): Promise<TravelPlan | null> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?', [planId, username]);
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
+      'SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?',
+      [planId, username]
+    );
 
-    if (Array.isArray(rows) && rows.length > 0) {
-      return rowToCamelCase(rows[0]) as TravelPlan;
+    if (rows.length > 0) {
+      return rowToCamelCase(rows[0]);
     }
 
     return null;
@@ -46,8 +49,8 @@ export const getPlan = async (planId: number, username: string): Promise<TravelP
  */
 export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_diary');
-    return (rows as RowDataPacket[]).map(rowToCamelCase);
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM travel_diary');
+    return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '모든 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
@@ -65,8 +68,8 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
       JOIN travel_plan p ON td.plan_id = p.plan_id
       WHERE p.username = ?;
     `;
-    const [rows] = await db.execute(query, [username]);
-    return (rows as RowDataPacket[]).map(rowToCamelCase);
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(query, [username]);
+    return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
@@ -78,8 +81,10 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
  */
 export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | null> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [diaryId]);
-    if (Array.isArray(rows) && rows.length > 0) {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [
+      diaryId,
+    ]);
+    if (rows.length > 0) {
       return rowToCamelCase(rows[0]) as Diary;
     }
     return null;
