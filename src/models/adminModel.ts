@@ -5,7 +5,7 @@ import { Diary } from '../types/diary';
 import { Comment } from '../types/comment';
 import { TouristDestinationType } from '../types/destination';
 import { AppError, CommonError } from '../types/AppError';
-import { RowDataPacket } from 'mysql2';
+import { RowDataPacket } from 'mysql2/promise';
 import { rowToCamelCase } from '../util/rowToCamelCase';
 
 /** [관리자] 모든 회원 정보 불러오기 */
@@ -178,15 +178,27 @@ export const updateTouristDestination = async (id: string, product: Partial<Tour
 
 /** [관리자] 관광지 삭제하기 */
 export const deleteTouristDestination = async (id: string): Promise<object> => {
+  const connection = await db.getConnection();
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_destination WHERE id = ?', [id]);
+    await connection.beginTransaction();
+
+    const [rows] = await connection.execute(`SELECT * FROM travel_destination WHERE id = ?`, [id]);
     const touristDestination = rowToCamelCase((rows as RowDataPacket[])[0]);
 
-    await db.execute('DELETE FROM travel_destination WHERE id = ?', [id]);
+    await connection.execute(`DELETE FROM travel_destination WHERE id = ?`, [id]);
+
+    await connection.commit();
 
     return touristDestination;
   } catch (error) {
+    if (connection) {
+      await connection.rollback();
+    }
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete tourist destination', 500);
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 };
