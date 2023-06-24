@@ -1,8 +1,7 @@
-import { FieldPacket, OkPacket, RowDataPacket } from 'mysql2';
+import { OkPacket, RowDataPacket } from 'mysql2';
 import { db } from '../loaders/dbLoader';
 import { AppError, CommonError } from '../types/AppError';
 import * as User from '../types/user';
-import { rowToCamelCase } from '../util/rowToCamelCase';
 
 /**
  * 사용자 생성
@@ -26,11 +25,9 @@ export const createUser = async (user: User.UserType): Promise<void> => {
  */
 export const getUserByUsername = async (username?: string): Promise<User.UserType | null> => {
   try {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM user WHERE username = ?', [
-      username,
-    ]);
-    if (rows.length > 0) {
-      const userData: User.UserType = rowToCamelCase(rows[0]);
+    const [rows] = await db.execute('SELECT * FROM user WHERE username = ?', [username]);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const userData = rows[0] as User.UserType;
       return userData;
     }
     return null;
@@ -47,9 +44,9 @@ export const getUserByUsername = async (username?: string): Promise<User.UserTyp
  */
 export const getUserByEmail = async (email?: string): Promise<User.UserType | null> => {
   try {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
-    if (rows.length > 0) {
-      const userData: User.UserType = rowToCamelCase(rows[0]);
+    const [rows] = await db.execute('SELECT * FROM user WHERE email = ?', [email]);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const userData = rows[0] as User.UserType;
       return userData;
     }
     return null;
@@ -84,19 +81,16 @@ export const updateUserByUsername = async (
  */
 export const deleteUserByUsername = async (username: string): Promise<User.UserType | null> => {
   try {
-    const [result]: [RowDataPacket[], FieldPacket[]] = await db.execute<RowDataPacket[]>(
-      'SELECT * FROM user WHERE username = ?',
-      [username]
-    );
+    const [result] = await db.execute<RowDataPacket[]>('SELECT * FROM user WHERE username = ?', [username]);
 
     if (result.length === 0) {
-      return null;
+      return null; // 사용자가 존재하지 않음
     }
 
-    const deletedUser: User.UserType = rowToCamelCase(result[0]);
+    const [deletedUser] = result;
     await db.execute<OkPacket>('DELETE FROM user WHERE username = ?', [username]);
 
-    return deletedUser;
+    return deletedUser as User.UserType;
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 탈퇴에 실패했습니다.', 500);

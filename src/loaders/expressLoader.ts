@@ -9,10 +9,9 @@ export default async function expressLoader(app: Application): Promise<Applicati
   try {
     const db = await dbLoader();
     const corsOptions = {
-      origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+      origin: ['http://localhost:5173', 'http://localhost:5174'],
       credentials: true,
     };
-
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 

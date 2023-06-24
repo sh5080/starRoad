@@ -13,8 +13,8 @@ const IMG_PATH = config.server.IMG_PATH;
 export const getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const users = await adminService.getAllUsers();
-    if (!users) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '불러올 유저정보가 없습니다.', 400);
+    if(!users){
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND,'불러올 유저정보가 없습니다.',400)
     }
     const userCount: number = users.length;
     res.status(200).json({ data: { users, userCount, message: '모든 회원을 불러왔습니다.' } });
@@ -160,7 +160,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
     let inputPath = '';
     let compressed = '';
 
-    if (req.files) {
+    if (req.files && Array.isArray(req.files)) {
       const files = req.files as Express.Multer.File[];
       const encodedFilename = encodeURIComponent(files[0].filename);
       imgName = files.length > 0 ? `${IMG_PATH}/${encodedFilename}` : '';

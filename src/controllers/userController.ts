@@ -1,16 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { AppError, CommonError } from '../types/AppError';
+import { JwtPayload } from 'jsonwebtoken';
 import { UserType } from '../types/user';
-import { CustomRequest } from '../types/customRequest';
-
+interface CustomRequest extends Request {
+  user?: JwtPayload & { username: string };
+}
 /** 회원가입 */
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, username, password, email } = req.body;
     const userData = { name, username, email, password };
     const exceptPassword = { name, username, email };
-
+    //유효성 검증
     if (username.length < 6 || username.length > 20) {
       throw new AppError(CommonError.INVALID_INPUT, '아이디는 6자 이상 20자 이내로 설정해야 합니다.', 400);
     }
@@ -41,12 +43,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '탈퇴한 회원입니다.', 400);
     }
     const token = await userService.loginUser(username!, password!);
-    console.log(token);
 
     res
       .cookie('token', token, {
         httpOnly: true,
-        // secure: true,
+        secure: true,
         maxAge: 3600000,
       })
       .status(200)
@@ -56,7 +57,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     next(error);
   }
 };
-
 /** 로그아웃 */
 export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {

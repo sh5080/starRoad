@@ -66,7 +66,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
       // 토큰을 쿠키에 설정하고 클라이언트에게 보냄
       res
         .cookie('token', token, {
-          httpOnly: true,
+          // httpOnly: true,
           secure: true,
           maxAge: 7200000,
         })
@@ -127,7 +127,7 @@ export const googleCallback = async (req: CustomRequest, res: Response, next: Ne
       res
         .cookie('token', token, {
           maxAge: 7200000,
-          httpOnly: true,
+          httpOnly: false,
         })
         .redirect(`${SERVER_URL}`);
     } else {

@@ -27,10 +27,11 @@ export const getCommentsByDiaryId = async (diaryId: number, page: number, limit:
   try {
     const offset = Math.floor(page - 1) * limit;
 
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
-      `SELECT * FROM comment WHERE diary_id = ? LIMIT = ? OFFSET = ?`,
-      [diaryId, limit, offset]
-    );
+    const [rows] = await db.query<RowDataPacket[]>(`SELECT * FROM comment WHERE diary_id = ? LIMIT = ? OFFSET = ?`, [
+      diaryId,
+      limit,
+      offset,
+    ]);
 
     return rows.map(rowToCamelCase);
   } catch (error) {
