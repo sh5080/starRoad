@@ -1,6 +1,6 @@
 import multer from 'multer';
 import * as fs from 'node:fs';
-import { AppError, CommonError } from '../../types/AppError';
+
 import { Request, Response, NextFunction } from 'express';
 import * as crypto from 'node:crypto';
 
