@@ -74,7 +74,7 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
   try {
     const { username } = req.user!;
 
-    const travelPlanData = await travelService.getTravelPlansByUsername(username); // 여행 일정 데이터
+    const travelPlanData = await travelService.getTravelPlansByUsername(username);
 
 
     if (!travelPlanData) {
@@ -107,7 +107,7 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
 export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { planId } = req.params;
-    const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId)); // 여행 일정 데이터
+    const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId));
 
 
     if (!travelPlanData) {
@@ -117,7 +117,6 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
     if (travelPlanData.planId !== undefined) {
       const locations = await travelService.getTravelLocationsByPlanId(travelPlanData.planId);
 
-      // Create a map where the key is the date and the value is an array of locations for that date
       const datesMap: { [date: string]: TravelLocation[] } = {};
 
       locations.forEach((location: TravelLocation) => {
@@ -128,7 +127,7 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
           datesMap[String(date)] = [location];
         }
       });
-      // Convert the map into an array of TravelDate objects
+      
       travelPlanData.dates = Object.keys(datesMap).map((date: string) => ({
         date,
         locations: datesMap[date],
