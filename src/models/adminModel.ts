@@ -102,10 +102,10 @@ export const getAllCommentsByUsernameAndDiaryId = async (username: string, diary
 export const getAllCommentsByUsername = async (username: string): Promise<Comment[]> => {
   try {
     const [rows] = await db.execute(
-      'SELECT comment.*, travel_diary.title ' +
-        'FROM comment ' +
-        'LEFT JOIN travel_diary ON comment.diary_id = travel_diary.id ' +
-        'WHERE comment.username = ?',
+      `SELECT comment.*, travel_diary.title 
+      FROM comment 
+      LEFT JOIN travel_diary ON comment.diary_id = travel_diary.id 
+      WHERE comment.username = ?`,
       [username]
     );
     return (rows as RowDataPacket[]).map(rowToCamelCase) as Comment[];
