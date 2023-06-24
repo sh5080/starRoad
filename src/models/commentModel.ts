@@ -1,6 +1,6 @@
 import { db } from '../loaders/dbLoader';
 import { Comment } from '../types/comment';
-import { RowDataPacket } from 'mysql2';
+import { RowDataPacket, FieldPacket } from 'mysql2/promise';
 import { AppError, CommonError } from '../types/AppError';
 import { rowToCamelCase } from '../util/rowToCamelCase';
 
@@ -53,12 +53,12 @@ export const updateComment = async (id: number, comment: Comment) => {
 };
 
 /**
- * 댓글 조회
+ * 특정 여행기의 댓글 조회
  */
 export const getOneComment = async (id: number): Promise<Comment | null> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
-    if (Array.isArray(rows) && rows.length > 0) {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
+    if (rows.length > 0) {
       return rowToCamelCase(rows[0]);
     }
     return null;
