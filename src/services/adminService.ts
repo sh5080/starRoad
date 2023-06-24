@@ -105,6 +105,9 @@ export const getAllCommentsByUsernameAndDiaryId = async (username: string, diary
 export const getAllCommentsByUsername = async (username: string): Promise<Comment[]> => {
   try {
     const userComments = await adminModel.getAllCommentsByUsername(username);
+    if (!userComments) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '사용자 댓글을 찾을 수 없습니다.', 404);
+    }
     return userComments;
   } catch (error) {
     console.error(error);
@@ -116,6 +119,10 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
 export const deleteCommentByUsernameAndDiaryId = async (username: string, diaryId: number, commentId: number) => {
   try {
     await adminModel.deleteCommentByUsernameAndDiaryId(username, diaryId, commentId);
+    if (username === undefined || diaryId === undefined || commentId === undefined) {
+      throw new AppError(CommonError.INVALID_INPUT, '올바르지 않은 값입니다.', 400);
+    }
+    
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, '댓글 삭제에 실패했습니다.', 500);

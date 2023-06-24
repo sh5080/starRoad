@@ -129,7 +129,9 @@ export const getAllCommentsByUsername = async (req: CustomRequest, res: Response
     const { username } = req.params;
 
     const userAllComments = await adminService.getAllCommentsByUsername(String(username));
-
+    if (userAllComments.length === 0) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '사용자의 댓글이 없습니다.', 404);
+    }
     res.status(200).json({ data: userAllComments, message: '회원이 작성한 모든 댓글을 조회했습니다.' });
   } catch (error) {
     console.error(error);
