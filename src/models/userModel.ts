@@ -1,4 +1,5 @@
 import { FieldPacket, OkPacket, RowDataPacket } from 'mysql2';
+import Connection from 'mysql2/typings/mysql/lib/Connection';
 import { db } from '../loaders/dbLoader';
 import { AppError, CommonError } from '../types/AppError';
 import * as User from '../types/user';
@@ -82,23 +83,31 @@ export const updateUserByUsername = async (
 /**
  * 사용자 삭제
  */
-export const deleteUserByUsername = async (username: string): Promise<User.UserType | null> => {
+export const deleteUserByUsername = async (username: string): Promise<User.UserType> => {
+  const connection = await db.getConnection();
+  await connection.beginTransaction();
+
   try {
-    const [result]: [RowDataPacket[], FieldPacket[]] = await db.execute<RowDataPacket[]>(
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await connection.execute(
       'SELECT * FROM user WHERE username = ?',
       [username]
     );
 
-    if (result.length === 0) {
-      return null;
+    if (rows.length === 0) {
+      throw new AppError(CommonError.AUTHENTICATION_ERROR, '존재하지 않는 사용자입니다.', 401);
     }
 
-    const deletedUser: User.UserType = rowToCamelCase(result[0]);
-    await db.execute<OkPacket>('DELETE FROM user WHERE username = ?', [username]);
+    const deletedUser: User.UserType = rowToCamelCase(rows[0]);
+    await connection.execute<OkPacket>('DELETE FROM user WHERE username = ?', [username]);
+
+    await connection.commit();
 
     return deletedUser;
   } catch (error) {
     console.error(error);
+    await connection.rollback();
     throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 탈퇴에 실패했습니다.', 500);
+  } finally {
+    connection.release();
   }
 };
