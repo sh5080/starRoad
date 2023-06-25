@@ -200,7 +200,6 @@ export const addTouristDestination = async (
     if (!nameEn || !nameKo || !image || !introduction || !latitude || !longitude) {
       throw new AppError(CommonError.INVALID_INPUT, '올바른 관광지 정보가 제공되지 않았습니다.', 400);
     }
-
     await adminModel.addTouristDestination(nameEn, nameKo, image, introduction, latitude, longitude);
   } catch (error) {
     console.error(error);

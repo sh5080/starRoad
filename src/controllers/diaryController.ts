@@ -9,14 +9,33 @@ import path from 'node:path';
 const IMG_PATH = config.server.IMG_PATH;
 
 /** 여행기 작성 */
+
+export const checkAuthorization = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { planId } = req.params;
+    const username = req.user?.username!;
+
+    const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
+    if (plan?.username === undefined) {
+      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '사용자에게 권한이 없습니다.', 403);
+    }
+    next();
+  } catch (error) {
+    console.error(error)
+    next(error);
+  }
+};
 export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { title, content } = req.body;
     const { planId } = req.params;
     const username = req.user?.username!;
+    const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
 
     let imgNames: string[] = [];
-
+    if (!req.files) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '이미지 파일이 첨부되지 않았습니다.', 400);
+    }
     if (req.files) {
       const files = req.files as Express.Multer.File[];
       const promises = files.map(async (file) => {
@@ -36,18 +55,18 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
     }
     // 오류 발생 여부 상관없이 미들웨어에서 이미지 생성, 생성된 파일 삭제
     // 미들웨어에서 에러발생시 이미지 생성 하지 않는 로직 필요?
-    const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
-    if (plan?.username === undefined) {
-      const deletePromises = imgNames.map(async (imgName) => {
-        const decodedFilename = decodeURIComponent(path.basename(imgName));
-        const compressedPath = path.join(__dirname, '../../public/compressed', decodedFilename);
-        await fs.unlink(compressedPath);
-      });
-      await Promise.all(deletePromises);
-      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '사용자에게 권한이 없습니다.', 403);
-    }
+    // const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
+    // if (plan?.username === undefined) {
+    //   const deletePromises = imgNames.map(async (imgName) => {
+    //     const decodedFilename = decodeURIComponent(path.basename(imgName));
+    //     const compressedPath = path.join(__dirname, '../../public/compressed', decodedFilename);
+    //     await fs.unlink(compressedPath);
+    //   });
+    //   await Promise.all(deletePromises);
+    //   throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '사용자에게 권한이 없습니다.', 403);
+    // }
 
-    const diary = await diaryService.createDiary({ username, title, content, image: imgNames }, plan);
+    const diary = await diaryService.createDiary({ username, title, content, image: imgNames }, plan!);
 
     res.status(201).json(diary);
   } catch (error) {

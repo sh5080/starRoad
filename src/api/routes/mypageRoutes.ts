@@ -8,7 +8,14 @@ import { validateRequestBody } from '../middlewares/validateRequest';
 const router = Router();
 
 /** [다이어리] 여행기 작성 */
-router.post('/diaries/:planId', validateToken, processImage, validateRequestBody(['title', 'content']),diaryController.createDiary);
+router.post(
+  '/diaries/:planId',
+  validateToken,
+  diaryController.checkAuthorization,
+  processImage,
+  validateRequestBody(['title', 'content']),
+  diaryController.createDiary
+);
 
 /** [다이어리] 여행기 조회 */
 router.get('/diaries', validateToken, diaryController.getMyDiaries);
@@ -17,10 +24,16 @@ router.get('/diaries', validateToken, diaryController.getMyDiaries);
 router.get('/', validateToken, userController.getUserInfo);
 
 /** [다이어리] 여행기 수정 */
-router.put('/diaries/:diaryId', validateToken, processImage, validateRequestBody(['title', 'content']),diaryController.updateDiary);
+router.put(
+  '/diaries/:diaryId',
+  validateToken,
+  processImage,
+  validateRequestBody(['title', 'content']),
+  diaryController.updateDiary
+);
 
 /** [사용자] 회원정보 수정 */
-router.put('/', validateToken,validateRequestBody(['email', 'password']), userController.updateUserInfo);
+router.put('/', validateToken, validateRequestBody(['email', 'password']), userController.updateUserInfo);
 
 /** [다이어리] 여행기 삭제 */
 router.delete('/diaries/:diaryId', validateToken, diaryController.deleteDiary);
