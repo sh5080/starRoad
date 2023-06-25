@@ -39,42 +39,51 @@ export const getCommentsByDiaryId = async (diaryId: number, page: number, limit:
   }
 };
 
-/**
- * 댓글 업데이트
- */
-export const updateComment = async (id: number, comment: Comment) => {
-  try {
-    await db.execute('UPDATE comment SET comment = ? WHERE id = ?', [comment.comment, id]);
-  } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 업데이트에 실패했습니다.', 500);
-  }
-};
+export const updateComment = async (newComment: Comment, id: number) => {
+  const connection = await db.getConnection();
+  await connection.beginTransaction();
 
-/**
- * 특정 여행기의 댓글 조회
- */
-export const getOneComment = async (id: number): Promise<Comment | null> => {
   try {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM comment WHERE id = ?', [id]);
-    if (rows.length > 0) {
-      return rowToCamelCase(rows[0]);
-    }
-    return null;
+    // 권한 확인을 위한 조회
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await connection.execute(
+      'SELECT username FROM comment WHERE id = ?',
+      [id]
+    );
+    const commentsInfo = rows[0];
+    // 업데이트
+    await connection.execute('UPDATE comment SET comment = ? WHERE id = ?', [newComment.comment, id]);
+
+    await connection.commit();
+    return commentsInfo;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 조회에 실패했습니다.', 500);
+    await connection.rollback();
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 업데이트에 실패했습니다.', 500);
+  } finally {
+    connection.release();
   }
 };
 
 /**
  * 댓글 삭제
  */
-export const deleteComment = async (id: number): Promise<void> => {
+export const deleteComment = async (id: number) => {
+  const connection = await db.getConnection();
+  await connection.beginTransaction();
   try {
-    await db.execute('DELETE FROM comment WHERE id = ?', [id]);
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await connection.execute(
+      'SELECT username FROM comment WHERE id = ?',
+      [id]
+    );
+    const commentsInfo = rows[0];
+    await connection.execute('DELETE FROM comment WHERE id = ?', [id]);
+    await connection.commit();
+    return commentsInfo;
   } catch (error) {
     console.error(error);
+    await connection.rollback();
     throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 삭제에 실패했습니다.', 500);
+  } finally {
+    connection.release();
   }
 };
