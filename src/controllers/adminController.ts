@@ -24,12 +24,47 @@ export const getAllUsers = async (req: CustomRequest, res: Response, next: NextF
   }
 };
 
-/** [관리자] 회원 정보 수정하기 */
+/** [관리자] 특정 회원 조회하기 */
+export const getUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    if (isNaN(Number(id))) {
+      throw new AppError(CommonError.INVALID_INPUT, '입력값이 유효하지 않습니다.', 400);
+    }
+
+    const user = await adminService.getUser(Number(id));
+
+    res.status(200).json({
+      data: {
+        user,
+        message: '유저 조회에 성공하였습니다.',
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+/** [관리자] 회원 정보 업데이트 */
 export const updateUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { username, name, email, role } = req.body;
+
+    if (isNaN(Number(id))) {
+      throw new AppError(CommonError.INVALID_INPUT, '입력값이 유효하지 않습니다.', 400);
+    }
+
+    const user = await adminService.getUser(Number(id));
+
+    if (!user) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '존재하지 않는 유저입니다.', 400);
+    }
+
     const userInfo = { username, name, email, role };
+
     const data = await adminService.updateUser(Number(id), userInfo);
     res.status(201).json({ data, message: '회원 정보 수정을 완료했습니다.' });
   } catch (error) {
@@ -42,6 +77,10 @@ export const updateUser = async (req: CustomRequest, res: Response, next: NextFu
 export const deleteUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+
+    if (isNaN(Number(id))) {
+      throw new AppError(CommonError.INVALID_INPUT, '입력값이 유효하지 않습니다.', 400);
+    }
 
     const message = await adminService.deleteUser(Number(id));
     res.status(200).json({ message });
@@ -56,6 +95,10 @@ export const getAllTravelPlansByUsername = async (req: CustomRequest, res: Respo
   try {
     const { username } = req.params;
 
+    if (!username) {
+      throw new AppError(CommonError.INVALID_INPUT, '입력값이 유효하지 않습니다.', 400);
+    }
+
     const userTravelInfos = await adminService.getAllTravelPlansByUsername(String(username));
     res.status(200).json({ data: userTravelInfos, message: '회원이 작성한 여행 일정을 조회했습니다.' });
   } catch (error) {
@@ -68,6 +111,10 @@ export const getAllTravelPlansByUsername = async (req: CustomRequest, res: Respo
 export const getAllLocationsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { planId } = req.params;
+
+    if (!planId) {
+      throw new AppError(CommonError.INVALID_INPUT, '입력값이 유효하지 않습니다.', 400);
+    }
 
     const userTravelLocationInfos = await adminService.getAllLocationsByPlanId(Number(planId));
 

@@ -7,6 +7,8 @@ import { TouristDestinationType } from '../types/destination';
 import { AppError, CommonError } from '../types/AppError';
 import { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import { rowToCamelCase } from '../util/rowToCamelCase';
+import { FitEnum } from 'sharp';
+import { Deserializer } from 'v8';
 
 /** [관리자] 모든 회원 정보 불러오기 */
 export const getAllUsers = async (): Promise<UserType[]> => {
@@ -19,16 +21,51 @@ export const getAllUsers = async (): Promise<UserType[]> => {
   }
 };
 
+/** [관리자] 회원 정보 불러오기 */
+export const getUser = async (id: number): Promise<UserType> => {
+  try {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(`SELECT * FROM user WHERE id = ?`, [id]);
+
+    if (rows.length === 0) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, 'User not found', 404);
+    }
+
+    return rowToCamelCase(rows[0]);
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user information', 500);
+  }
+};
+
 /** [관리자] 회원 정보 업데이트 */
 export const updateUserById = async (id: number, user: Partial<UserType>): Promise<UserType> => {
+  const connection = await db.getConnection();
+
   try {
-    await db.execute('UPDATE user SET ? WHERE id = ?', [user, id]);
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM user WHERE id = ?', [id]);
+    await connection.beginTransaction();
+
+    const { username, name, email, role } = user;
+
+    await connection.execute('UPDATE user SET username = ?, name = ?, email = ?, role = ? WHERE id = ?', [
+      username,
+      name,
+      email,
+      role,
+      id,
+    ]);
+
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await connection.execute('SELECT * FROM user WHERE id = ?', [id]);
     const updatedUser: UserType[] = rows.map(rowToCamelCase);
+
+    await connection.commit();
+
     return updatedUser[0];
   } catch (error) {
     console.error(error);
+    await connection.rollback();
     throw new AppError(CommonError.SERVER_ERROR, 'Failed to update user information', 500);
+  } finally {
+    connection.release();
   }
 };
 
@@ -161,7 +198,7 @@ export const addTouristDestination = async (
     );
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to add tourist destination', 500);
+    throw new AppError(CommonError.SERVER_ERROR, '관광지 추가에 실패했습니다.', 500);
   }
 };
 

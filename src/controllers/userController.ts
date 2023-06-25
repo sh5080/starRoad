@@ -41,7 +41,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '탈퇴한 회원입니다.', 400);
     }
     const token = await userService.loginUser(username!, password!);
-    console.log(token);
 
     res
       .cookie('token', token, {

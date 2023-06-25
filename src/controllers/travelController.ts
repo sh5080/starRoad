@@ -11,14 +11,14 @@ export const createTravelPlan = async (req: CustomRequest, res: Response, next: 
     const { dates, startDate, endDate, destination } = req.body;
     const { username } = req.user!;
 
-    const start: Date | string | undefined = startDate ? new Date(startDate) : undefined;
-    const end: Date | string | undefined = endDate ? new Date(endDate) : undefined;
-
-    if ((start && start.toString() === 'Invalid Date') || (end && end.toString() === 'Invalid Date')) {
+    if (
+      (String(startDate) && isNaN(Date.parse(String(startDate)))) ||
+      (String(endDate) && isNaN(Date.parse(String(endDate))))
+    ) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
     }
 
-    if (start && end && start > end) {
+    if (String(startDate) && String(endDate) && String(startDate) > String(endDate)) {
       throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜 범위입니다.', 400);
     }
 
@@ -32,25 +32,33 @@ export const createTravelPlan = async (req: CustomRequest, res: Response, next: 
     const planId = Number(await travelService.createTravelPlan(travelPlanWithUserId));
 
     // 각 날짜별 장소 등록
-    if (dates) {
-      for (const dateInfo of dates) {
-        if (!dateInfo.date) {
-          throw new AppError(CommonError.INVALID_INPUT, '날짜가 없는 장소입니다.', 400);
-        }
+    if (!dates) {
+      throw new AppError(CommonError.INVALID_INPUT, '날짜 정보가 필요합니다.', 400);
+    }
 
-        const locationDate = new Date(dateInfo.date);
-        if (start && end && (locationDate < start || locationDate > end)) {
-          throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
-        }
+    for (const dateInfo of dates) {
+      if (!dateInfo.date || isNaN(Date.parse(dateInfo.date))) {
+        throw new AppError(CommonError.INVALID_INPUT, '날짜가 없는 장소입니다.', 400);
+      }
 
-        // 각 날짜에 대해 location을 등록
-        if (dateInfo.locations) {
-          for (const location of dateInfo.locations) {
-            const date = dateInfo.date;
-            location.date = date;
-            await travelService.createTravelLocationByPlanId(location, planId);
-          }
-        }
+      const locationDate = new Date(dateInfo.date);
+      if (
+        String(startDate) &&
+        String(endDate) &&
+        (locationDate < new Date(String(startDate)) || locationDate > new Date(String(endDate)))
+      ) {
+        throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
+      }
+
+      // 각 날짜에 대해 location을 등록
+      if (!dateInfo.locations || dateInfo.locations.length === 0) {
+        throw new AppError(CommonError.INVALID_INPUT, '장소 정보가 필요합니다.', 400);
+      }
+
+      for (const location of dateInfo.locations) {
+        const date = dateInfo.date;
+        location.date = date;
+        await travelService.createTravelLocationByPlanId(location, planId);
       }
     }
 
@@ -76,7 +84,7 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
 
     const travelPlanData = await travelService.getTravelPlansByUsername(username);
 
-
+    
     if (!travelPlanData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
     }
@@ -127,7 +135,7 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
           datesMap[String(date)] = [location];
         }
       });
-      
+
       travelPlanData.dates = Object.keys(datesMap).map((date: string) => ({
         date,
         locations: datesMap[date],
