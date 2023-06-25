@@ -252,8 +252,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
       Number(latitude),
       Number(longitude)
     );
-
-    res.status(200).json({ message });
+   res.status(200).json({nameEn, nameKo, introduction, latitude, longitude, imgName });
   } catch (error) {
     console.error(error);
     next(error);

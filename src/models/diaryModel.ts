@@ -2,7 +2,7 @@ import { db } from '../loaders/dbLoader';
 import { Diary } from '../types/diary';
 import { TravelPlan } from '../types/travel';
 import { AppError, CommonError } from '../types/AppError';
-import { Field, FieldPacket, RowDataPacket } from 'mysql2';
+import { FieldPacket, RowDataPacket } from 'mysql2';
 import { rowToCamelCase } from '../util/rowToCamelCase';
 
 /**
