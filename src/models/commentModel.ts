@@ -44,13 +44,12 @@ export const updateComment = async (newComment: Comment, id: number) => {
   await connection.beginTransaction();
 
   try {
-    // 권한 확인을 위한 조회
     const [rows]: [RowDataPacket[], FieldPacket[]] = await connection.execute(
       'SELECT username FROM comment WHERE id = ?',
       [id]
     );
     const commentsInfo = rows[0];
-    // 업데이트
+
     await connection.execute('UPDATE comment SET comment = ? WHERE id = ?', [newComment.comment, id]);
 
     await connection.commit();

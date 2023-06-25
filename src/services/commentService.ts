@@ -8,7 +8,6 @@ import { AppError, CommonError } from '../types/AppError';
 export const createComment = async (comment: Comment): Promise<void> => {
   try {
     const { username, diaryId, comment: commentText } = comment;
-
     await commentModel.createComment({ username, diaryId, comment: commentText });
   } catch (error) {
     console.error(error);
@@ -19,7 +18,6 @@ export const createComment = async (comment: Comment): Promise<void> => {
  * 게시물별 댓글 조회
  */
 export const getCommentsByDiaryId = async (diaryId: number, page: number, limit: number): Promise<Comment[]> => {
-  // pagination 적용
   const comments = await commentModel.getCommentsByDiaryId(diaryId, page, limit);
   return comments;
 };
