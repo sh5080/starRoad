@@ -27,6 +27,7 @@ router.get('/', validateToken, userController.getUserInfo);
 router.put(
   '/diaries/:diaryId',
   validateToken,
+  diaryController.checkAuthorization,
   processImage,
   validateRequestBody(['title', 'content']),
   diaryController.updateDiary

@@ -81,9 +81,10 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
  */
 export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | null> => {
   try {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM travel_diary WHERE id = ?', [
-      diaryId,
-    ]);
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
+      'SELECT td.*, tp.username FROM travel_diary td JOIN travel_plan tp ON td.plan_id = tp.plan_id WHERE td.id = ?',
+      [diaryId]
+    );
     if (rows.length > 0) {
       return rowToCamelCase(rows[0]);
     }
