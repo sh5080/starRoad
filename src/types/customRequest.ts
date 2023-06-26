@@ -1,7 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
 import { TravelLocation } from '../types/travel';
-import { SpawnSyncOptionsWithBufferEncoding } from 'child_process';
 
 export interface CustomRequest extends Request {
   user?: JwtPayload & { username: string; role: string };
