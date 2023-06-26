@@ -69,6 +69,7 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
       WHERE p.username = ?;
     `;
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(query, [username]);
+
     return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);

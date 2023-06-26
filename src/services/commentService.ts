@@ -25,7 +25,7 @@ export const getCommentsByDiaryId = async (diaryId: number, page: number, limit:
 /**
  * 댓글 수정
  */
-export const updateComment = async (newComment: Comment, id: number, username: string) => {
+export const updateComment = async (newComment: string, id: number, username: string) => {
   const commentsInfo = await commentModel.updateComment(newComment, id);
 
   if (!commentsInfo) {

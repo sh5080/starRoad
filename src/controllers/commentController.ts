@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import * as commentService from '../services/commentService';
 import { getOneDiaryByDiaryId } from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
@@ -15,9 +15,9 @@ export const createComment = async (req: CustomRequest, res: Response, next: Nex
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '유효하지 않은 여행기입니다.', 404);
     }
     await commentService.createComment({
-      username: username,
-      diaryId,
-      comment,
+      username: String(username),
+      diaryId: Number(diaryId),
+      comment: String(comment),
     });
 
     res.status(201).json({ diaryId, comment });
@@ -49,9 +49,9 @@ export const updateComment = async (req: CustomRequest, res: Response, next: Nex
   try {
     const { commentId } = req.params;
     const { comment } = req.body;
-    const username = req.user?.username;
+    const username = req.user!.username;
 
-    await commentService.updateComment({ comment }, Number(commentId), username as string);
+    await commentService.updateComment(String(comment), Number(commentId), username);
     res.status(200).json({ message: comment });
   } catch (error) {
     console.error(error);
@@ -60,15 +60,15 @@ export const updateComment = async (req: CustomRequest, res: Response, next: Nex
 };
 
 /** 댓글 삭제 */
-export const deleteComment = async (req: CustomRequest, res: Response, next:NextFunction) => {
+export const deleteComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { commentId } = req.params;
     const username = req.user?.username!;
-    
+
     await commentService.deleteComment(Number(commentId), username);
     res.status(200).json({ message: '댓글 삭제가 완료되었습니다.' });
   } catch (error) {
     console.error(error);
-    next(error)
+    next(error);
   }
 };

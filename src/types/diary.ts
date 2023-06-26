@@ -5,4 +5,5 @@ export interface Diary {
   content?: string;
   image?: string[] | string;
   destination?: string;
+  id?: number;
 }

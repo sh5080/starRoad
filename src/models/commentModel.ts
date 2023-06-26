@@ -39,7 +39,10 @@ export const getCommentsByDiaryId = async (diaryId: number, page: number, limit:
   }
 };
 
-export const updateComment = async (newComment: Comment, id: number) => {
+/**
+ * 특정 여행기의 댓글 수정
+ */
+export const updateComment = async (newComment: string, id: number) => {
   const connection = await db.getConnection();
   await connection.beginTransaction();
 
@@ -48,9 +51,10 @@ export const updateComment = async (newComment: Comment, id: number) => {
       'SELECT username FROM comment WHERE id = ?',
       [id]
     );
+
     const commentsInfo = rows[0];
 
-    await connection.execute('UPDATE comment SET comment = ? WHERE id = ?', [newComment.comment, id]);
+    await connection.execute('UPDATE comment SET comment = ? WHERE id = ?', [newComment, id]);
 
     await connection.commit();
     return commentsInfo;
