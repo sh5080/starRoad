@@ -25,12 +25,13 @@ export const checkAuthorization = async (req: CustomRequest, res: Response, next
     next(error);
   }
 };
+
+/** 여행기 작성 */
 export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { title, content } = req.body;
     const { planId } = req.params;
     const username = req.user?.username!;
-    const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
 
     let imgNames: string[] = [];
     if (!req.files) {
@@ -53,19 +54,7 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
       });
       await Promise.all(promises);
     }
-    // 오류 발생 여부 상관없이 미들웨어에서 이미지 생성, 생성된 파일 삭제
-    // 미들웨어에서 에러발생시 이미지 생성 하지 않는 로직 필요?
-    // const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
-    // if (plan?.username === undefined) {
-    //   const deletePromises = imgNames.map(async (imgName) => {
-    //     const decodedFilename = decodeURIComponent(path.basename(imgName));
-    //     const compressedPath = path.join(__dirname, '../../public/compressed', decodedFilename);
-    //     await fs.unlink(compressedPath);
-    //   });
-    //   await Promise.all(deletePromises);
-    //   throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '사용자에게 권한이 없습니다.', 403);
-    // }
-
+    const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
     const diary = await diaryService.createDiary({ username, title, content, image: imgNames }, plan!);
 
     res.status(201).json(diary);
@@ -202,18 +191,15 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
     const username = req.user?.username!;
 
     const deletedDiary = await diaryService.deleteDiary(diaryId, username);
-
-    if (!deletedDiary) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 여행기가 아닙니다.', 404);
-    }
     if (deletedDiary.image && typeof deletedDiary.image === 'string') {
-
       const imgURLs = JSON.parse(deletedDiary.image);
 
       const promises = imgURLs.map(async (url: string) => {
-        const imgName = url.split('/compressed')[1];
-        const filePath = path.join(__dirname, '../../public/compressed', imgName);
-        return await fs.unlink(filePath);
+        const imgName = url.split('/compressed').pop();
+        if (imgName) {
+          const filePath = path.join(__dirname, '../../public/compressed', imgName);
+          await fs.unlink(filePath);
+        }
       });
 
       await Promise.all(promises);
@@ -225,3 +211,4 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
     next(error);
   }
 };
+
