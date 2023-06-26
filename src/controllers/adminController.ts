@@ -13,8 +13,8 @@ const IMG_PATH = config.server.IMG_PATH;
 export const getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const users = await adminService.getAllUsers();
-    if (!users) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '불러올 유저정보가 없습니다.', 400);
+    if(!users){
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND,'불러올 유저정보가 없습니다.',400)
     }
     const userCount: number = users.length;
     res.status(200).json({ data: { users, userCount, message: '모든 회원을 불러왔습니다.' } });
@@ -176,9 +176,7 @@ export const getAllCommentsByUsername = async (req: CustomRequest, res: Response
     const { username } = req.params;
 
     const userAllComments = await adminService.getAllCommentsByUsername(String(username));
-    if (userAllComments.length === 0) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '사용자의 댓글이 없습니다.', 404);
-    }
+
     res.status(200).json({ data: userAllComments, message: '회원이 작성한 모든 댓글을 조회했습니다.' });
   } catch (error) {
     console.error(error);
@@ -205,18 +203,45 @@ export const deleteCommentByUsernameAndDiaryId = async (req: CustomRequest, res:
 /** [관리자] 관광지 추가 */
 export const addTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    let imgName = '';
-    let inputPath = '';
-    let compressed = '';
+    // let imgName = '';
+    // let inputPath = '';
+    // let compressed = '';
+    
+    // if (req.files) {
+    //   const files = req.files as Express.Multer.File[];
+    //   const encodedFilename = encodeURIComponent(files[0].filename);
+    //   console.log(encodedFilename)
+    //   imgName = `${IMG_PATH}/${encodedFilename}`;
+    //   inputPath = path.join(__dirname, '../../public', encodedFilename);
+    //   compressed = path.join(__dirname, '../../public/compressed', encodedFilename);
+    //   let encodedImage = '';
 
+    //     await compressImage(inputPath, compressed, 600, 600);
+    //     const imgData = await fs.readFile(compressed);
+    //     encodedImage = `data:image/jpeg;base64,${imgData.toString('base64')}`;
+    //     fs.unlink(inputPath);
+      
+    // }
+    let imgName:string[] = [];
+
+    
     if (req.files) {
       const files = req.files as Express.Multer.File[];
-      const encodedFilename = encodeURIComponent(files[0].filename);
-      imgName = files.length > 0 ? `${IMG_PATH}/${encodedFilename}` : '';
-      inputPath = files.length > 0 ? path.join(__dirname, '../public', encodedFilename) : '';
-      compressed = files.length > 0 ? path.join(__dirname, '../public/compressed', encodedFilename) : '';
-    }
+      const promises = files.map(async (file) => {
+        const inputPath = path.join(__dirname, '../../public', file.filename);
+        const compressedPath = path.join(__dirname, '../../public/compressed', file.filename);
 
+        await compressImage(inputPath, compressedPath, 600, 600);
+
+        const compressedFilename = path.basename(compressedPath);
+        const encodedFilename = encodeURIComponent(compressedFilename);
+
+        imgName.push(`${IMG_PATH}/${encodedFilename}`);
+
+        await fs.unlink(inputPath);
+      });
+      await Promise.all(promises);
+    }
     const { nameEn, nameKo, introduction, latitude, longitude } = req.body;
 
     const message = await adminService.addTouristDestination(
@@ -227,16 +252,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
       Number(latitude),
       Number(longitude)
     );
-
-    let encodedImage = '';
-    if (inputPath && compressed) {
-      await compressImage(inputPath, compressed, 600, 600);
-      const imgData = await fs.readFile(compressed);
-      encodedImage = `data:image/jpeg;base64,${imgData.toString('base64')}`;
-      fs.unlink(inputPath);
-    }
-
-    res.status(200).json({ message, encodedImage });
+   res.status(200).json({nameEn, nameKo, introduction, latitude, longitude, imgName });
   } catch (error) {
     console.error(error);
     next(error);

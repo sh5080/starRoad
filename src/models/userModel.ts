@@ -1,5 +1,4 @@
 import { FieldPacket, OkPacket, RowDataPacket } from 'mysql2';
-import Connection from 'mysql2/typings/mysql/lib/Connection';
 import { db } from '../loaders/dbLoader';
 import { AppError, CommonError } from '../types/AppError';
 import * as User from '../types/user';

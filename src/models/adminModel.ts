@@ -7,8 +7,6 @@ import { TouristDestinationType } from '../types/destination';
 import { AppError, CommonError } from '../types/AppError';
 import { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import { rowToCamelCase } from '../util/rowToCamelCase';
-import { FitEnum } from 'sharp';
-import { Deserializer } from 'v8';
 
 /** [관리자] 모든 회원 정보 불러오기 */
 export const getAllUsers = async (): Promise<UserType[]> => {
