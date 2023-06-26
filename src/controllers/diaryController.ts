@@ -21,7 +21,7 @@ export const checkAuthorization = async (req: CustomRequest, res: Response, next
     }
     next();
   } catch (error) {
-    console.error(error)
+    console.error(error);
     next(error);
   }
 };
@@ -207,11 +207,12 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '나의 여행기가 아닙니다.', 404);
     }
     if (deletedDiary.image && typeof deletedDiary.image === 'string') {
-
       const imgURLs = JSON.parse(deletedDiary.image);
 
       const promises = imgURLs.map(async (url: string) => {
-        const imgName = url.split('/compressed')[1];
+        const encodedImgName = url.split('/compressed/')[1];
+        const imgName = decodeURIComponent(encodedImgName);
+        console.log(imgName);
         const filePath = path.join(__dirname, '../../public/compressed', imgName);
         return await fs.unlink(filePath);
       });
