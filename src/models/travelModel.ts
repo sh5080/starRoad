@@ -1,6 +1,6 @@
 import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
-import { RowDataPacket, FieldPacket } from 'mysql2';
+import { RowDataPacket, FieldPacket, ResultSetHeader } from 'mysql2';
 import { AppError, CommonError } from '../types/AppError';
 import { rowToCamelCase } from '../util/rowToCamelCase';
 
@@ -9,12 +9,12 @@ import { rowToCamelCase } from '../util/rowToCamelCase';
  */
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
   try {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
+    const [result]: [ResultSetHeader, FieldPacket[]] = await db.execute(
       'INSERT INTO travel_plan (username, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
       [travelPlan.username, travelPlan.startDate, travelPlan.endDate, travelPlan.destination]
     );
-
-    return rows[0];
+    const planId = result.insertId;
+    return planId;
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 생성에 실패했습니다.', 500);
