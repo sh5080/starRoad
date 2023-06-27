@@ -99,7 +99,9 @@ export const getOneDiaryByDiaryId = async (req: Request, res: Response, next: Ne
   try {
     const diaryId = parseInt(req.params.diaryId, 10);
     const diary = await diaryService.getOneDiaryByDiaryId(diaryId);
-
+    if (!diary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 여행기를 찾을 수 없습니다.', 404);
+    }
     res.status(200).json(diary);
   } catch (error) {
     console.error(error);

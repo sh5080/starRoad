@@ -40,7 +40,7 @@ export const getPlan = async (planId: number, username: string): Promise<TravelP
     return null;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정을 가져오는 중에 오류가 발생했습니다.', 404);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정을 가져오는 중에 오류가 발생했습니다.', 500);
   }
 };
 
@@ -53,7 +53,7 @@ export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
     return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '모든 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '모든 여행기를 가져오는 중에 오류가 발생했습니다.', 500);
   }
 };
 
@@ -73,7 +73,7 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
     return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 404);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 500);
   }
 };
 
@@ -86,10 +86,12 @@ export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | nul
       'SELECT td.*, tp.username FROM travel_diary td JOIN travel_plan tp ON td.plan_id = tp.plan_id WHERE td.id = ?',
       [diaryId]
     );
-    if (rows.length > 0) {
+
+    if (rows.length <= 0) {
+      return null;
+    } else {
       return rowToCamelCase(rows[0]);
     }
-    return null;
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기를 가져오는 중에 오류가 발생했습니다.', 404);

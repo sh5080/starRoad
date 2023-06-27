@@ -59,7 +59,7 @@ export const getMyDiaries = async (username: string): Promise<Diary[]> => {
 /**
  * 특정 여행기 조회
  */
-export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | null> => {
+export const getOneDiaryByDiaryId = async (diaryId: number) => {
   try {
     const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
     if (!diary) {
@@ -68,7 +68,7 @@ export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | nul
     return diary;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 조회에 실패했습니다.', 500);
+    throw error;
   }
 };
 
@@ -99,12 +99,11 @@ export const updateDiary = async (newDiary: Diary, diaryId: number, username: st
 export const deleteDiary = async (diaryId: number, username: string) => {
   try {
     const diary = await diaryModel.getOneDiaryByDiaryId(diaryId);
-      console.log(diary)
 
     if (!diary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기 찾을 수 없습니다.', 404);
     }
-    if(diary.username !== username){
+    if (diary.username !== username) {
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '권한이 없습니다.', 403);
     }
     await diaryModel.deleteDiaryByUsername(diaryId);
