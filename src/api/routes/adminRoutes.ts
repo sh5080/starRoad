@@ -46,7 +46,7 @@ router.delete('/users/:id', validateToken, ensureAdmin, adminController.deleteUs
 /** [관리자] 모든 회원 조회하기 */
 router.get('/users', validateToken, ensureAdmin, adminController.getAllUsers);
 
-/** [관리자] 회원 정보 조회하기 */
+/** [관리자] 특정 회원 정보 조회하기 */
 router.get('/users/:id',validateToken,ensureAdmin,adminController.getUser)
 
 /** [관리자] 관광지 추가하기 */ 
