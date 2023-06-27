@@ -107,9 +107,20 @@ export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPla
 /** [관리자] 회원이 작성한 다이어리 조회하기 */
 export const getAllDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM travel_diary WHERE username = ?', [
-      username,
-    ]);
+    const [planIds]: [RowDataPacket[], FieldPacket[]] = await db.execute(
+      'SELECT plan_id FROM travel_plan WHERE username = ?',
+      [username]
+    );
+
+    const planIdArray = planIds.map((planId) => planId.plan_id);
+
+    const planIdList = planIdArray.join(', ');
+
+    // IN 연산자를 사용하여 해당하는 데이터를 검색
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
+      `SELECT * FROM travel_diary WHERE plan_id IN (${planIdList})`
+    );
+
     return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
@@ -118,13 +129,13 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
 };
 
 /** [관리자] 회원이 작성한 다이어리 삭제하기 */
-export const deleteDiaryByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<void> => {
+export const deleteDiaryByUsernameAndDiaryId = async (diaryId: number): Promise<void> => {
   try {
-    await db.execute('DELETE FROM travel_diary WHERE username = ? AND diary_id = ?', [username, diaryId]);
+    await db.execute('DELETE FROM travel_diary WHERE id= ?', [diaryId]);
   } catch (error) {
     console.error(error);
     {
-      throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 삭제 실패했습니다.', 500);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제 실패했습니다.', 500);
     }
   }
 };

@@ -13,8 +13,8 @@ const IMG_PATH = config.server.IMG_PATH;
 export const getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const users = await adminService.getAllUsers();
-    if(!users){
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND,'불러올 유저정보가 없습니다.',400)
+    if (!users) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '불러올 유저정보가 없습니다.', 400);
     }
     const userCount: number = users.length;
     res.status(200).json({ data: { users, userCount, message: '모든 회원을 불러왔습니다.' } });
@@ -129,6 +129,7 @@ export const getAllLocationsByPlanId = async (req: CustomRequest, res: Response,
 export const getAllDiariesByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
+
     const userTravelDiaryInfos = await adminService.getAllDiariesByUsername(String(username));
 
     res.status(200).json({ data: userTravelDiaryInfos, message: '회원이 작성한 다이어리를 조회했습니다.' });
@@ -141,9 +142,10 @@ export const getAllDiariesByUsername = async (req: CustomRequest, res: Response,
 /** [관리자] 회원이 작성한 다이어리 삭제하기 */
 export const deleteDiaryByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { username, planId } = req.params;
-    const message = await adminService.deleteDiaryByUsernameAndDiaryId(String(username), Number(planId));
-    res.status(200).json({ data: message });
+    const { diaryId } = req.params;
+
+    const message = await adminService.deleteDiaryByUsernameAndDiaryId(Number(diaryId));
+    res.status(200).json({ message: `Diary with ID ${diaryId} has been successfully deleted.` });
   } catch (error) {
     console.error(error);
     next(error);
@@ -188,12 +190,10 @@ export const getAllCommentsByUsername = async (req: CustomRequest, res: Response
 export const deleteCommentByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diaryId, commentId } = req.params;
-    const message = await adminService.deleteCommentByUsernameAndDiaryId(
-      String(username),
-      Number(diaryId),
-      Number(commentId)
-    );
-    res.status(200).json({ data: message });
+
+    res.status(200).json({
+      message: `Comment with ID ${commentId} in Diary ID ${diaryId} by user ${username} has been successfully deleted.`,
+    });
   } catch (error) {
     console.error(error);
     next(error);
@@ -206,7 +206,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
     // let imgName = '';
     // let inputPath = '';
     // let compressed = '';
-    
+
     // if (req.files) {
     //   const files = req.files as Express.Multer.File[];
     //   const encodedFilename = encodeURIComponent(files[0].filename);
@@ -220,11 +220,10 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
     //     const imgData = await fs.readFile(compressed);
     //     encodedImage = `data:image/jpeg;base64,${imgData.toString('base64')}`;
     //     fs.unlink(inputPath);
-      
-    // }
-    let imgName:string[] = [];
 
-    
+    // }
+    let imgName: string[] = [];
+
     if (req.files) {
       const files = req.files as Express.Multer.File[];
       const promises = files.map(async (file) => {
@@ -244,15 +243,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
     }
     const { nameEn, nameKo, introduction, latitude, longitude } = req.body;
 
-    const message = await adminService.addTouristDestination(
-      String(nameEn),
-      String(nameKo),
-      String(imgName),
-      String(introduction),
-      Number(latitude),
-      Number(longitude)
-    );
-   res.status(200).json({nameEn, nameKo, introduction, latitude, longitude, imgName });
+    res.status(200).json({ nameEn, nameKo, introduction, latitude, longitude, imgName });
   } catch (error) {
     console.error(error);
     next(error);

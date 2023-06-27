@@ -124,13 +124,13 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
 };
 
 // [관리자] 회원이 작성한 다이어리 삭제하기
-export const deleteDiaryByUsernameAndDiaryId = async (username: string, diaryId: number) => {
+export const deleteDiaryByUsernameAndDiaryId = async (diaryId: number) => {
   try {
-    if (!username || !diaryId) {
+    if (!diaryId) {
       throw new AppError(CommonError.INVALID_INPUT, '올바른 사용자 정보가 제공되지 않았습니다.', 400);
     }
 
-    await adminModel.deleteDiaryByUsernameAndDiaryId(username, diaryId);
+    await adminModel.deleteDiaryByUsernameAndDiaryId(diaryId);
   } catch (error) {
     console.error(error);
     throw new AppError(CommonError.SERVER_ERROR, '여행기 삭제에 실패했습니다.', 500);
