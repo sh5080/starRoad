@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import * as userModel from '../models/userModel';
 import jwt from 'jsonwebtoken';
 import config from '../config';
-import { UserType } from '../types/user';
+import * as User from '../types/user';
 import { AppError, CommonError } from '../types/AppError';
 
 const { saltRounds } = config.bcrypt;
@@ -11,7 +11,10 @@ const REFRESH_TOKEN_SECRET = config.jwt.REFRESH_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 const REFRESH_TOKEN_EXPIRES_IN = config.jwt.ACCESS_TOKEN_EXPIRES_IN;
 
-export const signupUser = async (user: UserType): Promise<string> => {
+/**
+ * 사용자 회원가입
+ */
+export const signupUser = async (user: User.UserType)=> {
   const hashedPassword = await bcrypt.hash(String(user.password), saltRounds);
 
   const foundUserId = await userModel.getUserByUsername(String(user.username));
@@ -20,10 +23,11 @@ export const signupUser = async (user: UserType): Promise<string> => {
   }
 
   await userModel.createUser({ ...user, password: hashedPassword });
-
-  return '회원가입이 정상적으로 완료되었습니다.';
 };
 
+/**
+ * 사용자 로그인
+ */
 export const loginUser = async (username: string, password: string): Promise<object> => {
   const user = await userModel.getUserByUsername(username);
 
@@ -51,18 +55,24 @@ export const loginUser = async (username: string, password: string): Promise<obj
   return { accessToken, refreshToken };
 };
 
-export const getUser = async (username: string) => {
+/**
+ * 사용자 정보 조회
+ */
+export const getUser = async (username?: string) => {
   const user = await userModel.getUserByUsername(username);
 
   if (!user) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 사용자 입니다.', 404);
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '로그인 후 이용가능합니다.', 404);
   }
   const { id, password, ...userData } = user;
 
   return userData;
 };
 
-export const updateUser = async (username: string, updateData: Partial<UserType>) => {
+/**
+ * 사용자 정보 업데이트
+ */
+export const updateUser = async (username: string, updateData: Partial<User.UserType>) => {
   // 기존 유저 정보 가져오기
   const existingUser = await userModel.getUserByUsername(username);
 
@@ -76,7 +86,7 @@ export const updateUser = async (username: string, updateData: Partial<UserType>
 
   if (updateData.password) {
     // 비밀번호가 변경되었는지 확인
-    const isSamePassword = await bcrypt.compare(updateData.password, existingUser.password || '');
+    const isSamePassword = await bcrypt.compare(updateData.password, existingUser.password ?? '');
     if (isSamePassword) {
       throw new AppError(CommonError.INVALID_INPUT, '새로운 비밀번호를 입력해주세요.', 400);
     }
@@ -95,6 +105,9 @@ export const updateUser = async (username: string, updateData: Partial<UserType>
   return userInfo;
 };
 
+/**
+ * 사용자 삭제
+ */
 export const deleteUser = async (username: string) => {
   try {
     const deletedUser = await userModel.deleteUserByUsername(username);

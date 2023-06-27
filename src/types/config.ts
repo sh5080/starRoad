@@ -1,11 +1,16 @@
 export interface Config {
+  port: number;
+  server: {
+    SERVER_MODE: string;
+    SERVER_URL: string;
+    IMG_PATH: string;
+  };
   jwt: {
     ACCESS_TOKEN_SECRET: string;
     REFRESH_TOKEN_SECRET: string;
     REFRESH_TOKEN_EXPIRES_IN: string;
     ACCESS_TOKEN_EXPIRES_IN: string;
   };
-  port: string;
   database: {
     DB_HOST: string;
     DB_USER: string;
@@ -16,8 +21,12 @@ export interface Config {
     saltRounds: number;
   };
   google: {
-    CLIENT_ID: string;
-    CLIENT_SECRET: string;
-    REDIRECT_URI: string;
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    GOOGLE_REDIRECT_URI: string;
+  };
+  kakao: {
+    KAKAO_CLIENT_ID: string;
+    KAKAO_REDIRECT_URI: string;
   };
 }

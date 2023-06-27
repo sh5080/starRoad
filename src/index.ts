@@ -4,6 +4,9 @@ import expressLoader from './loaders/expressLoader';
 const { port } = config || 3000;
 const app = express();
 
+/**
+ * Starts the server by initializing the Express loader.
+ */
 async function startServer() {
   expressLoader(app)
     .then((expressApp) => {

@@ -1,69 +1,98 @@
 import dotenv from 'dotenv';
-dotenv.config();
 import { Config } from '../types/config';
 
+dotenv.config();
+
+/**
+ * 환경 변수 값 가져오기 (문자열)
+ * @param key 환경 변수 키
+ * @param defaultValue 기본 값 (선택 사항)
+ * @returns 환경 변수 값
+ * @throws {Error} 환경 변수가 필요한 경우 에러를 throw합니다.
+ */
+const getEnv = (key: string, defaultValue?: string): string => {
+  const value = process.env[key] ?? defaultValue;
+
+  if (!value) {
+    throw new Error(`${key} 환경 변수가 필요합니다.`);
+  }
+
+  return value;
+};
+
+/**
+ * 환경 변수 값 가져오기 (숫자)
+ * @param key 환경 변수 키
+ * @param defaultValue 기본 값 (선택 사항)
+ * @returns 환경 변수 값
+ * @throws {Error} 환경 변수가 필요한 경우 에러를 throw합니다.
+ */
+const getEnvNumber = (key: string, defaultValue?: number): number => {
+  const value = Number(process.env[key]) ?? defaultValue;
+
+  if (!value && value !== 0) {
+    throw new Error(`${key} 환경 변수가 필요합니다.`);
+  }
+
+  return value;
+};
+
 const config: Config = {
+  /** [포트] 포트 번호 */
+  port: getEnvNumber(process.env.SERVER_MODE === 'PRO' ? 'PRO_PORT' : 'DEV_PORT'),
+
+  server: {
+    /** [서버] 서버 모드 */
+    SERVER_MODE: getEnv('SERVER_MODE', 'DEV'),
+    /** [서버] 서버 URL */
+    SERVER_URL: getEnv(process.env.SERVER_MODE === 'PRO' ? 'PRO_SERVER_URL' : 'DEV_SERVER_URL'),
+    /** [서버] 이미지 경로 */
+    IMG_PATH: getEnv(process.env.SERVER_MODE === 'PRO' ? 'PRO_IMG_PATH' : 'DEV_IMG_PATH'),
+  },
+
   jwt: {
-    ACCESS_TOKEN_SECRET:
-      process.env.ACCESS_TOKEN_SECRET ||
-      (() => {
-        throw new Error('ACCESS_TOKEN_SECRET 환경 변수가 필요합니다.');
-      })(),
-    REFRESH_TOKEN_SECRET:
-      process.env.REFRESH_TOKEN_SECRET ||
-      (() => {
-        throw new Error('REFRESH_TOKEN_SECRET 환경 변수가 필요합니다.');
-      })(),
-    REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
-    ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN || '12h',
+    /** [JWT] 액세스 토큰 비밀 키 */
+    ACCESS_TOKEN_SECRET: getEnv('ACCESS_TOKEN_SECRET'),
+    /** [JWT] 리프레시 토큰 비밀 키 */
+    REFRESH_TOKEN_SECRET: getEnv('REFRESH_TOKEN_SECRET'),
+    /** [JWT] 리프레시 토큰 만료 시간 */
+    REFRESH_TOKEN_EXPIRES_IN: getEnv('REFRESH_TOKEN_EXPIRES_IN', '7d'),
+    /** [JWT] 액세스 토큰 만료 시간 */
+    ACCESS_TOKEN_EXPIRES_IN: getEnv('ACCESS_TOKEN_EXPIRES_IN', '12h'),
   },
-  port:
-    process.env.PORT ||
-    (() => {
-      throw new Error('PORT 환경 변수가 필요합니다.');
-    })(),
+
   database: {
-    DB_HOST:
-      process.env.DB_HOST ||
-      (() => {
-        throw new Error('DB_HOST 환경 변수가 필요합니다.');
-      })(),
-    DB_USER:
-      process.env.DB_USER ||
-      (() => {
-        throw new Error('DB_USER 환경 변수가 필요합니다.');
-      })(),
-    DB_PASSWORD:
-      process.env.DB_PASSWORD ||
-      (() => {
-        throw new Error('DB_PASSWORD 환경 변수가 필요합니다.');
-      })(),
-    DB_NAME:
-      process.env.DB_NAME ||
-      (() => {
-        throw new Error('DB_NAME 환경 변수가 필요합니다.');
-      })(),
+    /** [데이터베이스] 데이터베이스 호스트 */
+    DB_HOST: getEnv('DB_HOST'),
+    /** [데이터베이스] 데이터베이스 사용자 */
+    DB_USER: getEnv('DB_USER'),
+    /** [데이터베이스] 데이터베이스 비밀번호 */
+    DB_PASSWORD: getEnv('DB_PASSWORD'),
+    /** [데이터베이스] 데이터베이스 이름 */
+    DB_NAME: getEnv('DB_NAME'),
   },
+
   bcrypt: {
-    saltRounds: process.env.BCRYPT_SALT_ROUNDS ? Number(process.env.BCRYPT_SALT_ROUNDS) : 10,
+    /** [bcrypt] 솔트 라운드 */
+    saltRounds: getEnvNumber('BCRYPT_SALT_ROUNDS', 10),
   },
+
   google: {
-    CLIENT_ID:
-      process.env.CLIENT_ID ||
-      (() => {
-        throw new Error('CLIENT_ID 환경 변수가 필요합니다.');
-      })(),
-    CLIENT_SECRET:
-      process.env.CLIENT_SECRET ||
-      (() => {
-        throw new Error('CLIENT_SECRET 환경 변수가 필요합니다.');
-      })(),
-    REDIRECT_URI:
-      process.env.REDIRECT_URI ||
-      (() => {
-        throw new Error('REDIRECT_URI 환경 변수가 필요합니다.');
-      })(),
+    /** [Google] 클라이언트 ID */
+    GOOGLE_CLIENT_ID: getEnv('GOOGLE_CLIENT_ID'),
+    /** [Google] 클라이언트 시크릿 */
+    GOOGLE_CLIENT_SECRET: getEnv('GOOGLE_CLIENT_SECRET'),
+    /** [Google] 리디렉션 URI */
+    GOOGLE_REDIRECT_URI: getEnv(process.env.SERVER_MODE === 'PRO' ? 'PRO_GOOGLE_REDIRECT_URI' : 'DEV_GOOGLE_REDIRECT_URI'),
   },
+
+  kakao: {
+    /** [Kakao] 클라이언트 ID */
+    KAKAO_CLIENT_ID: getEnv('KAKAO_CLIENT_ID'),
+    /** [Kakao] 리디렉션 URI */
+    KAKAO_REDIRECT_URI: getEnv(process.env.SERVER_MODE === 'PRO' ? 'PRO_KAKAO_REDIRECT_URI' : 'DEV_KAKAO_REDIRECT_URI'),
+  },
+
 };
 
 export default config;

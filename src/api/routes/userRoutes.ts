@@ -1,16 +1,16 @@
 import { Router } from 'express';
 import * as userController from '../../controllers/userController';
-import { validateToken } from '../middlewares/jwt';
+import { validateRequestBody } from '../middlewares/validateRequest';
 
 const router = Router();
 
-router.post('/signup', userController.signup);
-router.post('/login', userController.login);
-router.post('/logout', validateToken ,userController.logout);
+/** [인증] 회원 가입 */
+router.post('/signup', validateRequestBody(['name','username','password','email']),userController.signup);
 
-router.get('/', validateToken, userController.getUserInfo); //회원정보 조회
-router.patch('/', validateToken, userController.updateUserInfo); //회원정보 수정
-router.delete('/', validateToken, userController.deleteUserInfo); //회원 탈퇴
+/** [인증] 로그인 */
+router.post('/login', validateRequestBody(['username','password']), userController.login);
+
+/** [인증] 로그아웃 */
+router.post('/logout', userController.logout);
 
 export default router;
-

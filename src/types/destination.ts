@@ -1,6 +1,6 @@
 export interface TouristDestinationType {
-  name_en?: string;
-  name_ko?: string;
+  nameEn?: string;
+  nameKo?: string;
   image?: string;
   introduction?: string;
 }

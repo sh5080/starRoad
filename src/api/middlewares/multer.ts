@@ -17,22 +17,32 @@ const storage = multer.diskStorage({
   ) {
     cb(null, './public');
   },
-  filename: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
-    // 유니크한 파일명
-    cb(null, crypto.randomUUID() + '-' + file.originalname);
+  filename: function (
+    req: Request, 
+    files: Express.Multer.File, 
+    cb: (error: Error | null, filename: string) => void
+    ) {
+    cb(null, crypto.randomUUID() + '-' + files.originalname);
   },
 });
 
-// 스토리지 초기화
 const upload = multer({ storage: storage });
 
-// 미들웨어 함수
 export const processImage = (req: Request, res: Response, next: NextFunction) => {
-  upload.single('image')(req, res, (err) => {
+  // multer 미들웨어를 라우터 핸들러 함수 내에서 호출
+  upload.array('image', 4)(req, res, (err) => {
     if (err) {
-      return next(new AppError(CommonError.RESOURCE_NOT_FOUND, '업로드중 에러 발생', 400));
-    } else {
-      next();
+      console.error(err);
+      return next(err); // 에러를 다음 미들웨어로 전달
     }
+
+    // 파일 업로드 성공한 경우
+    const files = req.files as Express.Multer.File[];
+    files.forEach((file) => {
+      // 업로드된 파일의 정보를 활용하여 추가 작업 수행
+      console.log('Uploaded file:', file.filename);
+    });
+
+    next();
   });
 };

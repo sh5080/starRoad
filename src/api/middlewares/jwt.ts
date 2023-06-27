@@ -15,7 +15,6 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
       if (cookies[i].startsWith('token=')) {
         const cookieValue = cookies[i].substring(6);
         const decodedValue = decodeURIComponent(cookieValue);
-        // 'j:' 접두사 제거
         const jsonStr = decodedValue.substring(2);
         const cookieObject = JSON.parse(jsonStr);
         accessToken = cookieObject.accessToken;
@@ -23,12 +22,6 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
         break;
       }
     }
-    console.log(accessToken);
-    console.log(refreshToken);
-    
-  }
-  if (req.method === 'GET' && !accessToken) {
-    return next();
   }
 
   if (!accessToken) {
@@ -38,7 +31,7 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
   try {
     req.user = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as JwtPayload & { username: string; role: string };
     next();
-  } catch (err: unknown) {
+  } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {
       if (!refreshToken) {
         console.error(err);
@@ -68,15 +61,12 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
           username: decodedRefreshToken.username,
           role: decodedRefreshToken.role,
         };
-        // 새로운 엑세스 토큰 쿠키에 담아서 보냄
-        res.cookie('accessToken', newAccessToken, {
-          httpOnly: true,
-        });
-        res.status(200).json({
-          message: '새로운 엑세스 토큰이 발급되었습니다.',
-        });
-        next();
-      } catch (err: unknown) {
+
+        res
+          .cookie('accessToken', newAccessToken, { httpOnly: true, secure: true })
+          .status(200)
+          .json({ message: '새로운 엑세스 토큰이 발급되었습니다.' });
+      } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
           res.clearCookie('refreshToken');
           return next(

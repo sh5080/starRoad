@@ -1,28 +1,35 @@
 import { db } from '../loaders/dbLoader';
 import { TravelPlan, TravelLocation } from '../types/travel';
-import { RowDataPacket, FieldPacket } from 'mysql2';
-import { AppError,CommonError } from '../types/AppError';
+import { RowDataPacket, FieldPacket, ResultSetHeader } from 'mysql2';
+import { AppError, CommonError } from '../types/AppError';
+import { rowToCamelCase } from '../util/rowToCamelCase';
 
+/**
+ * 여행 일정 생성
+ */
 export const createTravelPlan = async (travelPlan: TravelPlan) => {
   try {
-    const [rows] = await db.execute(
+    const [result]: [ResultSetHeader, FieldPacket[]] = await db.execute(
       'INSERT INTO travel_plan (username, start_date, end_date, destination) VALUES (?, ?, ?, ?)',
-      [travelPlan.username, travelPlan.start_date, travelPlan.end_date, travelPlan.destination]
+      [travelPlan.username, travelPlan.startDate, travelPlan.endDate, travelPlan.destination]
     );
-    const insertId = (rows as any).insertId;
-    return insertId;
+    const planId = result.insertId;
+    return planId;
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'일정 생성에 실패했습니다.',500)
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 생성에 실패했습니다.', 500);
   }
 };
 
-export const createTravelLocation = async (travelLocation: TravelLocation, plan_id: number): Promise<void> => {
+/**
+ * 여행 장소 생성
+ */
+export const createTravelLocationByPlanId = async (travelLocation: TravelLocation, planId: number): Promise<void> => {
   try {
     await db.execute(
       'INSERT INTO travel_location (plan_id, date, location, `order`, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
       [
-        plan_id,
+        planId,
         travelLocation.date,
         travelLocation.location,
         travelLocation.order,
@@ -32,122 +39,143 @@ export const createTravelLocation = async (travelLocation: TravelLocation, plan_
     );
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜 및 장소 생성에 실패했습니다.',500)
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜 및 장소 생성에 실패했습니다.', 500);
   }
 };
 
-export const getTravelPlansByUserId = async (username: string): Promise<TravelPlan[]> => {
+/**
+ * 사용자별 모든 여행 일정 조회
+ */
+export const getTravelPlansByUsername = async (username: string): Promise<TravelPlan[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [username]);
-    return rows as TravelPlan[];
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM travel_plan WHERE username = ?', [
+      username,
+    ]);
+    return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 조회에 실패했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 조회에 실패했습니다.', 500);
   }
 };
 
-export const getTravelLocationsByPlanId = async (plan_id: number): Promise<TravelLocation[]> => {
+/**
+ * 특정 여행 일정의 모든 장소 조회
+ */
+export const getTravelLocationsByPlanId = async (planId: number): Promise<TravelLocation[]> => {
   try {
-    const [rows] = await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id]);
-    return rows as TravelLocation[];
-  } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 조회에 실패했습니다.',500);
-  }
-};
-
-export const updateTravelPlan = async (travelPlan: TravelPlan): Promise<void> => {
-  try {
-
-
-    await db.execute(
-      'UPDATE travel_plan SET start_date = ?, end_date = ?, destination = ? WHERE plan_id = ? AND username = ?',
-      [travelPlan.start_date, travelPlan.end_date, travelPlan.destination, travelPlan.plan_id, travelPlan.username]
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
+      'SELECT * FROM travel_location WHERE plan_id = ? ORDER BY date ASC, `order` ASC',
+      [planId]
     );
+    return rows.map(rowToCamelCase);
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 수정에 실패했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜별 장소 조회에 실패했습니다.', 500);
   }
 };
 
-export const updateTravelLocation = async (username: string, travelLocation: TravelLocation): Promise<{myLocation:RowDataPacket[],myPlan:RowDataPacket[]}> => {
+/**
+ * 특정 여행 일정 조회
+ */
+export const getTravelPlanDetailsByPlanId = async (planId: string): Promise<TravelPlan> => {
   try {
-    const [myPlan] = await db.execute(
-      'SELECT * FROM travel_plan WHERE plan_id = ? AND username = ?',
-      [travelLocation.plan_id, username]
-    )as [RowDataPacket[],FieldPacket[]];
-    const [myLocation] = await db.execute(
-      'SELECT * FROM travel_location WHERE location_id = ?',
-      [travelLocation.location_id]
-    )as [RowDataPacket[],FieldPacket[]];
+    const [rows] = await db.execute<RowDataPacket[]>('SELECT * FROM travel_plan WHERE plan_id = ?', [planId]);
+    return rowToCamelCase(rows[0]);
+  } catch (error) {
+    console.error(error);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 상세 조회에 실패했습니다.', 500);
+  }
+};
 
-    await db.execute(
-      'UPDATE travel_location SET location = ?, date = ?, `order` = ? WHERE plan_id = ? AND location_id = ?',
+/**
+ * 여행 장소 수정
+ */
+export const updateTravelLocation = async (
+  username: string,
+  travelLocation: TravelLocation
+): Promise<TravelLocation> => {
+  let conn;
+  try {
+    conn = await db.getConnection();
+
+    await conn.beginTransaction();
+
+    await conn.execute(
+      'UPDATE travel_location SET location = ?, date = ?, `order` = ?, latitude = ?, longitude = ? WHERE plan_id = ? AND location_id = ?',
       [
         travelLocation.location,
         travelLocation.newDate,
         travelLocation.order,
-        travelLocation.plan_id,
-        travelLocation.location_id,
+        travelLocation.latitude,
+        travelLocation.longitude,
+        travelLocation.planId,
+        travelLocation.locationId,
       ]
     );
-    return {myLocation,myPlan}
+
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(
+      'SELECT * FROM travel_location WHERE location_id = ?',
+      [travelLocation.locationId]
+    );
+
+    let updatedLocation: TravelLocation = {
+      locationId: rows[0].location_id,
+      planId: rows[0].plan_id,
+      location: rows[0].location,
+      newDate: rows[0].date,
+      order: rows[0].order,
+      latitude: rows[0].latitude,
+      longitude: rows[0].longitude,
+    };
+
+    await conn.commit();
+
+    return updatedLocation;
   } catch (error) {
+    if (conn) await conn.rollback();
+
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 수정에 실패했습니다.',500);
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜별 장소 수정에 실패했습니다.', 500);
+  } finally {
+    if (conn) conn.release();
   }
 };
 
+/**
+ * 여행 일정 삭제
+ */
 export const deleteTravelPlan = async (
   username: string,
-  plan_id: number
-): Promise<{ deletedPlan: RowDataPacket[]; deletedLocations: RowDataPacket[] }> => {
+  planId: number
+): Promise<{ deletedPlan: TravelPlan[]; deletedLocations: TravelLocation[] }> => {
+  const connection = await db.getConnection();
+  await connection.beginTransaction();
+
   try {
-    const [planData] = (await db.execute('SELECT * FROM travel_plan WHERE username = ? AND plan_id = ?', [
-      username,
-      plan_id,
-    ])) as [RowDataPacket[], FieldPacket[]];
+    const [planData]: [RowDataPacket[], FieldPacket[]] = await connection.execute(
+      'SELECT * FROM travel_plan WHERE username = ? AND plan_id = ?',
+      [username, planId]
+    );
 
-    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE plan_id = ?', [plan_id])) as [
-      RowDataPacket[],
-      FieldPacket[]
-    ];
+    const [locationData]: [RowDataPacket[], FieldPacket[]] = await connection.execute(
+      'SELECT * FROM travel_location WHERE plan_id = ?',
+      [planId]
+    );
 
-    await db.execute('DELETE FROM travel_location WHERE plan_id = ?', [plan_id]);
-    await db.execute('DELETE FROM travel_plan WHERE username = ? AND plan_id = ?', [username, plan_id]);
+    await connection.execute('DELETE FROM travel_location WHERE plan_id = ?', [planId]);
+    await connection.execute('DELETE FROM travel_plan WHERE username = ? AND plan_id = ?', [username, planId]);
+
+    await connection.commit();
 
     return {
-      deletedPlan: planData,
-      deletedLocations: locationData,
+      deletedPlan: planData.map(rowToCamelCase),
+      deletedLocations: locationData.map(rowToCamelCase),
     };
   } catch (error) {
     console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'여행 일정 삭제에 실패했습니다.',500);
-  }
-};
-
-export const deleteTravelLocation = async (
-  location_id:number,
-  travelLocation: TravelLocation
-  ): Promise<{deletedLocations:RowDataPacket[]}> => {
-  try {
-    const [locationData] = (await db.execute('SELECT * FROM travel_location WHERE location_id = ?', [
-      location_id, 
-    ])) as [
-      RowDataPacket[],
-      FieldPacket[]
-    ];
-    await db.execute('UPDATE travel_location SET location = NULL WHERE plan_id = ? AND location_id = ?', [
-      travelLocation.plan_id,
-      travelLocation.location_id,
-    ])
-return {
-  deletedLocations: locationData
-}
-
-
-  } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR,'날짜별 장소 삭제에 실패했습니다.',500);
+    await connection.rollback();
+    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 삭제에 실패했습니다.', 500);
+  } finally {
+    connection.release();
   }
 };

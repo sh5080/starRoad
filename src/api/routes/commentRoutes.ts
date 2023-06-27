@@ -1,15 +1,19 @@
 import { Router } from 'express';
 import { validateToken } from '../middlewares/jwt';
-import { ensureAdmin } from '../middlewares/admin';
 import * as commentController from '../../controllers/commentController';
-
-
+import { validateRequestBody } from '../middlewares/validateRequest';
 const router = Router();
 
-router.post('/', validateToken, commentController.createCommentController);
-router.get('/diary/:diary_id', commentController.getCommentsByDiaryController); //여행기별 댓글 조회
-router.patch('/:comment_id', validateToken, commentController.updateCommentController); // comment의 id값 입력
-router.delete('/:comment_id', validateToken, commentController.deleteCommentController); // comment의 id값 입력
+/** [댓글] 댓글 생성 */
+router.post('/', validateToken, validateRequestBody(['diaryId', 'comment']),commentController.createComment);
+
+/** [댓글] 여행기별 댓글 조회 */
+router.get('/diaries/:diaryId', commentController.getCommentsByDiaryId); 
+
+/** [댓글] 댓글 수정 */
+router.put('/:commentId', validateToken, validateRequestBody(['comment']),commentController.updateComment); 
+
+/** [댓글] 댓글 삭제 */
+router.delete('/:commentId', validateToken, commentController.deleteComment);
 
 export default router;
-
