@@ -84,6 +84,9 @@ export const getMyDiaries = async (req: CustomRequest, res: Response, next: Next
   try {
     const username = req.user?.username!;
     const diaries = await diaryService.getMyDiaries(username);
+    if (!diaries[0]) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기가 없습니다.', 404);
+    }
     res.status(200).json(diaries);
   } catch (error) {
     console.error(error);
@@ -211,4 +214,3 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
     next(error);
   }
 };
-
