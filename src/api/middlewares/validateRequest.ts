@@ -27,7 +27,7 @@ export const validateRequestBody = (requiredFields: string[]) => {
     if (unexpectedFields.length > 0) {
       throw new AppError(
         CommonError.INVALID_INPUT,
-        `유효하지 않은 입력이 포함되었습니다.`,
+        `유효하지 않은 입력이 포함되었습니다: ${unexpectedFields.join(', ')}만 입력이 가능합니다.`,
         400
       );
     }
