@@ -84,7 +84,6 @@ export const getTravelPlansByUsername = async (req: CustomRequest, res: Response
 
     const travelPlanData = await travelService.getTravelPlansByUsername(username);
 
-    
     if (!travelPlanData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
     }
@@ -116,7 +115,6 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
   try {
     const { planId } = req.params;
     const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId));
-
 
     if (!travelPlanData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
@@ -162,7 +160,10 @@ export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Respo
         if (!dateInfo.date) {
           throw new AppError(CommonError.INVALID_INPUT, '날짜가 없는 장소입니다.', 400);
         }
-
+        const newDate = new Date(dateInfo.date);
+        if (isNaN(newDate.getTime())) {
+          throw new AppError(CommonError.INVALID_INPUT, '유효하지 않은 날짜입니다.', 400);
+        }
         // 각 날짜에 대해 location을 수정
         if (dateInfo.locations) {
           for (let i = 0; i < dateInfo.locations.length; i++) {
