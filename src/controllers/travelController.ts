@@ -115,8 +115,8 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
   try {
     const { planId } = req.params;
     const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId));
-
-    if (!travelPlanData) {
+    console.log(travelPlanData)
+    if (!travelPlanData || Object.keys(travelPlanData).length === 0) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
     }
 
