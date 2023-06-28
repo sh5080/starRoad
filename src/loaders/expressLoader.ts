@@ -4,6 +4,7 @@ import cors from 'cors';
 import { dbLoader } from '../loaders/dbLoader';
 import routeLoader from './routeLoader';
 import { errorHandler } from '../api/middlewares/errorHandler';
+import responseTime from '../api/middlewares/responseTime';
 
 export default async function expressLoader(app: Application): Promise<Application> {
   try {
@@ -12,6 +13,7 @@ export default async function expressLoader(app: Application): Promise<Applicati
       origin: ['http://localhost:5173', 'http://localhost:5174'],
       credentials: true,
     };
+    app.use(responseTime)
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
