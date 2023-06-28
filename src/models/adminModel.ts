@@ -14,8 +14,13 @@ export const getAllUsers = async (): Promise<UserType[]> => {
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM user');
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch all user information', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원정보 불러오기에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -30,8 +35,13 @@ export const getUser = async (id: number): Promise<UserType> => {
 
     return rowToCamelCase(rows[0]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user information', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 정보 불러오기에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -61,7 +71,13 @@ export const updateUserById = async (id: number, user: Partial<UserType>): Promi
   } catch (error) {
     console.error(error);
     await connection.rollback();
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to update user information', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원정보 수정에 실패했습니다.', 500);
+    }
   } finally {
     connection.release();
   }
@@ -72,8 +88,13 @@ export const deleteUserById = async (id: number): Promise<void> => {
   try {
     await db.execute('UPDATE user SET activated = 0 WHERE id = ?', [id]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete user information', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 정보 삭제에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -85,8 +106,13 @@ export const getAllTravelPlansByUsername = async (username: string): Promise<Tra
     ]);
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel plans', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 일정 불러오기에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -99,8 +125,13 @@ export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPla
     );
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel locations', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 일정 장소 및 날짜 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -113,18 +144,21 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
     );
 
     const planIdArray = planIds.map((planId) => planId.plan_id);
-
     const planIdList = planIdArray.join(', ');
 
-    // IN 연산자를 사용하여 해당하는 데이터를 검색
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
       `SELECT * FROM travel_diary WHERE plan_id IN (${planIdList})`
     );
 
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user travel diaries', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원이 작성한 여행기 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -133,9 +167,12 @@ export const deleteDiaryByUsernameAndDiaryId = async (diaryId: number): Promise<
   try {
     await db.execute('DELETE FROM travel_diary WHERE id= ?', [diaryId]);
   } catch (error) {
-    console.error(error);
-    {
-      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원의 여행기 삭제에 실패했습니다.', 500);
     }
   }
 };
@@ -149,8 +186,13 @@ export const getAllCommentsByUsernameAndDiaryId = async (username: string, diary
     );
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user diary comments', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '해당 여행기의 댓글 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -166,8 +208,13 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
     );
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch user comments', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '해당 회원의 모든 댓글 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -184,8 +231,13 @@ export const deleteCommentByUsernameAndDiaryId = async (
       commentId,
     ]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete comment', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '해당 회원의 댓글 삭제에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -206,8 +258,13 @@ export const addTouristDestination = async (
       [nameEn, nameKo, correctedImage, introduction, latitude, longitude]
     );
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '관광지 추가에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '관광지 추가에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -219,8 +276,13 @@ export const updateTouristDestination = async (id: string, product: Partial<Tour
       [product.nameEn, product.nameKo, product.image, product.introduction, id]
     );
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to update tourist destination', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '관광지 수정에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -237,7 +299,6 @@ export const deleteTouristDestination = async (id: string): Promise<object> => {
     const touristDestination = rowToCamelCase(rows[0]);
 
     await connection.execute(`DELETE FROM travel_destination WHERE id = ?`, [id]);
-
     await connection.commit();
 
     return touristDestination;
@@ -245,8 +306,13 @@ export const deleteTouristDestination = async (id: string): Promise<object> => {
     if (connection) {
       await connection.rollback();
     }
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to delete tourist destination', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '관광제 삭제에 실패했습니다.', 500);
+    }
   } finally {
     if (connection) {
       connection.release();

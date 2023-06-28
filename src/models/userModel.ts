@@ -16,8 +16,13 @@ export const createUser = async (user: User.UserType): Promise<void> => {
       user.email,
     ]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '회원가입에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원가입에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -35,8 +40,11 @@ export const getUserByUsername = async (username?: string): Promise<User.UserTyp
     }
     return null;
   } catch (error) {
-    console.error(error);
-    {
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
       throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
     }
   }
@@ -54,8 +62,13 @@ export const getUserByEmail = async (email?: string): Promise<User.UserType | nu
     }
     return null;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -74,8 +87,13 @@ export const updateUserByUsername = async (
     const updatedUser = await getUserByUsername(userId);
     return updatedUser;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 수정에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 수정에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -87,10 +105,9 @@ export const deleteUserByUsername = async (username: string): Promise<User.UserT
   await connection.beginTransaction();
 
   try {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await connection.execute(
-      'SELECT * FROM user WHERE username = ?',
-      [username]
-    );
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await connection.execute('SELECT * FROM user WHERE username = ?', [
+      username,
+    ]);
 
     if (rows.length === 0) {
       throw new AppError(CommonError.AUTHENTICATION_ERROR, '존재하지 않는 사용자입니다.', 401);
@@ -103,9 +120,14 @@ export const deleteUserByUsername = async (username: string): Promise<User.UserT
 
     return deletedUser;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 탈퇴에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 탈퇴에 실패했습니다.', 500);
+    }
   } finally {
     connection.release();
   }

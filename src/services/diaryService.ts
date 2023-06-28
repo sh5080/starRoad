@@ -51,8 +51,13 @@ export const getMyDiaries = async (username: string): Promise<Diary[]> => {
     }
     return diaries;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -67,8 +72,13 @@ export const getOneDiaryByDiaryId = async (diaryId: number) => {
     }
     return diary;
   } catch (error) {
-    console.error(error);
-    throw error;
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '특정 여행기 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -88,8 +98,13 @@ export const updateDiary = async (newDiary: Diary, diaryId: number, username: st
     await diaryModel.updateDiaryByUsername(newDiary, diaryId);
     return diary;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 수정에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 수정에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -110,7 +125,12 @@ export const deleteDiary = async (diaryId: number, username: string) => {
 
     return diary;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);
+    }
   }
 };

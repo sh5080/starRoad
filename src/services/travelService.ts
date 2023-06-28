@@ -24,17 +24,27 @@ export const createTravelPlan = async (travelPlan: TravelPlan) => {
  * 여행 날짜별 장소 등록
  */
 export const createTravelLocationByPlanId = async (travelLocation: TravelLocation, planId: number): Promise<void> => {
-  if (
-    !travelLocation.date ||
-    !travelLocation.location ||
-    !travelLocation.order ||
-    !travelLocation.latitude ||
-    !travelLocation.longitude ||
-    !planId
-  ) {
-    throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+  try {
+    if (
+      !travelLocation.date ||
+      !travelLocation.location ||
+      !travelLocation.order ||
+      !travelLocation.latitude ||
+      !travelLocation.longitude ||
+      !planId
+    ) {
+      throw new AppError(CommonError.INVALID_INPUT, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+    }
+    await travelModel.createTravelLocationByPlanId(travelLocation, planId);
+  } catch (error) {
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 날짜별 장소 등록에 실패했습니다.', 500);
+    }
   }
-  await travelModel.createTravelLocationByPlanId(travelLocation, planId);
 };
 
 /**
@@ -61,25 +71,37 @@ export const getTravelPlanDetailsByPlanId = async (planId: string): Promise<Trav
   return rowToCamelCase(travelPlan);
 };
 
-
-
 /**
  * 여행 날짜별 장소 수정
  */
 export const updateLocation = async (travelLocation: TravelLocation, username: string): Promise<TravelLocation> => {
-  if (
-    !travelLocation.locationId ||
-    !travelLocation.planId ||
-    !travelLocation.location?.trim() ||
-    !travelLocation.newDate ||
-    !travelLocation.order?.toString().trim() ||
-    !travelLocation.latitude ||
-    !travelLocation.longitude
-  ) {
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+  try {
+    if (
+      !travelLocation.locationId ||
+      !travelLocation.planId ||
+      !travelLocation.location?.trim() ||
+      !travelLocation.newDate ||
+      !travelLocation.order?.toString().trim() ||
+      !travelLocation.latitude ||
+      !travelLocation.longitude
+    ) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+    }
+
+    const updatedLocation = await travelModel.updateTravelLocation(username, travelLocation);
+    if (!updatedLocation || !updatedLocation.locationId) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '장소 등록에 필요한 정보가 제공되지 않았습니다.', 400);
+    }
+    return updatedLocation;
+  } catch (error) {
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 날짜별 장소 수정에 실패했습니다.', 500);
+    }
   }
-  const updatedLocation = await travelModel.updateTravelLocation(username, travelLocation);
-  return updatedLocation;
 };
 
 /**

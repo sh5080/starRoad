@@ -16,8 +16,13 @@ export const createTravelPlan = async (travelPlan: TravelPlan) => {
     const planId = result.insertId;
     return planId;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 생성에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 생성에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -38,8 +43,13 @@ export const createTravelLocationByPlanId = async (travelLocation: TravelLocatio
       ]
     );
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜 및 장소 생성에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜 및 장소 생성에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -53,8 +63,13 @@ export const getTravelPlansByUsername = async (username: string): Promise<Travel
     ]);
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -69,8 +84,13 @@ export const getTravelLocationsByPlanId = async (planId: number): Promise<Travel
     );
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜별 장소 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜별 장소조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -82,8 +102,13 @@ export const getTravelPlanDetailsByPlanId = async (planId: string): Promise<Trav
     const [rows] = await db.execute<RowDataPacket[]>('SELECT * FROM travel_plan WHERE plan_id = ?', [planId]);
     return rowToCamelCase(rows[0]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 상세 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 상세조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -100,6 +125,22 @@ export const updateTravelLocation = async (
 
     await conn.beginTransaction();
 
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(
+      'SELECT * FROM travel_location WHERE location_id = ?',
+      [travelLocation.locationId]
+    );
+    if (rows.length === 0) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, 'locationId를 찾을 수 없습니다.', 404);
+    }
+    let updatedLocation: TravelLocation = {
+      locationId: rows[0].location_id,
+      planId: rows[0].plan_id,
+      location: rows[0].location,
+      newDate: rows[0].date,
+      order: rows[0].order,
+      latitude: rows[0].latitude,
+      longitude: rows[0].longitude,
+    };
     await conn.execute(
       'UPDATE travel_location SET location = ?, date = ?, `order` = ?, latitude = ?, longitude = ? WHERE plan_id = ? AND location_id = ?',
       [
@@ -112,30 +153,17 @@ export const updateTravelLocation = async (
         travelLocation.locationId,
       ]
     );
-
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await conn.execute(
-      'SELECT * FROM travel_location WHERE location_id = ?',
-      [travelLocation.locationId]
-    );
-
-    let updatedLocation: TravelLocation = {
-      locationId: rows[0].location_id,
-      planId: rows[0].plan_id,
-      location: rows[0].location,
-      newDate: rows[0].date,
-      order: rows[0].order,
-      latitude: rows[0].latitude,
-      longitude: rows[0].longitude,
-    };
-
     await conn.commit();
-
     return updatedLocation;
   } catch (error) {
     if (conn) await conn.rollback();
-
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '날짜별 장소 수정에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 수정에 실패했습니다.', 500);
+    }
   } finally {
     if (conn) conn.release();
   }
@@ -172,9 +200,14 @@ export const deleteTravelPlan = async (
       deletedLocations: locationData.map(rowToCamelCase),
     };
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정 삭제에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 삭제에 실패했습니다.', 500);
+    }
   } finally {
     connection.release();
   }

@@ -21,8 +21,13 @@ export const getAllUsers = async (): Promise<UserType[]> => {
     const allUserData = await adminModel.getAllUsers();
     return allUserData;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '회원정보 불러오기에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원 정보 불러오기에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -35,8 +40,13 @@ export const getUser = async (id: number): Promise<UserType> => {
     }
     return userData;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '회원정보 불러오기에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원정보 불러오기에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -49,8 +59,13 @@ export const updateUser = async (id: number, user: Partial<UserType>): Promise<U
     const updatedUser = await adminModel.updateUserById(id, user);
     return updatedUser;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '회원정보 수정에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '회원정보 수정에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -59,10 +74,11 @@ export const deleteUser = async (id: number) => {
   try {
     await adminModel.deleteUserById(id);
   } catch (error) {
-    console.error(error);
     if (error instanceof AppError) {
+      console.error(error);
       throw error;
     } else {
+      console.error(error);
       throw new AppError(CommonError.SERVER_ERROR, '회원정보 삭제에 실패했습니다.', 500);
     }
   }
@@ -80,8 +96,13 @@ export const getAllTravelPlansByUsername = async (username: string): Promise<Tra
 
     return travelPlans;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '일정 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '일정 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -99,8 +120,13 @@ export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPla
 
     return travelPlans;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '여행장소, 날짜 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 장소, 날짜 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -118,8 +144,13 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
 
     return travelDiaries;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '여행기 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -132,8 +163,13 @@ export const deleteDiaryByUsernameAndDiaryId = async (diaryId: number) => {
 
     await adminModel.deleteDiaryByUsernameAndDiaryId(diaryId);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '여행기 삭제에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -151,8 +187,13 @@ export const getAllCommentsByUsernameAndDiaryId = async (username: string, diary
 
     return diaryComments;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '해당 사용자의 특정 여행기 댓글 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '해당 여행기의 모든 댓글 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -169,8 +210,13 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
     }
     return userComments;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '특정 사용자 댓글 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '특정 사용자의 댓글 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -182,8 +228,13 @@ export const deleteCommentByUsernameAndDiaryId = async (username: string, diaryI
     }
     await adminModel.deleteCommentByUsernameAndDiaryId(username, diaryId, commentId);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '댓글 삭제에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 삭제에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -202,8 +253,13 @@ export const addTouristDestination = async (
     }
     await adminModel.addTouristDestination(nameEn, nameKo, image, introduction, latitude, longitude);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '관광지 추가에 실패하였습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '관광지 추가에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -215,8 +271,13 @@ export const updateTouristDestination = async (id: string, product: Partial<Tour
     }
     await adminModel.updateTouristDestination(id, product);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '관광지 수정에 실패하였습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '관광지 수정에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -229,7 +290,12 @@ export const deleteTouristDestination = async (id: string): Promise<DeletedData>
     }
     return { message: '관광지 삭제에 성공하였습니다.', touristDestination };
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, '관광지 삭제에 실패하였습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '관광지 삭제에 실패했습니다.', 500);
+    }
   }
 };

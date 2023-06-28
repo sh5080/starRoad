@@ -15,8 +15,13 @@ export const createComment = async (comment: Comment): Promise<void> => {
       comment.comment,
     ]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 생성에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 생성에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -34,8 +39,13 @@ export const getCommentsByDiaryId = async (diaryId: number, page: number, limit:
 
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -59,9 +69,14 @@ export const updateComment = async (newComment: string, id: number) => {
     await connection.commit();
     return commentsInfo;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 업데이트에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 수정에 실패했습니다.', 500);
+    }
   } finally {
     connection.release();
   }
@@ -83,9 +98,14 @@ export const deleteComment = async (id: number) => {
     await connection.commit();
     return commentsInfo;
   } catch (error) {
-    console.error(error);
     await connection.rollback();
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 삭제에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '댓글 삭제에 실패했습니다.', 500);
+    }
   } finally {
     connection.release();
   }

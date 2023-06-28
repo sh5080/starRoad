@@ -32,8 +32,13 @@ export const getUserByUsername = async (username?: string): Promise<User.UserTyp
     }
     return null;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -64,8 +69,13 @@ export const getUserByEmail = async (email?: string): Promise<User.OauthUser | n
     return null;
   } catch (error) {
     await connection.rollback();
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보 조회에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보조회에 실패했습니다.', 500);
+    }
   } finally {
     connection.release();
   }

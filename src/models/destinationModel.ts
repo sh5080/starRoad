@@ -11,8 +11,13 @@ export const getAllTouristDestination = async (): Promise<TouristDestinationType
 
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch tourist destinations', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '관광지 조회에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -25,7 +30,12 @@ export const getTouristDestination = async (id: number): Promise<TouristDestinat
 
     return rowToCamelCase(rows[0]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.SERVER_ERROR, 'Failed to fetch tourist destination', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '관광지 조회에 실패했습니다.', 500);
+    }
   }
 };

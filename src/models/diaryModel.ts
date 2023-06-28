@@ -18,8 +18,13 @@ export const createDiary = async (diary: Diary, plan: Diary): Promise<void> => {
       diary.destination,
     ]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 생성에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 생성에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -39,8 +44,13 @@ export const getPlan = async (planId: number, username: string): Promise<TravelP
 
     return null;
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정을 가져오는 중에 오류가 발생했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행 일정을 가져오는 중에 오류가 발생했습니다.', 500);
+    }
   }
 };
 
@@ -52,8 +62,13 @@ export const getAllDiariesByUsername = async (): Promise<Diary[]> => {
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute('SELECT * FROM travel_diary');
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '모든 여행기를 가져오는 중에 오류가 발생했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '모든 여행기를 가져오는 중에 오류가 발생했습니다.', 500);
+    }
   }
 };
 
@@ -72,8 +87,13 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
 
     return rows.map(rowToCamelCase);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '내 여행기를 가져오는 중에 오류가 발생했습니다.', 500);
+    }
   }
 };
 
@@ -83,7 +103,11 @@ export const getMyDiariesByUsername = async (username: string): Promise<Diary[]>
 export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | null> => {
   try {
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
-      'SELECT td.*, tp.username FROM travel_diary td JOIN travel_plan tp ON td.plan_id = tp.plan_id WHERE td.id = ?',
+      `SELECT td.*, 
+      tp.username FROM travel_diary td 
+      JOIN travel_plan tp 
+      ON td.plan_id = tp.plan_id 
+      WHERE td.id = ?`,
       [diaryId]
     );
 
@@ -93,8 +117,13 @@ export const getOneDiaryByDiaryId = async (diaryId: number): Promise<Diary | nul
       return rowToCamelCase(rows[0]);
     }
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기를 가져오는 중에 오류가 발생했습니다.', 404);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기를 가져오는 중에 오류가 발생했습니다.', 500);
+    }
   }
 };
 
@@ -110,8 +139,13 @@ export const updateDiaryByUsername = async (diary: Omit<Diary, 'id'>, diary_id: 
       diary_id,
     ]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 업데이트에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 수정에 실패했습니다.', 500);
+    }
   }
 };
 
@@ -122,7 +156,12 @@ export const deleteDiaryByUsername = async (diaryId: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM travel_diary WHERE id = ?', [diaryId]);
   } catch (error) {
-    console.error(error);
-    throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '여행기 삭제에 실패했습니다.', 500);
+    }
   }
 };
