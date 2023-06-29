@@ -10,7 +10,7 @@ export const validateToken = async (req: CustomRequest, res: Response, next: Nex
   let accessToken;
   let refreshToken;
 
-  if (req.headers.cookie) {
+  if (req.headers?.cookie) {
     const cookies = req.headers.cookie.split('; ');
     for (let i = 0; i < cookies.length; i++) {
       if (cookies[i].startsWith('token=')) {
