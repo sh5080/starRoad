@@ -423,6 +423,43 @@ export declare function updateComment(req: CustomRequest, res: Response, next: N
  */
 export declare function deleteComment(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function updateComment(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * 카카오 로그인 콜백
+ *
+ * @param {string} req.query.code 카카오 로그인 인가코드
+ * @param {Response} res.cookie
+ *                        - httpOnly: true/false (클라이언트 스크립트에서 쿠키를 읽지 못하게 할지 여부)
+ *                        - secure: true/false (HTTPS 연결에서만 쿠키를 전송할지 여부)
+ *                        - maxAge: number (쿠키의 유효 기간, 밀리초 단위)
+ * @param {Response} res.redirect
+ *                        리다이렉트는 클라이언트를 다른 URL로 이동시키는 작업을 의미합니다.
+ *                        이 작업은 `res.redirect(URL)` 형태로 수행됩니다.
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function kakaoCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function updateComment(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * 구글 로그인 콜백
+ *
+ * @param {string} req.query.code 구글 로그인 인가코드
+ * @param {Response} res.cookie
+ *                        - httpOnly: true/false (클라이언트 스크립트에서 쿠키를 읽지 못하게 할지 여부)
+ *                        - secure: true/false (HTTPS 연결에서만 쿠키를 전송할지 여부)
+ *                        - maxAge: number (쿠키의 유효 기간, 밀리초 단위)
+ * @param {Response} res.redirect
+ *                        리다이렉트는 클라이언트를 다른 URL로 이동시키는 작업을 의미합니다.
+ *                        이 작업은 `res.redirect(URL)` 형태로 수행됩니다.
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;

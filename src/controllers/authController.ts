@@ -4,6 +4,7 @@ import config from '../config/index';
 import qs from 'qs';
 import { CustomRequest } from '../types/customRequest';
 import axios from 'axios';
+import docs from '../types/controller'
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = config.google;
 const { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } = config.kakao;
@@ -22,7 +23,7 @@ const SERVER_URL = config.server.SERVER_URL;
 // };
 
 /** 카카오 로그인 콜백 */
-export const kakaoCallback = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const kakaoCallback:typeof docs.kakaoCallback = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const code = req.query.code;
 
@@ -92,7 +93,7 @@ export const kakaoCallback = async (req: CustomRequest, res: Response, next: Nex
 };
 
 /** 구글 로그인 콜백 */
-export const googleCallback = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const googleCallback:typeof docs.googleCallback = async (req: CustomRequest, res: Response, next: NextFunction) => {
   const code = req.query.code;
 
   // oauth 위임을 위한 절차
