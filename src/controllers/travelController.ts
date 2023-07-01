@@ -111,7 +111,7 @@ export const getTravelPlansByUsername:typeof docs.getTravelPlansByUsername = asy
 };
 
 /** 유저의 여행 일정 상세 조회 */
-export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getTravelPlanDetailsByPlanId:typeof docs.getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { planId } = req.params;
     const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId));
@@ -147,7 +147,7 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
 };
 
 /** 여행 일정의 날짜별 장소 수정 */
-export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateTravelPlanAndLocation:typeof docs.updateTravelPlanAndLocation = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { planId } = req.params;
     const { dates } = req.body;
@@ -191,7 +191,7 @@ export const updateTravelPlanAndLocation = async (req: CustomRequest, res: Respo
 };
 
 /** 여행 일정 삭제 */
-export const deleteTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteTravelPlan:typeof docs.deleteTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.user!;
     const { planId } = req.params;

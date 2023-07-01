@@ -6,11 +6,12 @@ import * as fs from 'node:fs/promises';
 import { compressImage } from '../util/compressImage';
 import config from '../config';
 import path from 'node:path';
+import docs from '../types/controller';
 const IMG_PATH = config.server.IMG_PATH;
 
 /** 여행기 작성 */
 
-export const checkAuthorization = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const checkAuthorization:typeof docs.checkAuthorization = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { planId } = req.params;
     const username = req.user?.username!;
@@ -27,7 +28,7 @@ export const checkAuthorization = async (req: CustomRequest, res: Response, next
 };
 
 /** 여행기 작성 */
-export const createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const createDiary:typeof docs.createDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { title, content } = req.body;
     const { planId } = req.params;
@@ -55,24 +56,23 @@ export const createDiary = async (req: CustomRequest, res: Response, next: NextF
       await Promise.all(promises);
     }
     const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
-    const diary = await diaryService.createDiary({ username, title, content, image: imgNames }, plan!);
+    const diaryData = await diaryService.createDiary({ username, title, content, image: imgNames }, plan!);
 
-    res.status(201).json(diary);
+    res.status(201).json(diaryData);
   } catch (error) {
     console.error(error);
-
     next(error);
   }
 };
 
 /** 전체 여행기 조회 */
-export const getAllDiaries = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllDiaries:typeof docs.getAllDiaries = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const diary = await diaryService.getAllDiaries();
-    if (!diary) {
+    const diaryData = await diaryService.getAllDiaries();
+    if (!diaryData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '전체 여행기를 찾을 수 없습니다.', 404);
     }
-    res.status(200).json(diary);
+    res.status(200).json(diaryData);
   } catch (error) {
     console.error(error);
     next(error);
@@ -80,14 +80,14 @@ export const getAllDiaries = async (req: Request, res: Response, next: NextFunct
 };
 
 /** 내 여행기 조회 */
-export const getMyDiaries = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getMyDiaries:typeof docs.getMyDiaries = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const username = req.user?.username!;
-    const diaries = await diaryService.getMyDiaries(username);
-    if (!diaries[0]) {
+    const diaryData = await diaryService.getMyDiaries(username);
+    if (!diaryData[0]) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기가 없습니다.', 404);
     }
-    res.status(200).json(diaries);
+    res.status(200).json(diaryData);
   } catch (error) {
     console.error(error);
     next(error);
@@ -95,14 +95,14 @@ export const getMyDiaries = async (req: CustomRequest, res: Response, next: Next
 };
 
 /** 특정 여행기 조회 */
-export const getOneDiaryByDiaryId = async (req: Request, res: Response, next: NextFunction) => {
+export const getOneDiaryByDiaryId:typeof docs.getOneDiaryByDiaryId = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const diaryId = parseInt(req.params.diaryId, 10);
-    const diary = await diaryService.getOneDiaryByDiaryId(diaryId);
-    if (!diary) {
+    const diaryData = await diaryService.getOneDiaryByDiaryId(diaryId);
+    if (!diaryData) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 여행기를 찾을 수 없습니다.', 404);
     }
-    res.status(200).json(diary);
+    res.status(200).json(diaryData);
   } catch (error) {
     console.error(error);
     next(error);
@@ -110,7 +110,7 @@ export const getOneDiaryByDiaryId = async (req: Request, res: Response, next: Ne
 };
 
 /** 여행기 수정 */
-export const updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateDiary:typeof docs.updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diaryId = parseInt(String(req.params.diaryId), 10);
     const { title, content } = req.body;
@@ -190,14 +190,14 @@ export const updateDiary = async (req: CustomRequest, res: Response, next: NextF
 };
 
 /** 여행기 삭제 */
-export const deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteDiary: typeof docs.deleteDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diaryId = parseInt(String(req.params.diaryId), 10);
     const username = req.user?.username!;
 
-    const deletedDiary = await diaryService.deleteDiary(diaryId, username);
-    if (deletedDiary.image && typeof deletedDiary.image === 'string') {
-      const imgURLs = JSON.parse(deletedDiary.image);
+    const diaryData = await diaryService.deleteDiary(diaryId, username);
+    if (diaryData.image && typeof diaryData.image === 'string') {
+      const imgURLs = JSON.parse(diaryData.image);
 
       const promises = imgURLs.map(async (url: string) => {
         const encodedImgName = url.split('/compressed/')[1];
@@ -210,7 +210,7 @@ export const deleteDiary = async (req: CustomRequest, res: Response, next: NextF
       await Promise.all(promises);
     }
 
-    res.status(200).json(deletedDiary);
+    res.status(200).json(diaryData);
   } catch (error) {
     console.error(error);
     next(error);
