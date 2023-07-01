@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { CustomRequest } from './customRequest';
 
-// userController
+// userController -----------------------------------------------------------------------------
 /**
  * 회원가입
  * @param req.body name: 이름, username: 사용자 ID, password: 패스워드, email: 이메일
@@ -55,7 +55,7 @@ export declare function updateUserInfo(req: CustomRequest, res: Response, next: 
  */
 export declare function deleteUserInfo(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-//travelController
+//travelController -----------------------------------------------------------------------------
 /**
  * 여행 일정 작성
  * @param {CustomRequest} req.body 작성할 여행 일정 정보 dates, startDate, endDate, destination
@@ -234,7 +234,7 @@ export declare function updateTravelPlanAndLocation(
 */
 export declare function deleteTravelPlan(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-//diaryController
+//diaryController -----------------------------------------------------------------------------
 /**
  * 권한 확인 미들웨어
  * @param {CustomRequest} req.params planId: 일정 ID
@@ -343,11 +343,37 @@ export declare function updateDiary(req: CustomRequest, res: Response, next: Nex
 */
 export declare function deleteDiary(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
+//destinationController -----------------------------------------------------------------------------
 
-export declare function updateDiary(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * 관광지 모두 조회하기
+ *
+ * @param {Response} res data:{destinations, destinationCount} 관광지 정보, 업로드한 관광지 수
+ * @example
+destinations: [
+  {
+    id: 182,
+    nameEn: 'SEOUL',
+    nameKo: '서울',
+    image: '서울.jpg',
+    introduction: '서울은 대한민국의 수도이자 가장 큰 도시로, 아시아에서 가장 현대적이고 역동적인 도시 중 하나입니다. 다양한 관광 명소, 문화적인 경험, 풍부한 음식 문화, 쇼핑, 엔터테인먼트 등을 제공하여 많은 여행객들이 매년 방문하고 있습니다. 서울의 대표적인 관광지로는 남산 타워가 있습니다. 서울의 아름다운 전경을 조망할 수 있으며, 근처에는 남산 공원이 있어 산책이나 피크닉을 즐길 수 있습니다. 또한, 한강을 따라 자전거를 타거나 워터스포츠를 즐길 수 있는 한강 공원도 인기 있는 관광지 중 하나입니다.',
+    latitude: '37.565383',
+    longitude: '126.978483'
+  }
+],
+destinationCount: 12
+ * @param {NextFunction} next - 다음 미들웨어 함수 (에러 핸들러)
+ */
+export declare function getAllTouristDestination(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-
-export declare function updateDiary(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * 관광지 상세 조회하기
+ *
+ * @param {string} req.params.locationId locationId: 위치 ID
+ * @param {Response} res destination: 관광지 정보(관광지 모두 조회하기 destination 참고)
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function getTouristDestination(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 
 export declare function updateDiary(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
