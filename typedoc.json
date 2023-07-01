@@ -1,0 +1,18 @@
+// {
+//     "out": "./docs",
+//     "entryPoints": ["src/index.ts"],
+//     "readme": "none"
+//   }
+
+{
+  // "inputFiles": ["src"],
+  "out": "docs",
+  "exclude": ["*/.test.ts"],
+  "entryPoints": ["src/index.ts", "src/controllers/commentController.ts"],
+  "include": ["src/**/*.ts", "types/**/*.d.ts"]
+}
+
+// "readme": "none",
+// "theme": "minimal",
+// "plugin": ["typedoc-plugin-markdown"],
+// "hideBreadcrumbs": true

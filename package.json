@@ -5,7 +5,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "docs": "typedoc"
   },
   "nodemonConfig": {
     "watch": [
@@ -51,6 +52,7 @@
     "eslint-plugin-promise": "^6.0.0",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
+    "typedoc": "^0.24.8",
     "typescript": "^5.1.3"
   }
 }

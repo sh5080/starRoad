@@ -1,12 +1,24 @@
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
+    "target": "ES2015",
+    "module": "commonjs",
     "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node"]
+  },
+  "include": ["src", "src/types"],
+  "exclude": ["node_modules", "*/.spec.ts"],
+
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "doc": "typedoc"
+  },
+  "devDependencies": {
+    "typescript": "^3.7.5",
+    "typedoc": "^0.15.0"
   }
 }
