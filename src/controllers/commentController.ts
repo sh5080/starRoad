@@ -3,19 +3,10 @@ import * as commentService from '../services/commentService';
 import { getOneDiaryByDiaryId } from '../services/diaryService';
 import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
-
+import docs from '../types/controller'
 /** 댓글 생성 */
-/**
- * 댓글 생성 API 컨트롤러
- * 
- * @async
- * @param {CustomRequest} req - 다이어리 ID와 댓글 내용 입력받음
- * @param {Response} res - 생성된 다이어리 ID와 댓글 내용을 반환
- * @param {NextFunction} next - 에러 발생시, 에러 처리 미들웨어로 이동
- * @returns {Promise<Response>} 201 상태코드 반환
- * @throws {AppError} 유효하지 않은 여행기일 경우 에러 발생
- */
-export const createComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
+
+export const createComment: typeof docs.createComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diaryId, comment } = req.body;
 
@@ -38,7 +29,7 @@ export const createComment = async (req: CustomRequest, res: Response, next: Nex
 };
 
 /** 여행기에 대한 댓글 조회 */
-export const getCommentsByDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getCommentsByDiaryId: typeof docs.getCommentsByDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diaryId } = req.params;
     const { page } = req.query;
@@ -55,7 +46,7 @@ export const getCommentsByDiaryId = async (req: CustomRequest, res: Response, ne
 };
 
 /** 댓글 수정 */
-export const updateComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateComment:typeof docs.updateComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { commentId } = req.params;
     const { comment } = req.body;
@@ -70,7 +61,7 @@ export const updateComment = async (req: CustomRequest, res: Response, next: Nex
 };
 
 /** 댓글 삭제 */
-export const deleteComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteComment:typeof docs.deleteComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { commentId } = req.params;
     const username = req.user?.username!;
