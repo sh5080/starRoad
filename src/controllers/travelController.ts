@@ -4,9 +4,10 @@ import * as travelService from '../services/travelService';
 import { CustomRequest } from '../types/customRequest';
 import { TravelDate } from '../types/travel';
 import { TravelLocation } from '../types/travel';
+import docs from '../types/controller';
 
 /** 여행 일정 작성 */
-export const createTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const createTravelPlan:typeof docs.createTravelPlan = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { dates, startDate, endDate, destination } = req.body;
     const { username } = req.user!;
@@ -76,9 +77,8 @@ export const createTravelPlan = async (req: CustomRequest, res: Response, next: 
     next(error);
   }
 };
-
 /** 모든 여행 일정 조회 */
-export const getTravelPlansByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getTravelPlansByUsername:typeof docs.getTravelPlansByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.user!;
 
@@ -115,7 +115,6 @@ export const getTravelPlanDetailsByPlanId = async (req: CustomRequest, res: Resp
   try {
     const { planId } = req.params;
     const travelPlanData = await travelService.getTravelPlanDetailsByPlanId(String(planId));
-    console.log(travelPlanData)
     if (!travelPlanData || Object.keys(travelPlanData).length === 0) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행 일정을 찾을 수 없습니다.', 404);
     }
@@ -200,7 +199,7 @@ export const deleteTravelPlan = async (req: CustomRequest, res: Response, next: 
     const deletedPlan = await travelService.deletePlan(username, Number(planId));
 
     if (!deletedPlan.deletedPlan[0] || !deletedPlan.deletedLocations[0]) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '없는 일정입니다.', 400);
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '이미 삭제되었거나 없는 일정입니다.', 400);
     }
     res.status(200).json(deletedPlan);
   } catch (error) {

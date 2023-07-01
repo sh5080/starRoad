@@ -5,6 +5,16 @@ import { AppError, CommonError } from '../types/AppError';
 import { CustomRequest } from '../types/customRequest';
 
 /** 댓글 생성 */
+/**
+ * 댓글 생성 API 컨트롤러
+ * 
+ * @async
+ * @param {CustomRequest} req - 다이어리 ID와 댓글 내용 입력받음
+ * @param {Response} res - 생성된 다이어리 ID와 댓글 내용을 반환
+ * @param {NextFunction} next - 에러 발생시, 에러 처리 미들웨어로 이동
+ * @returns {Promise<Response>} 201 상태코드 반환
+ * @throws {AppError} 유효하지 않은 여행기일 경우 에러 발생
+ */
 export const createComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diaryId, comment } = req.body;

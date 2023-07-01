@@ -3,9 +3,10 @@ import * as userService from '../services/userService';
 import { AppError, CommonError } from '../types/AppError';
 import { UserType } from '../types/user';
 import { CustomRequest } from '../types/customRequest';
+import docs from '../types/controller';
 
 /** 회원가입 */
-export const signup = async (req: Request, res: Response, next: NextFunction) => {
+export const signup: typeof docs.signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, username, password, email } = req.body;
     const userData = { name, username, email, password };
@@ -32,7 +33,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 /** 로그인 */
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login: typeof docs.login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, password }: UserType = req.body;
     const userData = await userService.getUser(username);
@@ -57,7 +58,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 };
 
 /** 로그아웃 */
-export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const logout: typeof docs.logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     res.clearCookie('token').status(200).json({ message: '로그아웃 되었습니다.' });
   } catch (error) {
@@ -67,7 +68,7 @@ export const logout = async (req: CustomRequest, res: Response, next: NextFuncti
 };
 
 /** 내 정보 조회 */
-export const getUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getUserInfo: typeof docs.getUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const username = req.user?.username;
     const userData = await userService.getUser(username);
@@ -82,7 +83,11 @@ export const getUserInfo = async (req: CustomRequest, res: Response, next: NextF
 };
 
 /** 회원 정보 수정 */
-export const updateUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateUserInfo: typeof docs.updateUserInfo = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username } = req.user!;
     const { email, password } = req.body;
@@ -104,7 +109,11 @@ export const updateUserInfo = async (req: CustomRequest, res: Response, next: Ne
 };
 
 /** 회원 탈퇴 */
-export const deleteUserInfo = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteUserInfo: typeof docs.deleteUserInfo = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username: currentUser } = req.user!;
     const deletedUserData = await userService.deleteUser(currentUser);
@@ -116,8 +125,8 @@ export const deleteUserInfo = async (req: CustomRequest, res: Response, next: Ne
     const { name, username, email } = deletedUserData;
     const responseData = { name, username, email };
     res.clearCookie('token').status(200).json(responseData);
-  } catch (err) {
-    console.error(err);
-    next(err);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
