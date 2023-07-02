@@ -138,20 +138,13 @@ export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPla
 /** [관리자] 회원이 작성한 다이어리 조회하기 */
 export const getAllDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
-    const [planIds]: [RowDataPacket[], FieldPacket[]] = await db.execute(
-      'SELECT plan_id FROM travel_plan WHERE username = ?',
-      [username]
-    );
-
-    const planIdArray = planIds.map((planId) => planId.plan_id);
-    const planIdList = planIdArray.join(', ');
-    if (planIdArray.length === 0) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '작성된 여행기가 없습니다.', 404);
-    }
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
-      `SELECT * FROM travel_diary WHERE plan_id IN (${planIdList})`
-    );
-
+    const query = `
+    SELECT td.*
+    FROM travel_diary td
+    JOIN travel_plan p ON td.plan_id = p.plan_id
+    WHERE p.username = ?;
+  `;
+  const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(query, [username]);
     return rows.map(rowToCamelCase);
   } catch (error) {
     if (error instanceof AppError) {
