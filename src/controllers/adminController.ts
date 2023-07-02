@@ -126,8 +126,8 @@ export const getAllLocationsByPlanId:typeof docs.getAllLocationsByPlanId = async
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리 모두 조회하기 */
-export const getAllDiariesByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
+/** [관리자] 회원이 작성한 여행기 모두 조회하기 */
+export const getAllDiariesByUsername:typeof docs.getAllDiariesByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
 
@@ -140,13 +140,13 @@ export const getAllDiariesByUsername = async (req: CustomRequest, res: Response,
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리 삭제하기 */
-export const deleteDiaryByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+/** [관리자] 회원이 작성한 여행기 삭제하기 */
+export const deleteDiaryByUsernameAndDiaryId:typeof docs.deleteDiaryByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { diaryId } = req.params;
 
-    const message = await adminService.deleteDiaryByUsernameAndDiaryId(Number(diaryId));
-    res.status(200).json({ message: `Diary with ID ${diaryId} has been successfully deleted.` });
+    await adminService.deleteDiaryByUsernameAndDiaryId(Number(diaryId));
+    res.status(200).json({ message: `DiaryId ${diaryId}가 성공적으로 삭제되었습니다.` });
   } catch (error) {
     console.error(error);
     next(error);

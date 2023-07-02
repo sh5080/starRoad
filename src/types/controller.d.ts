@@ -327,7 +327,7 @@ export declare function getOneDiaryByDiaryId(req: CustomRequest, res: Response, 
 } | Express.Multer.File[]
  * {@link https://github.com/expressjs/multer/blob/master/doc/README-ko.md} multer github
  * @param {Response} res diaryData: 조회된 여행기 정보를 JSON 형식으로 응답(전체 여행기 조회 참고)
- * @throws {AppError} 해당 다이어리를 찾을 수 없는 경우 (RESOURCE_NOT_FOUND)
+ * @throws {AppError} 해당 여행기를 찾을 수 없는 경우 (RESOURCE_NOT_FOUND)
  * @param {NextFunction} next - 다음 미들웨어 함수
 */
 export declare function updateDiary(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
@@ -584,9 +584,39 @@ export declare function getAllTravelPlansByUsername(
  */
 export declare function getAllLocationsByPlanId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * [관리자] 회원이 작성한 여행기 모두 조회하기
+ *
+ * @param {CustomRequest} req.params.username 사용자 ID
+ * @param {Response} res 여행기 정보를 JSON 형식으로 응답
+ * @example
+{
+    "data": [
+        {
+            "id": 423,
+            "planId": 456,
+            "title": "테스트1",
+            "content": "본문1",
+            "image": "[\"http://domain/static/compressed/image.png\"]",
+            "destination": "{\"id\":158,\"nameEn\":\"SEOUL\",\"nameKo\":\"서울\",\"image\":\"http://domain/static/compressed/image.jpg\",\"introduction\":\"서울은...\",\"latitude\":\"37.121210\",\"longitude\":\"121.112115\"}",
+            "createdAt": "2023-07-02T04:28:37.000Z",
+            "updatedAt": "2023-07-02T04:28:37.000Z"
+        }
+    ],
+    "message": "회원이 작성한 여행기를 조회했습니다."
+}
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function getAllDiariesByUsername(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * [관리자] 회원이 작성한 여행기 삭제하기
+ *
+ * @param {CustomRequest} req.params.diaryId 여행기 ID
+ * @param {Response} res 삭제된 diaryId를 JSON 형식으로 응답
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function deleteDiaryByUsernameAndDiaryId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
