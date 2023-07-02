@@ -145,7 +145,9 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
 
     const planIdArray = planIds.map((planId) => planId.plan_id);
     const planIdList = planIdArray.join(', ');
-
+    if (planIdArray.length === 0) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '작성된 여행기가 없습니다.', 404);
+    }
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
       `SELECT * FROM travel_diary WHERE plan_id IN (${planIdList})`
     );
