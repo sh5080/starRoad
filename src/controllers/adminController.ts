@@ -6,15 +6,15 @@ import { compressImage } from '../util/compressImage';
 import config from '../config';
 import path from 'node:path';
 import { AppError, CommonError } from '../types/AppError';
-
+import docs from '../types/controller'
 const IMG_PATH = config.server.IMG_PATH;
 
 /** [관리자] 모든 회원 조회하기 */
-export const getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllUsers:typeof docs.getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const users = await adminService.getAllUsers();
     if (!users) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '불러올 유저정보가 없습니다.', 400);
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '불러올 회원 정보가 없습니다.', 400);
     }
     const userCount: number = users.length;
     res.status(200).json({ data: { users, userCount, message: '모든 회원을 불러왔습니다.' } });
@@ -25,7 +25,7 @@ export const getAllUsers = async (req: CustomRequest, res: Response, next: NextF
 };
 
 /** [관리자] 특정 회원 조회하기 */
-export const getUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getUser:typeof docs.getUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
 
@@ -48,7 +48,7 @@ export const getUser = async (req: CustomRequest, res: Response, next: NextFunct
 };
 
 /** [관리자] 회원 정보 업데이트 */
-export const updateUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateUser:typeof docs.updateUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { username, name, email, role } = req.body;
@@ -62,7 +62,9 @@ export const updateUser = async (req: CustomRequest, res: Response, next: NextFu
     if (!user) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '존재하지 않는 유저입니다.', 400);
     }
-
+    if(role !== 'USER' && role !== 'ADMIN'){
+      throw new AppError(CommonError.INVALID_INPUT, 'USER 혹은 ADMIN만 입력 가능합니다.', 400);
+    }
     const userInfo = { username, name, email, role };
 
     const data = await adminService.updateUser(Number(id), userInfo);
@@ -74,7 +76,7 @@ export const updateUser = async (req: CustomRequest, res: Response, next: NextFu
 };
 
 /** [관리자] 회원 삭제하기 */
-export const deleteUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteUser:typeof docs.deleteUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
 
@@ -82,8 +84,8 @@ export const deleteUser = async (req: CustomRequest, res: Response, next: NextFu
       throw new AppError(CommonError.INVALID_INPUT, '입력값이 유효하지 않습니다.', 400);
     }
 
-    const message = await adminService.deleteUser(Number(id));
-    res.status(200).json({ message });
+    const user = await adminService.deleteUser(Number(id));
+    res.status(200).json({ user });
   } catch (error) {
     console.error(error);
     next(error);
@@ -91,10 +93,9 @@ export const deleteUser = async (req: CustomRequest, res: Response, next: NextFu
 };
 
 /** [관리자] 회원이 작성한 여행 일정 조회하기 */
-export const getAllTravelPlansByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllTravelPlansByUsername:typeof docs.getAllTravelPlansByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
-
     if (!username) {
       throw new AppError(CommonError.INVALID_INPUT, '입력값이 유효하지 않습니다.', 400);
     }
@@ -108,7 +109,7 @@ export const getAllTravelPlansByUsername = async (req: CustomRequest, res: Respo
 };
 
 /** [관리자] 회원이 작성한 날짜 장소 조회하기 */
-export const getAllLocationsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllLocationsByPlanId:typeof docs.getAllLocationsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { planId } = req.params;
 

@@ -312,7 +312,7 @@ export declare function getMyDiaries(req: CustomRequest, res: Response, next: Ne
  * @param {Response} res diaryData: 조회된 여행기 정보를 JSON 형식으로 응답(전체 여행기 조회 참고)
  * @throws {AppError} 해당 여행기를 찾을 수 없는 경우 (RESOURCE_NOT_FOUND)
  * @param {NextFunction} next - 다음 미들웨어 함수(에러 핸들러)
-*/
+ */
 export declare function getOneDiaryByDiaryId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 /**
@@ -340,7 +340,7 @@ export declare function updateDiary(req: CustomRequest, res: Response, next: Nex
  * @param {Response} res diaryData: 조회된 여행기 정보를 JSON 형식으로 응답(전체 여행기 조회 참고)
  * @throws {AppError} 이미지 삭제 실패 또는 해당 여행기를 찾을 수 없는 경우
  * @param {NextFunction} next - 다음 미들웨어 함수(에러 핸들러)
-*/
+ */
 export declare function deleteDiary(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 //destinationController -----------------------------------------------------------------------------
@@ -423,6 +423,7 @@ export declare function updateComment(req: CustomRequest, res: Response, next: N
  */
 export declare function deleteComment(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
+//authController ----------------------------------------------------------------------------------------------
 /**
  * 카카오 로그인 콜백
  *
@@ -453,6 +454,141 @@ export declare function kakaoCallback(req: CustomRequest, res: Response, next: N
  */
 export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
+//adminController ----------------------------------------------------------------------------------------------
+/**
+ * [관리자] 모든 회원 조회하기
+ *
+ * @param {Response} res users: 모든 회원 정보를 JSON 형식으로 응답 role: 관리자 여부 activated: 가입/탈퇴여부, oauthProvider: 가입방식, userCount: 조회된 전체 회원 수
+ * @example
+{
+    "data": {
+        "users": [
+            {
+                "id": 123,
+                "username": "test1",
+                "name": "test",
+                "email": "test@test.com",
+                "createdAt": "2023-06-04T13:28:52.000Z",
+                "updatedAt": "2023-06-18T04:20:45.000Z",
+                "role": "ADMIN",
+                "activated": 1,
+                "oauthProvider": "origin"
+            }
+        ]
+        "userCount": 81,
+        "message": "모든 회원을 불러왔습니다."
+    }
+}
+ * @throws {AppError} 불러올 회원 정보(users)가 없는 경우
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function getAllUsers(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * [관리자] 특정 회원 조회하기
+ *
+ * @param {number} req.params.id 조회할 회원 고유 ID값
+ * @param {Response} res user: 회원 정보를 JSON 형식으로 응답(모든 회원 조회하기 users 참고)
+ * @throws {AppError} id값 유효성 검증 오류
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function getUser(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+/**
+ * [관리자] 회원 정보 업데이트
+ *
+ * @param {number} req.params.id 회원 고유 ID값
+ * @param {string} req.body.username 사용자 ID
+ * @param {string} req.body.name 수정할 회원 이름
+ * @param {string} req.body.email 수정할 회원 이메일
+ * @param {string} req.body.role 수정할 회원 권한 (user/admin)
+ * @param {Response} res 수정한 회원정보를 JSON 형식으로 응답
+ * @example {
+    "data": {
+        "id": 145,
+        "username": "updatedtest1",
+        "name": "updatedtest",
+        "email": "test@gmail.com",
+        "createdAt": "2023-06-30T06:12:10.000Z",
+        "updatedAt": "2023-07-02T02:48:22.000Z",
+        "role": "user",
+        "activated": 1,
+        "oauthProvider": kakao
+    },
+    "message": "회원 정보 수정을 완료했습니다."
+}
+ * @throws {AppError} id, role 유효성 검증, 존재 여부 오류
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function updateUser(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * [관리자] 회원 정보 삭제
+ *
+ * @param {number} req.params.id 회원 고유 ID값
+ * @param {Response} res 삭제한 회원 정보를 JSON 형식으로 응답
+ * @throws {AppError} id 유효성 검증 오류
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function deleteUser(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+/**
+ * [관리자] 회원이 작성한 여행 일정 조회하기
+ *
+ * @param {CustomRequest} req.params.username 사용자 ID
+ * @param {Response} res 여행 일정을 JSON 형식으로 응답
+ * @example
+{
+    "data": [
+        {
+            "planId": 323,
+            "username": "test1",
+            "startDate": "2023-06-03T15:00:00.000Z",
+            "endDate": "2023-06-22T15:00:00.000Z",
+            "destination": "{\"id\":158,\"nameEn\":\"SEOUL\",\"nameKo\":\"서울\",\"image\":\"http://domain/static/compressed/test.jpg\",\"introduction\":\"서울은...\",\"latitude\":\"37.121210\",\"longitude\":\"121.112115\"}",
+            "createdAt": "2023-06-16T07:46:00.000Z",
+            "updatedAt": "2023-06-16T07:46:00.000Z"
+        },
+    ],
+    "message": "회원이 작성한 여행 일정을 조회했습니다."
+}
+ * @throws {AppError} username 유효성 검증 오류
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function getAllTravelPlansByUsername(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void>;
+
+/**
+ * [관리자] 회원이 작성한 날짜 장소 조회하기
+ *
+ * @param {CustomRequest} req.params.planId 여행 일정 ID
+ * @param {Response} res 회원이 작성한 날짜별 장소를 JSON 형식으로 응답
+ * @example
+{
+    "data": [
+        {
+            "locationId": 632,
+            "planId": 325,
+            "date": "2023-06-04T15:00:00.000Z",
+            "location": "제주특별자치도 서귀포시 보목동",
+            "order": 1,
+            "latitude": "33.24127212",
+            "longitude": "126.59230607"
+        }
+    ],
+    "message": "회원이 작성한 날짜별 장소를 조회했습니다."
+}
+ * @throws {AppError} planId 유효성 검증 오류
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function getAllLocationsByPlanId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
