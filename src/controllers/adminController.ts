@@ -6,11 +6,11 @@ import { compressImage } from '../util/compressImage';
 import config from '../config';
 import path from 'node:path';
 import { AppError, CommonError } from '../types/AppError';
-import docs from '../types/controller'
+import docs from '../types/controller';
 const IMG_PATH = config.server.IMG_PATH;
 
 /** [관리자] 모든 회원 조회하기 */
-export const getAllUsers:typeof docs.getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllUsers: typeof docs.getAllUsers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const users = await adminService.getAllUsers();
     if (!users) {
@@ -25,7 +25,7 @@ export const getAllUsers:typeof docs.getAllUsers = async (req: CustomRequest, re
 };
 
 /** [관리자] 특정 회원 조회하기 */
-export const getUser:typeof docs.getUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getUser: typeof docs.getUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
 
@@ -48,7 +48,7 @@ export const getUser:typeof docs.getUser = async (req: CustomRequest, res: Respo
 };
 
 /** [관리자] 회원 정보 업데이트 */
-export const updateUser:typeof docs.updateUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateUser: typeof docs.updateUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { username, name, email, role } = req.body;
@@ -62,7 +62,7 @@ export const updateUser:typeof docs.updateUser = async (req: CustomRequest, res:
     if (!user) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '존재하지 않는 유저입니다.', 400);
     }
-    if(role !== 'USER' && role !== 'ADMIN'){
+    if (role !== 'USER' && role !== 'ADMIN') {
       throw new AppError(CommonError.INVALID_INPUT, 'USER 혹은 ADMIN만 입력 가능합니다.', 400);
     }
     const userInfo = { username, name, email, role };
@@ -76,7 +76,7 @@ export const updateUser:typeof docs.updateUser = async (req: CustomRequest, res:
 };
 
 /** [관리자] 회원 삭제하기 */
-export const deleteUser:typeof docs.deleteUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteUser: typeof docs.deleteUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
 
@@ -93,7 +93,11 @@ export const deleteUser:typeof docs.deleteUser = async (req: CustomRequest, res:
 };
 
 /** [관리자] 회원이 작성한 여행 일정 조회하기 */
-export const getAllTravelPlansByUsername:typeof docs.getAllTravelPlansByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllTravelPlansByUsername: typeof docs.getAllTravelPlansByUsername = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username } = req.params;
     if (!username) {
@@ -109,7 +113,11 @@ export const getAllTravelPlansByUsername:typeof docs.getAllTravelPlansByUsername
 };
 
 /** [관리자] 회원이 작성한 날짜 장소 조회하기 */
-export const getAllLocationsByPlanId:typeof docs.getAllLocationsByPlanId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllLocationsByPlanId: typeof docs.getAllLocationsByPlanId = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { planId } = req.params;
 
@@ -127,7 +135,11 @@ export const getAllLocationsByPlanId:typeof docs.getAllLocationsByPlanId = async
 };
 
 /** [관리자] 회원이 작성한 여행기 모두 조회하기 */
-export const getAllDiariesByUsername:typeof docs.getAllDiariesByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllDiariesByUsername: typeof docs.getAllDiariesByUsername = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username } = req.params;
 
@@ -141,7 +153,11 @@ export const getAllDiariesByUsername:typeof docs.getAllDiariesByUsername = async
 };
 
 /** [관리자] 회원이 작성한 여행기 삭제하기 */
-export const deleteDiaryByUsernameAndDiaryId:typeof docs.deleteDiaryByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteDiaryByUsernameAndDiaryId: typeof docs.deleteDiaryByUsernameAndDiaryId = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { diaryId } = req.params;
 
@@ -154,7 +170,11 @@ export const deleteDiaryByUsernameAndDiaryId:typeof docs.deleteDiaryByUsernameAn
 };
 
 /** [관리자] 회원이 작성한 여행기의 댓글 모두 조회하기 */
-export const getAllCommentsByUsernameAndDiaryId:typeof docs.getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllCommentsByUsernameAndDiaryId: typeof docs.getAllCommentsByUsernameAndDiaryId = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username, diaryId } = req.params;
 
@@ -174,7 +194,11 @@ export const getAllCommentsByUsernameAndDiaryId:typeof docs.getAllCommentsByUser
 /**
  * [관리자] 회원이 작성한 모든 댓글 조회하기
  */
-export const getAllCommentsByUsername:typeof docs.getAllCommentsByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllCommentsByUsername: typeof docs.getAllCommentsByUsername = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username } = req.params;
 
@@ -188,7 +212,11 @@ export const getAllCommentsByUsername:typeof docs.getAllCommentsByUsername = asy
 };
 
 /** [관리자] 특정 회원이 작성한 댓글 삭제하기 */
-export const deleteComment:typeof docs.deleteComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteComment: typeof docs.deleteComment = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { commentId } = req.params;
     await adminService.deleteComment(Number(commentId));
@@ -202,29 +230,16 @@ export const deleteComment:typeof docs.deleteComment = async (req: CustomRequest
 };
 
 /** [관리자] 관광지 추가 */
-export const addTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const addTouristDestination: typeof docs.addTouristDestination = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    // let imgName = '';
-    // let inputPath = '';
-    // let compressed = '';
-
-    // if (req.files) {
-    //   const files = req.files as Express.Multer.File[];
-    //   const encodedFilename = encodeURIComponent(files[0].filename);
-    //   console.log(encodedFilename)
-    //   imgName = `${IMG_PATH}/${encodedFilename}`;
-    //   inputPath = path.join(__dirname, '../../public', encodedFilename);
-    //   compressed = path.join(__dirname, '../../public/compressed', encodedFilename);
-    //   let encodedImage = '';
-
-    //     await compressImage(inputPath, compressed, 600, 600);
-    //     const imgData = await fs.readFile(compressed);
-    //     encodedImage = `data:image/jpeg;base64,${imgData.toString('base64')}`;
-    //     fs.unlink(inputPath);
-
-    // }
     let imgName: string[] = [];
-
+    if (req.files?.length === 0) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '이미지 파일이 첨부되지 않았습니다.', 400);
+    }
     if (req.files) {
       const files = req.files as Express.Multer.File[];
       const promises = files.map(async (file) => {
@@ -243,8 +258,9 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
       await Promise.all(promises);
     }
     const { nameEn, nameKo, introduction, latitude, longitude } = req.body;
-
-    res.status(200).json({ nameEn, nameKo, introduction, latitude, longitude, imgName });
+    const destinationData =  { nameEn, nameKo, introduction, latitude, longitude, image:imgName }
+    await adminService.addTouristDestination(destinationData);
+    res.status(200).json(destinationData);
   } catch (error) {
     console.error(error);
     next(error);
@@ -252,7 +268,7 @@ export const addTouristDestination = async (req: CustomRequest, res: Response, n
 };
 
 /** [관리자] 관광지 수정하기 */
-export const updateTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateTouristDestination:typeof docs.updateTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { locationId } = req.params;
     const { nameEn, nameKo, image, introduction } = req.body;

@@ -672,16 +672,48 @@ export declare function getAllCommentsByUsername(req: CustomRequest, res: Respon
 /**
  * [관리자] 특정 회원이 작성한 댓글 삭제하기
  *
- * @param {CustomRequest} req.params.username 사용자 ID
- * @param {CustomRequest} req.params.diaryId 여행기 ID
  * @param {CustomRequest} req.params.commentId 댓글 ID
- * @param {Response} res 응답
+ * @param {Response} res 삭제한 commentId를 JSON 형식으로 응답
  * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
  */
 export declare function deleteComment(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+//destination 관련
+/**
+ * [관리자] 관광지 추가
+ *
+ * @param {CustomRequest} req.body.nameEn 영문 관광지 이름
+ * @param {CustomRequest} req.body.nameKo 한글 관광지 이름
+ * @param {CustomRequest} req.body.introduction 관광지 소개
+ * @param {CustomRequest} req.body.latitude 관광지 위도
+ * @param {CustomRequest} req.body.longitude 관광지 경도
+ * @param {Response} res 추가된 관광지 정보를 JSON 형식으로 응답
+@example
+{
+    "nameEn": "dunsan",
+    "nameKo": "둔산",
+    "introduction": "둔산동",
+    "latitude": "123",
+    "longitude": "456",
+    "image": [
+        "http://domain/static/compressed/image.png"
+    ]
+}
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function addTouristDestination(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * [관리자] 관광지 수정하기
+ *
+ * @param {CustomRequest} req.params.locationId 관광지 ID
+ * @param {CustomRequest} req.body.nameEn 영문 관광지 이름
+ * @param {CustomRequest} req.body.nameKo 한글 관광지 이름
+ * @param {CustomRequest} req.body.image 관광지 이미지
+ * @param {CustomRequest} req.body.introduction 관광지 소개
+ * @param {Response} res 수정된 관광지 정보를 JSON 형식으로 응답
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function updateTouristDestination(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
