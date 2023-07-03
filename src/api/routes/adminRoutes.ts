@@ -10,12 +10,7 @@ const router = Router();
 router.get('/users/:planId/locations', validateToken, ensureAdmin, adminController.getAllLocationsByPlanId);
 
 /** [관리자] 회원이 작성한 댓글 삭제하기 */
-router.delete(
-  '/users/comments/:commentId',
-  validateToken,
-  ensureAdmin,
-  adminController.deleteComment
-);
+router.delete('/users/comments/:commentId', validateToken, ensureAdmin, adminController.deleteComment);
 
 /** [관리자] 여행기의 모든 댓글 조회하기 */
 router.get(
@@ -57,7 +52,7 @@ router.get('/users/:id', validateToken, ensureAdmin, adminController.getUser);
 
 /** [관리자] 관광지 추가하기 */
 router.post(
-  '/locations',
+  '/destinations',
   validateToken,
   ensureAdmin,
   processImage,
@@ -67,14 +62,15 @@ router.post(
 
 /** [관리자] 관광지 수정하기 */
 router.put(
-  '/locations/:locationId',
+  '/destinations/:id',
   validateToken,
   ensureAdmin,
-  validateRequestBody(['nameEn', 'nameKo', 'image', 'introduction']),
+  processImage,
+  validateRequestBody(['nameEn', 'nameKo', 'introduction', 'latitude', 'longitude']),
   adminController.updateTouristDestination
 );
 
 /** [관리자] 관광지 삭제하기 */
-router.delete('/locations/:locationId', validateToken, ensureAdmin, adminController.deleteTouristDestination);
+router.delete('/destinations/:id', validateToken, ensureAdmin, adminController.deleteTouristDestination);
 
 export default router;
