@@ -669,7 +669,16 @@ export declare function getAllCommentsByUsernameAndDiaryId(req: CustomRequest, r
  */
 export declare function getAllCommentsByUsername(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * [관리자] 특정 회원이 작성한 댓글 삭제하기
+ *
+ * @param {CustomRequest} req.params.username 사용자 ID
+ * @param {CustomRequest} req.params.diaryId 여행기 ID
+ * @param {CustomRequest} req.params.commentId 댓글 ID
+ * @param {Response} res 응답
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function deleteComment(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
