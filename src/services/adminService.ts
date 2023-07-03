@@ -130,7 +130,7 @@ export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPla
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리 조회하기 */
+/** [관리자] 회원이 작성한 여행기 조회하기 */
 export const getAllDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
     if (!username) {
@@ -154,7 +154,7 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
   }
 };
 
-// [관리자] 회원이 작성한 다이어리 삭제하기
+// [관리자] 회원이 작성한 여행기 삭제하기
 export const deleteDiaryByUsernameAndDiaryId = async (diaryId: number) => {
   try {
     if (!diaryId) {
@@ -173,7 +173,7 @@ export const deleteDiaryByUsernameAndDiaryId = async (diaryId: number) => {
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리의 모든 댓글 조회하기 */
+/** [관리자] 회원이 작성한 여행기의 모든 댓글 조회하기 */
 export const getAllCommentsByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<Comment[]> => {
   try {
     if (!username || !diaryId) {
@@ -254,13 +254,18 @@ destinationData: TouristDestinationType
   }
 };
 
+
 /** [관리자] 관광지 수정하기 */
-export const updateTouristDestination = async (id: string, product: Partial<TouristDestinationType>) => {
+export const getTouristDestinationImage = async (id:string) => {
+  const originImage = await adminModel.getTouristDestinationImage(id);
+  if (!originImage) {
+    throw new AppError(CommonError.RESOURCE_NOT_FOUND, '관광지를 찾을 수 없습니다.', 400);
+  }
+  return originImage
+}
+export const updateTouristDestination = async (id: string, updatedData: Partial<TouristDestinationType>) => {
   try {
-    if (!id) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '관광지를 찾을 수 없습니다.', 400);
-    }
-    await adminModel.updateTouristDestination(id, product);
+    await adminModel.updateTouristDestination(id, updatedData);
   } catch (error) {
     if (error instanceof AppError) {
       console.error(error);

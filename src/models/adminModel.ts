@@ -135,7 +135,7 @@ export const getAllLocationsByPlanId = async (planId: number): Promise<TravelPla
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리 조회하기 */
+/** [관리자] 회원이 작성한 여행기 조회하기 */
 export const getAllDiariesByUsername = async (username: string): Promise<Diary[]> => {
   try {
     const query = `
@@ -157,7 +157,7 @@ export const getAllDiariesByUsername = async (username: string): Promise<Diary[]
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리 삭제하기 */
+/** [관리자] 회원이 작성한 여행기 삭제하기 */
 export const deleteDiaryByUsernameAndDiaryId = async (diaryId: number): Promise<void> => {
   try {
     await db.execute('DELETE FROM travel_diary WHERE id= ?', [diaryId]);
@@ -172,7 +172,7 @@ export const deleteDiaryByUsernameAndDiaryId = async (diaryId: number): Promise<
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리 댓글 모두 조회하기 */
+/** [관리자] 회원이 작성한 여행기 댓글 모두 조회하기 */
 export const getAllCommentsByUsernameAndDiaryId = async (username: string, diaryId: number): Promise<Comment[]> => {
   try {
     const [rows]: [RowDataPacket[], FieldPacket[]] = await db.execute(
@@ -258,13 +258,36 @@ destinationData: TouristDestinationType
     }
   }
 };
+/** [관리자] 관광지 이미지 파일명 조회하기 */
+export const getTouristDestinationImage = async (id: string) => {
+  const connection = await db.getConnection();
+  try {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await connection.execute(
+      'SELECT image FROM travel_destination WHERE id = ?',
+      [id]
+    );
+    if (rows.length <= 0) {
+      return null;
+    } else {
+      return rowToCamelCase(rows[0]);
+    }
 
+  } catch (error) {
+    if (error instanceof AppError) {
+      console.error(error);
+      throw error;
+    } else {
+      console.error(error);
+      throw new AppError(CommonError.UNEXPECTED_ERROR, '이미지 정보를 가져오는 중에 오류가 발생했습니다.', 500);
+    }
+  }
+};
 /** [관리자] 관광지 수정하기 */
-export const updateTouristDestination = async (id: string, product: Partial<TouristDestinationType>): Promise<void> => {
+export const updateTouristDestination = async (id: string, updatedData: Partial<TouristDestinationType>): Promise<void> => {
   try {
     await db.execute(
       'UPDATE travel_destination SET name_en = ?, name_ko = ?, image = ?, introduction = ? WHERE id = ?',
-      [product.nameEn, product.nameKo, product.image, product.introduction, id]
+      [updatedData.nameEn, updatedData.nameKo, updatedData.image, updatedData.introduction, id]
     );
   } catch (error) {
     if (error instanceof AppError) {

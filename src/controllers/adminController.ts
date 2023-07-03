@@ -270,20 +270,84 @@ export const addTouristDestination: typeof docs.addTouristDestination = async (
 /** [관리자] 관광지 수정하기 */
 export const updateTouristDestination:typeof docs.updateTouristDestination = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { locationId } = req.params;
-    const { nameEn, nameKo, image, introduction } = req.body;
+    const { id } = req.params;
+    const { nameEn, nameKo, introduction, latitude, longitude } = req.body;
 
-    if (!locationId) {
+    if (!id) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '관광지를 찾을 수 없습니다.', 400);
     }
-    const product = {
-      nameEn: String(nameEn),
-      nameKo: String(nameKo),
-      image: String(image),
-      introduction: String(introduction),
+    const originImage = await adminService.getTouristDestinationImage(id);
+
+    if(originImage.image){
+      let imageArray: string[];
+
+      if (typeof originImage.image === 'string') {
+        try {
+          imageArray = JSON.parse(originImage.image);
+          if (!Array.isArray(imageArray)) {
+            throw new Error();
+          }
+        } catch {
+          imageArray = [originImage.image];
+        }
+      } else {
+        imageArray = originImage.image;
+      }
+      for (const imageName of imageArray) {
+        const url = new URL(imageName);
+        const pathname = url.pathname;
+        const baseDir = '/public/compressed/';
+        const start = pathname.indexOf(baseDir);
+        if (start === -1) {
+          console.log('Failed to detect image:', imageName);
+          continue;
+        }
+        const encodedFilename = pathname.substring(start + baseDir.length);
+        const filename = decodeURIComponent(encodedFilename);
+
+        if (filename) {
+          try {
+            await fs.unlink(path.join(__dirname, '../../public/compressed', filename));
+          } catch (err) {
+            console.error(`Failed to delete image at ${imageName}: `, err);
+            throw new AppError(CommonError.UNEXPECTED_ERROR, 'Failed to delete image', 500);
+          }
+        }
+      }
+    }
+    let imgName: string[] = [];
+    if (req.files?.length === 0) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '이미지 파일이 첨부되지 않았습니다.', 400);
+    }
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+      const promises = files.map(async (file) => {
+        const inputPath = path.join(__dirname, '../../public', file.filename);
+        const compressedPath = path.join(__dirname, '../../public/compressed', file.filename);
+
+        await compressImage(inputPath, compressedPath, 600, 600);
+
+        const compressedFilename = path.basename(compressedPath);
+        const encodedFilename = encodeURIComponent(compressedFilename);
+
+        imgName.push(`${IMG_PATH}/${encodedFilename}`);
+
+        await fs.unlink(inputPath);
+      });
+      await Promise.all(promises);
+    }
+    const updatedData = {
+      nameEn,
+      nameKo,
+      introduction,
+      latitude,
+      longitude,
+      image:imgName.join()
     };
-    const message = await adminService.updateTouristDestination(String(locationId), product);
-    res.status(200).json({ message: message });
+    
+    await adminService.updateTouristDestination(id, updatedData);
+      
+    res.status(200).json({ message: updatedData });
   } catch (error) {
     console.error(error);
     next(error);
