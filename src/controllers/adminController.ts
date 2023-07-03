@@ -133,7 +133,7 @@ export const getAllDiariesByUsername:typeof docs.getAllDiariesByUsername = async
 
     const userTravelDiaryInfos = await adminService.getAllDiariesByUsername(String(username));
 
-    res.status(200).json({ data: userTravelDiaryInfos, message: '회원이 작성한 다이어리를 조회했습니다.' });
+    res.status(200).json({ data: userTravelDiaryInfos, message: '회원이 작성한 여행기를 조회했습니다.' });
   } catch (error) {
     console.error(error);
     next(error);
@@ -153,8 +153,8 @@ export const deleteDiaryByUsernameAndDiaryId:typeof docs.deleteDiaryByUsernameAn
   }
 };
 
-/** [관리자] 회원이 작성한 다이어리의 댓글 모두 조회하기 */
-export const getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+/** [관리자] 회원이 작성한 여행기의 댓글 모두 조회하기 */
+export const getAllCommentsByUsernameAndDiaryId:typeof docs.getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username, diaryId } = req.params;
 
@@ -165,7 +165,7 @@ export const getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res
 
     res
       .status(200)
-      .json({ data: userTravelDiaryCommentInfos, message: '회원이 작성한 다이어리의 댓글을 조회했습니다.' });
+      .json({ data: userTravelDiaryCommentInfos, message: `${username} 회원이 작성한 여행기의 댓글을 조회했습니다.` });
   } catch (error) {
     console.error(error);
     next(error);
@@ -174,13 +174,13 @@ export const getAllCommentsByUsernameAndDiaryId = async (req: CustomRequest, res
 /**
  * [관리자] 회원이 작성한 모든 댓글 조회하기
  */
-export const getAllCommentsByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllCommentsByUsername:typeof docs.getAllCommentsByUsername = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { username } = req.params;
 
     const userAllComments = await adminService.getAllCommentsByUsername(String(username));
 
-    res.status(200).json({ data: userAllComments, message: '회원이 작성한 모든 댓글을 조회했습니다.' });
+    res.status(200).json({ data: userAllComments, message: `${username} 회원이 작성한 모든 댓글을 조회했습니다.` });
   } catch (error) {
     console.error(error);
     next(error);

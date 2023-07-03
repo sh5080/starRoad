@@ -5,7 +5,6 @@
 //   }
 
 {
-  // "inputFiles": ["src"],
   "out": "docs",
   "exclude": ["*/.test.ts"],
   "entryPoints": ["src/index.ts", "src/controllers/commentController.ts"],

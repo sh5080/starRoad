@@ -455,6 +455,8 @@ export declare function kakaoCallback(req: CustomRequest, res: Response, next: N
 export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 //adminController ----------------------------------------------------------------------------------------------
+
+//user 관련
 /**
  * [관리자] 모든 회원 조회하기
  *
@@ -530,6 +532,7 @@ export declare function updateUser(req: CustomRequest, res: Response, next: Next
  */
 export declare function deleteUser(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
+//travel 관련
 /**
  * [관리자] 회원이 작성한 여행 일정 조회하기
  *
@@ -584,6 +587,7 @@ export declare function getAllTravelPlansByUsername(
  */
 export declare function getAllLocationsByPlanId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
+//diary 관련
 /**
  * [관리자] 회원이 작성한 여행기 모두 조회하기
  *
@@ -618,9 +622,52 @@ export declare function getAllDiariesByUsername(req: CustomRequest, res: Respons
  */
 export declare function deleteDiaryByUsernameAndDiaryId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+//comment 관련
+/**
+ * [관리자] 회원이 작성한 여행기의 댓글 모두 조회하기
+ *
+ * @param {CustomRequest} req.params.username 사용자 ID
+ * @param {CustomRequest} req.params.diaryId 여행기 ID
+ * @param {Response} res 댓글 정보를 JSON 형식으로 응답
+ * @example
+{
+    "data": [
+        {
+            "id": 189,
+            "username": "test",
+            "diaryId": 305,
+            "comment": "commenttest",
+            "createdAt": "2023-07-02T22:26:07.000Z",
+            "updatedAt": "2023-07-02T22:26:07.000Z"
+        }
+    ],
+    "message": "test 회원이 작성한 여행기의 댓글을 조회했습니다."
+}
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function getAllCommentsByUsernameAndDiaryId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * [관리자] 특정 회원이 작성한 모든 댓글 조회하기
+ *
+ * @param {CustomRequest} req.params.username 사용자 ID
+ * @param {Response} res 댓글 정보를 JSON 형식으로 응답
+ * @example
+{
+    "data": [
+        {
+            "id": 1,
+            "diaryId": 4,
+            "comment": "23123",
+            "createdAt": "2023-06-04T17:14:06.000Z",
+            "updatedAt": "2023-06-10T03:36:51.000Z"
+        }
+    ]
+    "message": "test 회원이 작성한 모든 댓글을 조회했습니다."
+}
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function getAllCommentsByUsername(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
