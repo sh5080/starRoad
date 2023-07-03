@@ -41,7 +41,7 @@ export const getAllDiaries = async (): Promise<Diary[]> => {
 };
 
 /**
- * 내 다이어리 조회
+ * 내 여행기 조회
  */
 export const getMyDiaries = async (username: string): Promise<Diary[]> => {
   try {

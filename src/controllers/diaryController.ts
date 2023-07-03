@@ -113,8 +113,8 @@ export const checkAuthorizationForUpdate:typeof docs.checkAuthorizationForUpdate
     const { diaryId } = req.params;
     const username = req.user?.username!;
 
-    const existingDiary = await diaryService.getOneDiaryByDiaryId(Number(diaryId));
-    if(existingDiary.username !== username){
+    const originDiary = await diaryService.getOneDiaryByDiaryId(Number(diaryId));
+    if(originDiary.username !== username){
       throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '사용자에게 권한이 없습니다.', 403);
     }
     next();
@@ -129,24 +129,24 @@ export const updateDiary:typeof docs.updateDiary = async (req: CustomRequest, re
     const diaryId = parseInt(String(req.params.diaryId), 10);
     const { title, content } = req.body;
     const username = req.user?.username!;
-    const existingDiary = await diaryService.getOneDiaryByDiaryId(diaryId);
-    if (!existingDiary) {
-      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
+    const originDiary = await diaryService.getOneDiaryByDiaryId(diaryId);
+    if (!originDiary) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 여행기를 찾을 수 없습니다.', 404);
     }
-    if (existingDiary.image) {
+    if (originDiary.image) {
       let imageArray: string[];
 
-      if (typeof existingDiary.image === 'string') {
+      if (typeof originDiary.image === 'string') {
         try {
-          imageArray = JSON.parse(existingDiary.image);
+          imageArray = JSON.parse(originDiary.image);
           if (!Array.isArray(imageArray)) {
             throw new Error();
           }
         } catch {
-          imageArray = [existingDiary.image];
+          imageArray = [originDiary.image];
         }
       } else {
-        imageArray = existingDiary.image;
+        imageArray = originDiary.image;
       }
 
       for (const imageName of imageArray) {
