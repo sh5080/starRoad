@@ -108,14 +108,27 @@ export const getOneDiaryByDiaryId:typeof docs.getOneDiaryByDiaryId = async (req:
     next(error);
   }
 };
+export const checkAuthorizationForUpdate:typeof docs.checkAuthorizationForUpdate = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { diaryId } = req.params;
+    const username = req.user?.username!;
 
+    const existingDiary = await diaryService.getOneDiaryByDiaryId(Number(diaryId));
+    if(existingDiary.username !== username){
+      throw new AppError(CommonError.UNAUTHORIZED_ACCESS, '사용자에게 권한이 없습니다.', 403);
+    }
+    next();
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
 /** 여행기 수정 */
 export const updateDiary:typeof docs.updateDiary = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const diaryId = parseInt(String(req.params.diaryId), 10);
     const { title, content } = req.body;
     const username = req.user?.username!;
-
     const existingDiary = await diaryService.getOneDiaryByDiaryId(diaryId);
     if (!existingDiary) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '해당 다이어리를 찾을 수 없습니다.', 404);
@@ -178,7 +191,9 @@ export const updateDiary:typeof docs.updateDiary = async (req: CustomRequest, re
       });
       await Promise.all(promises);
     }
-
+    if(imgNames.length===0){
+      throw new AppError(CommonError.INVALID_INPUT, '업로드하려는 파일이 유효하지 않습니다.', 400);
+    }
     const diaryData = { title, content, image: JSON.stringify(imgNames) };
     await diaryService.updateDiary(diaryData, diaryId, username);
 

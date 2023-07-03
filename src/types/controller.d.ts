@@ -316,6 +316,17 @@ export declare function getMyDiaries(req: CustomRequest, res: Response, next: Ne
 export declare function getOneDiaryByDiaryId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
 /**
+ * 권한 확인 미들웨어
+ * @param {CustomRequest} req.params.diaryId 여행기 ID
+ * @param {CustomRequest} req.user.username 사용자 ID
+ * @throws {AppError} 권한이 없는 경우 (UNAUTHORIZED_ACCESS)
+ * @param {NextFunction} next 다음 미들웨어 함수 (processImage 이미지업로드 (multer))
+ * {@link https://github.com/expressjs/multer/blob/master/doc/README-ko.md} multer github
+ * @param {NextFunction} next 다음 미들웨어 함수 (에러 핸들러)
+ */
+export declare function checkAuthorizationForUpdate(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+
+/**
  * 여행기 수정
  *
  * @param {number} req.params.diaryId 여행기 ID
