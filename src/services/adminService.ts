@@ -181,10 +181,9 @@ export const getAllCommentsByUsernameAndDiaryId = async (username: string, diary
     }
 
     const diaryComments = await adminModel.getAllCommentsByUsernameAndDiaryId(username, diaryId);
-    if (!diaryComments) {
+    if (!diaryComments[0]) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '여행기 댓글을 찾을 수 없습니다.', 404);
     }
-
     return diaryComments;
   } catch (error) {
     if (error instanceof AppError) {
