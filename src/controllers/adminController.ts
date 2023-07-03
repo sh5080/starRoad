@@ -188,12 +188,12 @@ export const getAllCommentsByUsername:typeof docs.getAllCommentsByUsername = asy
 };
 
 /** [관리자] 특정 회원이 작성한 댓글 삭제하기 */
-export const deleteCommentByUsernameAndDiaryId = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteComment:typeof docs.deleteComment = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { username, diaryId, commentId } = req.params;
-
+    const { commentId } = req.params;
+    await adminService.deleteComment(Number(commentId));
     res.status(200).json({
-      message: `Comment with ID ${commentId} in Diary ID ${diaryId} by user ${username} has been successfully deleted.`,
+      message: `CommentID ${commentId}이 성공적으로 삭제되었습니다.`,
     });
   } catch (error) {
     console.error(error);

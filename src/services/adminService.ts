@@ -220,12 +220,12 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
 };
 
 /** [관리자] 회원이 작성한 댓글 삭제하기 */
-export const deleteCommentByUsernameAndDiaryId = async (username: string, diaryId: number, commentId: number) => {
+export const deleteComment = async (commentId: number) => {
   try {
-    if (!username || !diaryId || !commentId) {
-      throw new AppError(CommonError.INVALID_INPUT, '올바른 사용자 정보가 제공되지 않았습니다.', 400);
+    const deletedComment = await adminModel.deleteComment(commentId);
+    if (deletedComment===undefined) {
+      throw new AppError(CommonError.RESOURCE_NOT_FOUND, '삭제할 댓글이 없습니다.', 404);
     }
-    await adminModel.deleteCommentByUsernameAndDiaryId(username, diaryId, commentId);
   } catch (error) {
     if (error instanceof AppError) {
       console.error(error);

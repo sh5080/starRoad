@@ -11,10 +11,10 @@ router.get('/users/:planId/locations', validateToken, ensureAdmin, adminControll
 
 /** [관리자] 회원이 작성한 댓글 삭제하기 */
 router.delete(
-  '/users/:username/diaries/:diaryId/comments/:commentId',
+  '/users/comments/:commentId',
   validateToken,
   ensureAdmin,
-  adminController.deleteCommentByUsernameAndDiaryId
+  adminController.deleteComment
 );
 
 /** [관리자] 여행기의 모든 댓글 조회하기 */

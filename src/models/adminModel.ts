@@ -213,15 +213,11 @@ export const getAllCommentsByUsername = async (username: string): Promise<Commen
 };
 
 /** [관리자] 특정 회원이 작성한 댓글 삭제하기 */
-export const deleteCommentByUsernameAndDiaryId = async (
-  username: string,
-  diaryId: number,
+export const deleteComment = async (
   commentId: number
 ): Promise<void> => {
   try {
-    await db.execute('DELETE FROM comment WHERE username = ? AND diary_id = ? AND id = ?', [
-      username,
-      diaryId,
+    await db.execute('DELETE FROM comment WHERE id = ?', [
       commentId,
     ]);
   } catch (error) {
