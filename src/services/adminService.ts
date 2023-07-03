@@ -239,18 +239,10 @@ export const deleteComment = async (commentId: number) => {
 
 /** [관리자] 관광지 추가하기 */
 export const addTouristDestination = async (
-  nameEn: string,
-  nameKo: string,
-  image: string,
-  introduction: string,
-  latitude: number,
-  longitude: number
+destinationData: TouristDestinationType
 ) => {
   try {
-    if (!nameEn || !nameKo || !image || !introduction || !latitude || !longitude) {
-      throw new AppError(CommonError.INVALID_INPUT, '올바른 관광지 정보가 제공되지 않았습니다.', 400);
-    }
-    await adminModel.addTouristDestination(nameEn, nameKo, image, introduction, latitude, longitude);
+    await adminModel.addTouristDestination(destinationData);
   } catch (error) {
     if (error instanceof AppError) {
       console.error(error);

@@ -233,19 +233,20 @@ export const deleteComment = async (
 
 /** [관리자] 관광지 추가 */
 export const addTouristDestination = async (
-  nameEn: string,
-  nameKo: string,
-  image: string,
-  introduction: string,
-  latitude: number,
-  longitude: number
+destinationData: TouristDestinationType
 ): Promise<void> => {
   try {
-    let correctedImage = image.replace(/\\/g, '/');
+    let correctedImage = '';
+
+    if (destinationData.image) {
+      correctedImage = Array.isArray(destinationData.image)
+        ? destinationData.image[0]?.replace(/\\/g, '/')
+        : destinationData.image.replace(/\\/g, '/');
+    }
     correctedImage = correctedImage.replace('http:/', 'http://');
     await db.execute(
       'INSERT INTO travel_destination (name_en, name_ko, image, introduction, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
-      [nameEn, nameKo, correctedImage, introduction, latitude, longitude]
+      [destinationData.nameEn, destinationData.nameKo, correctedImage, destinationData.introduction, destinationData.latitude, destinationData.longitude]
     );
   } catch (error) {
     if (error instanceof AppError) {

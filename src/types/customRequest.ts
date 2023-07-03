@@ -14,8 +14,8 @@ export interface CustomRequest extends Request {
     commentId?: string;
   };
   body: {
-    latitude?: number;
-    longitude?: number;
+    latitude: number;
+    longitude: number;
     id?: number;
     username: string;
     password: string;
@@ -37,10 +37,11 @@ export interface CustomRequest extends Request {
     locations?: TravelLocation[];
     createdAt?: Date;
     updatedAt?: Date;
-    nameKo?: string;
-    nameEn?: string;
-    image?: string;
-    introduction?: string;
+    nameKo: string;
+    nameEn: string;
+    image: string;
+    imgName: string;
+    introduction: string;
     role?: string;
     planId?: number;
     locationId?: number;
