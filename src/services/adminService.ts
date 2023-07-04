@@ -9,11 +9,7 @@ import { TouristDestinationType } from '../types/destination';
 interface TouristDestination {
   [key: string]: any;
 }
-interface DeletedData {
-  touristDestination: TouristDestination;
-  message: string;
-  [key: string]: any;
-}
+
 
 /** [관리자] 모든 회원 정보 불러오기 */
 export const getAllUsers = async (): Promise<UserType[]> => {
@@ -278,13 +274,13 @@ export const updateTouristDestination = async (id: string, updatedData: Partial<
 };
 
 /** [관리자] 관광지 삭제하기 */
-export const deleteTouristDestination = async (id: string): Promise<DeletedData> => {
+export const deleteTouristDestination = async (id: string): Promise<TouristDestination> => {
   try {
     const touristDestination = await adminModel.deleteTouristDestination(id);
     if (!touristDestination) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '이미 삭제되었거나 없는 관광지입니다.', 404);
     }
-    return { message: '관광지 삭제에 성공하였습니다.', touristDestination };
+    return touristDestination;
   } catch (error) {
     if (error instanceof AppError) {
       console.error(error);
