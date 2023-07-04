@@ -734,7 +734,7 @@ export declare function updateTouristDestination(req: CustomRequest, res: Respon
  * [관리자] 관광지 삭제하기
  *
  * @param {CustomRequest} req.params.id 관광지 ID
- * @param {Response} res 삭제된 관광지 정보를 JSON 형식으로 응답
+ * @param {Response} res 삭제된 관광지 정보를 JSON 형식으로 응답(관광지 추가 참고)
  * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
  */
 export declare function deleteTouristDestination(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
