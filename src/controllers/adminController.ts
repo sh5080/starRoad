@@ -405,19 +405,18 @@ export const deleteTouristDestination: typeof docs.deleteTouristDestination = as
   try {
     const { id } = req.params;
     const deletedData = await adminService.deleteTouristDestination(String(id));
-
     if (!id) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '관광지를 찾을 수 없습니다.', 400);
     }
-    if (deletedData.length === undefined) {
+    if (Object.keys(deletedData).length === 0) {
       throw new AppError(CommonError.RESOURCE_NOT_FOUND, '관광지를 찾을 수 없습니다.', 400);
     }
-    if (deletedData) {
-      const imgName = deletedData.touristDestination.image.split('/compressed')[1];
+    if (deletedData.image) {
+      const imgName = deletedData.image.split('/compressed')[1];
 
-      const filePath = path.join(__dirname, '../public/compressed', imgName);
-
-      await fs.unlink(filePath);
+      const filePath = path.join(__dirname, '../../public/compressed', imgName);
+      const decodedPathname = decodeURIComponent(filePath)
+      await fs.unlink(decodedPathname);
     }
 
     res.status(200).json({ deletedData });
