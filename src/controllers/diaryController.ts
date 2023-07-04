@@ -56,11 +56,31 @@ export const createDiary:typeof docs.createDiary = async (req: CustomRequest, re
       await Promise.all(promises);
     }
     const plan = await diaryService.getPlanByIdAndUsername(Number(planId), username);
+    
     const diaryData = await diaryService.createDiary({ username, title, content, image: imgNames }, plan!);
 
     res.status(201).json(diaryData);
   } catch (error) {
     console.error(error);
+    if (req.files) {
+      const deletePromises = (req.files as Express.Multer.File[]).map(async (file) => {
+        const decodedFilename = decodeURIComponent(path.basename(file.filename));
+        const publicPath = path.join(__dirname, '../../public', decodedFilename);
+        const compressedPath = path.join(__dirname, '../../public/compressed', decodedFilename);
+        try {
+          await fs.unlink(publicPath);
+        } catch (err) {
+          console.error(err)
+        }
+
+        try {
+          await fs.unlink(compressedPath);
+        } catch (err) {
+          console.error(err)
+        }
+      });
+      await Promise.all(deletePromises);
+}
     next(error);
   }
 };
@@ -200,6 +220,25 @@ export const updateDiary:typeof docs.updateDiary = async (req: CustomRequest, re
     res.status(200).json(diaryData);
   } catch (error) {
     console.error(error);
+    if (req.files) {
+      const deletePromises = (req.files as Express.Multer.File[]).map(async (file) => {
+        const decodedFilename = decodeURIComponent(path.basename(file.filename));
+        const publicPath = path.join(__dirname, '../../public', decodedFilename);
+        const compressedPath = path.join(__dirname, '../../public/compressed', decodedFilename);
+        try {
+          await fs.unlink(publicPath);
+        } catch (err) {
+          console.error(err)
+        }
+
+        try {
+          await fs.unlink(compressedPath);
+        } catch (err) {
+          console.error(err)
+        }
+      });
+      await Promise.all(deletePromises);
+}
     next(error);
   }
 };

@@ -243,7 +243,7 @@ destinationData: TouristDestinationType
         ? destinationData.image[0]?.replace(/\\/g, '/')
         : destinationData.image.replace(/\\/g, '/');
     }
-    correctedImage = correctedImage.replace('http:/', 'http://');
+    // correctedImage = correctedImage.replace('http:/', 'http://');
     await db.execute(
       'INSERT INTO travel_destination (name_en, name_ko, image, introduction, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)',
       [destinationData.nameEn, destinationData.nameKo, correctedImage, destinationData.introduction, destinationData.latitude, destinationData.longitude]
