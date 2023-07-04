@@ -710,6 +710,7 @@ export declare function deleteComment(req: CustomRequest, res: Response, next: N
         "http://domain/static/compressed/image.png"
     ]
 }
+ * @throws {AppError} 이미지 첨부하지 않았을 경우
  * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
  */
 export declare function addTouristDestination(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
@@ -717,14 +718,23 @@ export declare function addTouristDestination(req: CustomRequest, res: Response,
 /**
  * [관리자] 관광지 수정하기
  *
- * @param {CustomRequest} req.params.locationId 관광지 ID
+ * @param {CustomRequest} req.params.id 관광지 ID
  * @param {CustomRequest} req.body.nameEn 영문 관광지 이름
  * @param {CustomRequest} req.body.nameKo 한글 관광지 이름
- * @param {CustomRequest} req.body.image 관광지 이미지
  * @param {CustomRequest} req.body.introduction 관광지 소개
- * @param {Response} res 수정된 관광지 정보를 JSON 형식으로 응답
+ * @param {CustomRequest} req.body.latitude 관광지 위도
+ * @param {CustomRequest} req.body.longitude 관광지 경도
+ * @param {Response} res 수정된 관광지 정보를 JSON 형식으로 응답(관광지 추가 참고)
+ * @throws {AppError} 관광지 id가 없는 경우
  * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
  */
 export declare function updateTouristDestination(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
 
-export declare function googleCallback(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+/**
+ * [관리자] 관광지 삭제하기
+ *
+ * @param {CustomRequest} req.params.id 관광지 ID
+ * @param {Response} res 삭제된 관광지 정보를 JSON 형식으로 응답
+ * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
+ */
+export declare function deleteTouristDestination(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
