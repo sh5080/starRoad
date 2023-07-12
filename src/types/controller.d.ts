@@ -14,7 +14,21 @@ export declare function signup(req: Request, res: Response, next: NextFunction):
 /**
  * 로그인
  * @param req.body username: 사용자 ID, password: 패스워드
- * @param res userData: 로그인이 성공한 경우 토큰을 쿠키에 담아 JSON 형식으로 응답
+ * @param res 로그인이 성공한 경우 로그인 성공 메세지와 userData를 JSON 형식으로 응답
+ * @example
+{
+    "message": "로그인 성공",
+    "user": {
+        "username": "admin",
+        "name": "admin1",
+        "email": "admin@test.com",
+        "createdAt": "2023-06-04T13:28:52.000Z",
+        "updatedAt": "2023-06-18T04:20:45.000Z",
+        "role": "ADMIN",
+        "activated": 1,
+        "oauthProvider": ""
+    }
+}
  * @throws {AppError} 탈퇴한 회원에 대한 접근 또는 인증 오류가 발생한 경우
  * @param next 다음 미들웨어 함수 (errorHandler)
  */
@@ -324,7 +338,11 @@ export declare function getOneDiaryByDiaryId(req: CustomRequest, res: Response, 
  * {@link https://github.com/expressjs/multer/blob/master/doc/README-ko.md} multer github
  * @param {NextFunction} next 다음 미들웨어 함수 (에러 핸들러)
  */
-export declare function checkAuthorizationForUpdate(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+export declare function checkAuthorizationForUpdate(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void>;
 
 /**
  * 여행기 수정
@@ -631,7 +649,11 @@ export declare function getAllDiariesByUsername(req: CustomRequest, res: Respons
  * @param {Response} res 삭제된 diaryId를 JSON 형식으로 응답
  * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
  */
-export declare function deleteDiaryByUsernameAndDiaryId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+export declare function deleteDiaryByUsernameAndDiaryId(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void>;
 
 //comment 관련
 /**
@@ -656,7 +678,11 @@ export declare function deleteDiaryByUsernameAndDiaryId(req: CustomRequest, res:
 }
  * @param {NextFunction} next 다음 미들웨어 함수(에러 핸들러)
  */
-export declare function getAllCommentsByUsernameAndDiaryId(req: CustomRequest, res: Response, next: NextFunction): Promise<void>;
+export declare function getAllCommentsByUsernameAndDiaryId(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void>;
 
 /**
  * [관리자] 특정 회원이 작성한 모든 댓글 조회하기
