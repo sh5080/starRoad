@@ -109,14 +109,14 @@ export const updateUser = async (username: string, updateData: Partial<User.User
       throw new AppError(CommonError.UNEXPECTED_ERROR, '사용자 정보를 찾을 수 없습니다.', 404);
     }
 
-    if (updateData.email && updateData.email === existingUser.email) {
-      throw new AppError(CommonError.INVALID_INPUT, '새로운 이메일을 입력해주세요.', 400);
+    if (!updateData.email && !updateData.password) {
+      throw new AppError(CommonError.INVALID_INPUT, '새로운 이메일 또는 비밀번호를 입력해주세요.', 400);
     }
 
-    if (updateData.password) {
+    if (updateData.email && updateData.password) {
       const isSamePassword = await bcrypt.compare(updateData.password, existingUser.password ?? '');
-      if (isSamePassword) {
-        throw new AppError(CommonError.INVALID_INPUT, '새로운 비밀번호를 입력해주세요.', 400);
+      if (isSamePassword && updateData.email === existingUser.email) {
+        throw new AppError(CommonError.INVALID_INPUT, '새로운 이메일 또는 비밀번호를 입력해주세요.', 400);
       }
 
       const salt = await bcrypt.genSalt();
